@@ -4,9 +4,9 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const supabase = createClient(
     config.public.supabaseUrl,
-    config.public.supabaseAnonKey
+    config.public.supabaseAnonKey,
   )
-  
+
   const slug = getRouterParam(event, 'id')
 
   if (!slug) {
@@ -59,7 +59,8 @@ export default defineEventHandler(async (event) => {
     }
 
     return tree
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error fetching tree:', error)
     if (error instanceof Error && 'statusCode' in error) {
       throw error

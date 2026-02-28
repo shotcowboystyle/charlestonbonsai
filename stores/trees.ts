@@ -1,5 +1,5 @@
+import type { FilterState, Tree } from '~/types'
 import { defineStore } from 'pinia'
-import type { Tree, FilterState, TreesResponse } from '~/types'
 
 export const useTreesStore = defineStore('trees', () => {
   // State
@@ -45,7 +45,7 @@ export const useTreesStore = defineStore('trees', () => {
 
     // Filter by price range
     result = result.filter(
-      tree => tree.price >= filters.value.priceRange[0] && tree.price <= filters.value.priceRange[1]
+      tree => tree.price >= filters.value.priceRange[0] && tree.price <= filters.value.priceRange[1],
     )
 
     // Filter by search
@@ -53,9 +53,9 @@ export const useTreesStore = defineStore('trees', () => {
       const searchLower = filters.value.search.toLowerCase()
       result = result.filter(
         tree =>
-          tree.name.toLowerCase().includes(searchLower) ||
-          tree.species.toLowerCase().includes(searchLower) ||
-          tree.description.toLowerCase().includes(searchLower)
+          tree.name.toLowerCase().includes(searchLower)
+          || tree.species.toLowerCase().includes(searchLower)
+          || tree.description.toLowerCase().includes(searchLower),
       )
     }
 
@@ -88,13 +88,13 @@ export const useTreesStore = defineStore('trees', () => {
 
   const hasActiveFilters = computed(() => {
     return (
-      filters.value.sizes.length > 0 ||
-      filters.value.careLevels.length > 0 ||
-      filters.value.treeTypes.length > 0 ||
-      filters.value.priceRange[0] > 0 ||
-      filters.value.priceRange[1] < 10000 ||
-      filters.value.search !== '' ||
-      filters.value.inStockOnly
+      filters.value.sizes.length > 0
+      || filters.value.careLevels.length > 0
+      || filters.value.treeTypes.length > 0
+      || filters.value.priceRange[0] > 0
+      || filters.value.priceRange[1] < 10000
+      || filters.value.search !== ''
+      || filters.value.inStockOnly
     )
   })
 
@@ -104,9 +104,8 @@ export const useTreesStore = defineStore('trees', () => {
     error.value = null
 
     try {
-      const config = useRuntimeConfig()
       const supabase = useSupabaseClient()
-      
+
       const from = (page - 1) * pageSize.value
       const to = from + pageSize.value - 1
 
@@ -115,16 +114,19 @@ export const useTreesStore = defineStore('trees', () => {
         .select('*', { count: 'exact' })
         .range(from, to)
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       trees.value = data as Tree[]
       total.value = count || 0
       currentPage.value = page
       hasMore.value = to < (count || 0)
-    } catch (e) {
+    }
+    catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch trees'
       console.error('Error fetching trees:', e)
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -132,7 +134,7 @@ export const useTreesStore = defineStore('trees', () => {
   async function fetchFeaturedTrees() {
     try {
       const supabase = useSupabaseClient()
-      
+
       const { data, error: supabaseError } = await supabase
         .from('trees')
         .select('*')
@@ -140,10 +142,12 @@ export const useTreesStore = defineStore('trees', () => {
         .eq('inStock', true)
         .limit(5)
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       featuredTrees.value = data as Tree[]
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Error fetching featured trees:', e)
     }
   }
@@ -154,22 +158,25 @@ export const useTreesStore = defineStore('trees', () => {
 
     try {
       const supabase = useSupabaseClient()
-      
+
       const { data, error: supabaseError } = await supabase
         .from('trees')
         .select('*')
         .eq('slug', slug)
         .single()
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       currentTree.value = data as Tree
       return currentTree.value
-    } catch (e) {
+    }
+    catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch tree'
       console.error('Error fetching tree:', e)
       return null
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -180,22 +187,25 @@ export const useTreesStore = defineStore('trees', () => {
 
     try {
       const supabase = useSupabaseClient()
-      
+
       const { data, error: supabaseError } = await supabase
         .from('trees')
         .select('*')
         .eq('id', id)
         .single()
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       currentTree.value = data as Tree
       return currentTree.value
-    } catch (e) {
+    }
+    catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch tree'
       console.error('Error fetching tree:', e)
       return null
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -232,11 +242,11 @@ export const useTreesStore = defineStore('trees', () => {
     pageSize,
     hasMore,
     filters,
-    
+
     // Getters
     filteredTrees,
     hasActiveFilters,
-    
+
     // Actions
     fetchTrees,
     fetchFeaturedTrees,

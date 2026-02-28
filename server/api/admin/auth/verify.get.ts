@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  
+
   // Get token from Authorization header
   const authHeader = getHeader(event, 'authorization')
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw createError({
       statusCode: 401,
@@ -16,8 +16,8 @@ export default defineEventHandler(async (event) => {
   const token = authHeader.substring(7)
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as { id: string; email: string }
-    
+    const decoded = jwt.verify(token, config.jwtSecret) as { id: string, email: string }
+
     return {
       success: true,
       user: {
@@ -25,7 +25,8 @@ export default defineEventHandler(async (event) => {
         email: decoded.email,
       },
     }
-  } catch (error) {
+  }
+  catch {
     throw createError({
       statusCode: 401,
       statusMessage: 'Invalid or expired token',

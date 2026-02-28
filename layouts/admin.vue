@@ -1,3 +1,40 @@
+<script setup lang="ts">
+const authStore = useAuthStore()
+const router = useRouter()
+
+// Compute page title from route
+const route = useRoute()
+const pageTitle = computed(() => {
+  const titles: Record<string, string> = {
+    '/admin': 'Dashboard',
+    '/admin/listings': 'Manage Listings',
+    '/admin/listings/create': 'Add New Tree',
+  }
+
+  // Check for edit page
+  if (route.path.startsWith('/admin/listings/') && route.path !== '/admin/listings/') {
+    return 'Edit Tree'
+  }
+
+  return titles[route.path] || 'Admin'
+})
+
+async function handleLogout() {
+  await authStore.logout()
+  router.push('/admin/login')
+}
+
+// Check auth on mount
+onMounted(async () => {
+  if (!authStore.isAuthenticated) {
+    const isAuthed = await authStore.checkAuth()
+    if (!isAuthed) {
+      router.push('/admin/login')
+    }
+  }
+})
+</script>
+
 <template>
   <div class="min-h-screen bg-cream-100 flex">
     <!-- Sidebar -->
@@ -10,8 +47,12 @@
               <span class="text-white text-xl">🌲</span>
             </div>
             <div>
-              <div class="font-serif font-semibold text-charcoal">Charleston</div>
-              <div class="text-xs text-stone-500">Admin Panel</div>
+              <div class="font-serif font-semibold text-charcoal">
+                Charleston
+              </div>
+              <div class="text-xs text-stone-500">
+                Admin Panel
+              </div>
             </div>
           </NuxtLink>
         </div>
@@ -68,9 +109,9 @@
               <span class="text-sm text-charcoal">{{ authStore.user?.email }}</span>
             </div>
             <button
-              @click="handleLogout"
               class="text-stone-400 hover:text-charcoal transition-colors"
               title="Logout"
+              @click="handleLogout"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -85,7 +126,9 @@
     <div class="flex-1 flex flex-col">
       <!-- Top bar -->
       <header class="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6">
-        <h1 class="font-serif text-xl text-charcoal">{{ pageTitle }}</h1>
+        <h1 class="font-serif text-xl text-charcoal">
+          {{ pageTitle }}
+        </h1>
         <div class="flex items-center gap-4">
           <NuxtLink
             to="/"
@@ -107,40 +150,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const authStore = useAuthStore()
-const router = useRouter()
-
-// Compute page title from route
-const route = useRoute()
-const pageTitle = computed(() => {
-  const titles: Record<string, string> = {
-    '/admin': 'Dashboard',
-    '/admin/listings': 'Manage Listings',
-    '/admin/listings/create': 'Add New Tree',
-  }
-  
-  // Check for edit page
-  if (route.path.startsWith('/admin/listings/') && route.path !== '/admin/listings/') {
-    return 'Edit Tree'
-  }
-  
-  return titles[route.path] || 'Admin'
-})
-
-async function handleLogout() {
-  await authStore.logout()
-  router.push('/admin/login')
-}
-
-// Check auth on mount
-onMounted(async () => {
-  if (!authStore.isAuthenticated) {
-    const isAuthed = await authStore.checkAuth()
-    if (!isAuthed) {
-      router.push('/admin/login')
-    }
-  }
-})
-</script>

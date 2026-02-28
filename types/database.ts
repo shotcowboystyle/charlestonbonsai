@@ -1,13 +1,13 @@
 // Database types - auto-generated from Supabase schema
 // Run `npx supabase gen types typescript --project-id your-project-id > types/database.ts` to generate
 
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json
+  = | string
+    | number
+    | boolean
+    | null
+    | { [key: string]: Json | undefined }
+    | Json[]
 
 export interface Database {
   public: {
@@ -104,8 +104,8 @@ export interface Database {
         }
       }
     }
-    Views: {}
-    Functions: {}
-    Enums: {}
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
   }
 }

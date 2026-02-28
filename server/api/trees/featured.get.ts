@@ -1,10 +1,10 @@
 import type { Tree } from '~/types'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
   const supabase = createClient(
     config.public.supabaseUrl,
-    config.public.supabaseAnonKey
+    config.public.supabaseAnonKey,
   )
 
   try {
@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
       .eq('in_stock', true)
       .limit(5)
 
-    if (error) throw error
+    if (error)
+      throw error
 
     // Transform snake_case to camelCase
     const trees: Tree[] = (data || []).map(item => ({
@@ -43,7 +44,8 @@ export default defineEventHandler(async (event) => {
     }))
 
     return trees
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error fetching featured trees:', error)
     return []
   }

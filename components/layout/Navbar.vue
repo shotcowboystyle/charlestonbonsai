@@ -1,3 +1,35 @@
+<script setup lang="ts">
+const scrolled = ref(false)
+const mobileMenuOpen = ref(false)
+
+const navLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/gallery', label: 'Gallery' },
+  { to: '/#about', label: 'About' },
+  { to: '/#contact', label: 'Contact' },
+]
+
+// Handle scroll
+onMounted(() => {
+  const handleScroll = () => {
+    scrolled.value = window.scrollY > 50
+  }
+
+  window.addEventListener('scroll', handleScroll)
+  handleScroll() // Check initial state
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+  })
+})
+
+// Close mobile menu on route change
+const route = useRoute()
+watch(() => route.path, () => {
+  mobileMenuOpen.value = false
+})
+</script>
+
 <template>
   <header
     ref="navbar"
@@ -8,20 +40,20 @@
       <div class="flex items-center justify-between h-20">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-3 group">
-          <div 
+          <div
             class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300"
             :class="scrolled ? 'bg-forest' : 'bg-white/20 backdrop-blur-sm'"
           >
             <span class="text-2xl">🌲</span>
           </div>
           <div>
-            <div 
+            <div
               class="font-serif font-semibold transition-colors duration-300"
               :class="scrolled ? 'text-charcoal' : 'text-white'"
             >
               Charleston Bonsai
             </div>
-            <div 
+            <div
               class="text-xs transition-colors duration-300"
               :class="scrolled ? 'text-stone-500' : 'text-white/70'"
             >
@@ -56,9 +88,9 @@
 
         <!-- Mobile Menu Button -->
         <button
-          @click="mobileMenuOpen = !mobileMenuOpen"
           class="md:hidden p-2 rounded-lg transition-colors"
           :class="scrolled ? 'text-charcoal hover:bg-cream' : 'text-white hover:bg-white/10'"
+          @click="mobileMenuOpen = !mobileMenuOpen"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -115,35 +147,3 @@
     </nav>
   </header>
 </template>
-
-<script setup lang="ts">
-const scrolled = ref(false)
-const mobileMenuOpen = ref(false)
-
-const navLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/gallery', label: 'Gallery' },
-  { to: '/#about', label: 'About' },
-  { to: '/#contact', label: 'Contact' },
-]
-
-// Handle scroll
-onMounted(() => {
-  const handleScroll = () => {
-    scrolled.value = window.scrollY > 50
-  }
-  
-  window.addEventListener('scroll', handleScroll)
-  handleScroll() // Check initial state
-  
-  onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
-  })
-})
-
-// Close mobile menu on route change
-const route = useRoute()
-watch(() => route.path, () => {
-  mobileMenuOpen.value = false
-})
-</script>

@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-08-05',
   devtools: { enabled: true },
-  
+
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
@@ -16,13 +16,13 @@ export default defineNuxtConfig({
     adminEmail: process.env.ADMIN_EMAIL || 'curt.blanton@gmail.com',
     adminPasswordHash: process.env.ADMIN_PASSWORD_HASH || '',
     jwtSecret: process.env.JWT_SECRET || 'change-me-in-production',
-    
+
     // Public (exposed to client)
     public: {
       supabaseUrl: process.env.SUPABASE_URL || 'https://xhderhlscsreyylyucvb.supabase.co',
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY || 'sb_publishable_ERYNxpVpCDlF17CT_VwCgg_ogPIzCg7',
       siteUrl: process.env.SITE_URL || 'http://localhost:3000',
-    }
+    },
   },
 
   app: {

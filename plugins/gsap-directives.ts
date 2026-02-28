@@ -11,7 +11,7 @@ declare module '#app' {
 export const vGsapFadeUp: Directive = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
     const { $gsap } = useNuxtApp()
-    
+
     $gsap.from(el, {
       y: binding.value?.y || 30,
       opacity: 0,
@@ -25,8 +25,8 @@ export const vGsapFadeUp: Directive = {
 // GSAP Scroll Trigger directive
 export const vGsapScroll: Directive = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
-    const { $gsap, $ScrollTrigger } = useNuxtApp()
-    
+    const { $gsap, $ScrollTrigger: _scrollTrigger } = useNuxtApp()
+
     $gsap.from(el, {
       scrollTrigger: {
         trigger: el,
@@ -46,11 +46,12 @@ export const vGsapScroll: Directive = {
 // GSAP Stagger directive (for groups of elements)
 export const vGsapStagger: Directive = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
-    const { $gsap, $ScrollTrigger } = useNuxtApp()
-    
+    const { $gsap, $ScrollTrigger: _scrollTrigger } = useNuxtApp()
+
     const children = el.children
-    if (!children.length) return
-    
+    if (!children.length)
+      return
+
     $gsap.from(children, {
       scrollTrigger: {
         trigger: el,
@@ -70,7 +71,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Register GSAP plugins
   const gsap = nuxtApp.$gsap
   const ScrollTrigger = nuxtApp.$ScrollTrigger
-  
+
   if (gsap && ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger)
   }

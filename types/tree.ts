@@ -1,14 +1,14 @@
 // Tree type categories
-export type TreeType = 
-  | 'ficus'
-  | 'juniper'
-  | 'maple'
-  | 'pine'
-  | 'elm'
-  | 'cedar'
-  | 'azalea'
-  | 'bamboo'
-  | 'other'
+export type TreeType
+  = | 'ficus'
+    | 'juniper'
+    | 'maple'
+    | 'pine'
+    | 'elm'
+    | 'cedar'
+    | 'azalea'
+    | 'bamboo'
+    | 'other'
 
 // Care level difficulty
 export type CareLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert'
@@ -132,14 +132,14 @@ export const CARE_LEVEL_LABELS: Record<CareLevel, string> = {
 }
 
 export const TREE_SIZE_LABELS: Record<TreeSize, string> = {
-  mini: 'Mini (< 6")',
-  small: 'Small (6-10")',
-  medium: 'Medium (10-16")',
-  large: 'Large (16-24")',
+  'mini': 'Mini (< 6")',
+  'small': 'Small (6-10")',
+  'medium': 'Medium (10-16")',
+  'large': 'Large (16-24")',
   'extra-large': 'Extra Large (24"+)',
 }
 
-export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+export const SORT_OPTIONS: { value: SortOption, label: string }[] = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
   { value: 'price-asc', label: 'Price: Low to High' },

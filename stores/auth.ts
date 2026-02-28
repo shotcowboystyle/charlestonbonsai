@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const user = ref<{ id: string; email: string } | null>(null)
+  const user = ref<{ id: string, email: string } | null>(null)
   const isAuthenticated = ref(false)
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -23,8 +23,8 @@ export const useAuthStore = defineStore('auth', () => {
         throw new Error(loginError.value?.statusMessage || 'Login failed')
       }
 
-      const result = data.value as { success: boolean; user: { id: string; email: string }; token: string }
-      
+      const result = data.value as { success: boolean, user: { id: string, email: string }, token: string }
+
       user.value = result.user
       token.value = result.token
       isAuthenticated.value = true
@@ -38,10 +38,12 @@ export const useAuthStore = defineStore('auth', () => {
       tokenCookie.value = result.token
 
       return true
-    } catch (e) {
+    }
+    catch (e) {
       error.value = e instanceof Error ? e.message : 'Login failed'
       return false
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -54,13 +56,15 @@ export const useAuthStore = defineStore('auth', () => {
           Authorization: `Bearer ${token.value}`,
         },
       })
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Logout error:', e)
-    } finally {
+    }
+    finally {
       user.value = null
       token.value = null
       isAuthenticated.value = false
-      
+
       const tokenCookie = useCookie('admin_token')
       tokenCookie.value = null
     }
@@ -68,7 +72,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function checkAuth() {
     const tokenCookie = useCookie('admin_token')
-    
+
     if (!tokenCookie.value) {
       isAuthenticated.value = false
       return false
@@ -88,8 +92,8 @@ export const useAuthStore = defineStore('auth', () => {
         return false
       }
 
-      const result = data.value as { success: boolean; user: { id: string; email: string } }
-      
+      const result = data.value as { success: boolean, user: { id: string, email: string } }
+
       if (result.success) {
         user.value = result.user
         isAuthenticated.value = true
@@ -97,7 +101,8 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       return false
-    } catch (e) {
+    }
+    catch {
       isAuthenticated.value = false
       return false
     }
@@ -114,7 +119,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     token,
-    
+
     // Actions
     login,
     logout,

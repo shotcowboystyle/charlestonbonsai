@@ -83,10 +83,10 @@ export default <Config>{
         '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
       },
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '112': '28rem',
-        '128': '32rem',
+        18: '4.5rem',
+        88: '22rem',
+        112: '28rem',
+        128: '32rem',
       },
       borderRadius: {
         '4xl': '2rem',
@@ -123,7 +123,7 @@ export default <Config>{
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-pattern': "url('/images/hero/pattern.svg')",
+        'hero-pattern': 'url(\'/images/hero/pattern.svg\')',
       },
     },
   },

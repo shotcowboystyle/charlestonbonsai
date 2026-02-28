@@ -1,6 +1,6 @@
-import type { FilterState, TreeSize, CareLevel, TreeType, SortOption } from '~/types'
+import type { CareLevel, FilterState, SortOption, TreeSize, TreeType } from '~/types'
 
-export const useFilters = () => {
+export function useFilters() {
   const route = useRoute()
   const router = useRouter()
 
@@ -17,7 +17,7 @@ export const useFilters = () => {
   // Initialize from URL query params
   const initFromQuery = () => {
     const query = route.query
-    
+
     if (query.sizes) {
       filters.value.sizes = (query.sizes as string).split(',') as TreeSize[]
     }
@@ -68,7 +68,8 @@ export const useFilters = () => {
     const index = filters.value.sizes.indexOf(size)
     if (index === -1) {
       filters.value.sizes.push(size)
-    } else {
+    }
+    else {
       filters.value.sizes.splice(index, 1)
     }
     updateQuery()
@@ -78,7 +79,8 @@ export const useFilters = () => {
     const index = filters.value.careLevels.indexOf(level)
     if (index === -1) {
       filters.value.careLevels.push(level)
-    } else {
+    }
+    else {
       filters.value.careLevels.splice(index, 1)
     }
     updateQuery()
@@ -88,7 +90,8 @@ export const useFilters = () => {
     const index = filters.value.treeTypes.indexOf(type)
     if (index === -1) {
       filters.value.treeTypes.push(type)
-    } else {
+    }
+    else {
       filters.value.treeTypes.splice(index, 1)
     }
     updateQuery()
@@ -124,11 +127,11 @@ export const useFilters = () => {
 
   const hasActiveFilters = computed(() => {
     return (
-      filters.value.sizes.length > 0 ||
-      filters.value.careLevels.length > 0 ||
-      filters.value.treeTypes.length > 0 ||
-      filters.value.search !== '' ||
-      filters.value.inStockOnly
+      filters.value.sizes.length > 0
+      || filters.value.careLevels.length > 0
+      || filters.value.treeTypes.length > 0
+      || filters.value.search !== ''
+      || filters.value.inStockOnly
     )
   })
 
@@ -149,7 +152,7 @@ export const useFilters = () => {
 // Simple debounce utility
 function debounce<T extends (...args: any[]) => any>(
   fn: T,
-  delay: number
+  delay: number,
 ): (...args: Parameters<T>) => void {
   let timeoutId: ReturnType<typeof setTimeout>
   return (...args: Parameters<T>) => {

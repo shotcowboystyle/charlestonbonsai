@@ -1,9 +1,3 @@
-<template>
-  <div :class="cardClasses">
-    <slot />
-  </div>
-</template>
-
 <script setup lang="ts">
 interface Props {
   hover?: boolean
@@ -17,9 +11,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cardClasses = computed(() => {
   const base = 'bg-white rounded-2xl shadow-soft overflow-hidden transition-all duration-300'
-  
+
   const hoverClass = props.hover ? 'hover:shadow-soft-lg hover:-translate-y-1' : ''
-  
+
   const paddingClasses = {
     none: '',
     sm: 'p-4',
@@ -30,3 +24,9 @@ const cardClasses = computed(() => {
   return [base, hoverClass, paddingClasses[props.padding]]
 })
 </script>
+
+<template>
+  <div :class="cardClasses">
+    <slot />
+  </div>
+</template>

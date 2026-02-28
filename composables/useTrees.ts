@@ -1,6 +1,6 @@
-import type { Tree, TreesResponse, FilterState } from '~/types'
+import type { FilterState, Tree } from '~/types'
 
-export const useTrees = () => {
+export function useTrees() {
   const supabase = useSupabaseClient()
   const trees = ref<Tree[]>([])
   const loading = ref(false)
@@ -29,19 +29,19 @@ export const useTrees = () => {
       // Apply filters
       if (options?.filters) {
         const { sizes, careLevels, treeTypes, inStockOnly } = options.filters
-        
+
         if (sizes && sizes.length > 0) {
           query = query.in('size', sizes)
         }
-        
+
         if (careLevels && careLevels.length > 0) {
           query = query.in('careLevel', careLevels)
         }
-        
+
         if (treeTypes && treeTypes.length > 0) {
           query = query.in('treeType', treeTypes)
         }
-        
+
         if (inStockOnly) {
           query = query.eq('inStock', true)
         }
@@ -49,7 +49,8 @@ export const useTrees = () => {
 
       const { data, error: supabaseError, count } = await query
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       trees.value = data as Tree[]
       total.value = count || 0
@@ -59,11 +60,13 @@ export const useTrees = () => {
         total: total.value,
         hasMore: to < (count || 0),
       }
-    } catch (e) {
+    }
+    catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch trees'
       console.error('Error fetching trees:', e)
       return null
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -79,14 +82,17 @@ export const useTrees = () => {
         .eq('slug', slug)
         .single()
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       return data as Tree
-    } catch (e) {
+    }
+    catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch tree'
       console.error('Error fetching tree:', e)
       return null
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }
@@ -100,10 +106,12 @@ export const useTrees = () => {
         .eq('inStock', true)
         .limit(limit)
 
-      if (supabaseError) throw supabaseError
+      if (supabaseError)
+        throw supabaseError
 
       return data as Tree[]
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Error fetching featured trees:', e)
       return []
     }

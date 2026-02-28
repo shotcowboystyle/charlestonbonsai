@@ -1,10 +1,10 @@
-export const useSeo = (options: {
+export function useSeo(options: {
   title?: string
   description?: string
   image?: string
   url?: string
   type?: 'website' | 'article' | 'product'
-}) => {
+}) {
   const config = useRuntimeConfig()
   const route = useRoute()
 
@@ -16,8 +16,8 @@ export const useSeo = (options: {
     type = 'website',
   } = options
 
-  const fullTitle = title === 'Charleston Bonsai Gallery' 
-    ? title 
+  const fullTitle = title === 'Charleston Bonsai Gallery'
+    ? title
     : `${title} | Charleston Bonsai`
 
   useHead({
@@ -41,15 +41,15 @@ export const useSeo = (options: {
   })
 }
 
-export const useProductSeo = (tree: {
+export function useProductSeo(tree: {
   name: string
   description: string
   price: number
   images: string[]
   slug: string
-}) => {
+}) {
   const config = useRuntimeConfig()
-  
+
   useSeo({
     title: tree.name,
     description: tree.description.slice(0, 160),
@@ -66,14 +66,14 @@ export const useProductSeo = (tree: {
         children: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Product',
-          name: tree.name,
-          description: tree.description,
-          image: tree.images,
-          offers: {
+          'name': tree.name,
+          'description': tree.description,
+          'image': tree.images,
+          'offers': {
             '@type': 'Offer',
-            price: tree.price,
-            priceCurrency: 'USD',
-            availability: 'https://schema.org/InStock',
+            'price': tree.price,
+            'priceCurrency': 'USD',
+            'availability': 'https://schema.org/InStock',
           },
         }),
       },

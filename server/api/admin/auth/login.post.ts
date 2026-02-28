@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
-  
+
   const { email, password } = body
 
   if (!email || !password) {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   // Create Supabase client with service key for admin operations
   const supabase = createClient(
     config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey
+    config.supabaseServiceKey || config.public.supabaseAnonKey,
   )
 
   try {
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
     // Verify password
     const isValid = await bcrypt.compare(password, user.password_hash)
-    
+
     if (!isValid) {
       throw createError({
         statusCode: 401,
@@ -47,12 +47,12 @@ export default defineEventHandler(async (event) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email 
+      {
+        id: user.id,
+        email: user.email,
       },
       config.jwtSecret,
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     )
 
     return {
@@ -63,7 +63,8 @@ export default defineEventHandler(async (event) => {
       },
       token,
     }
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof Error && 'statusCode' in error) {
       throw error
     }

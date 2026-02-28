@@ -1,9 +1,3 @@
-<template>
-  <span :class="badgeClasses">
-    <slot />
-  </span>
-</template>
-
 <script setup lang="ts">
 interface Props {
   variant?: 'forest' | 'sage' | 'bark' | 'stone' | 'success' | 'warning' | 'error'
@@ -17,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const badgeClasses = computed(() => {
   const base = 'inline-flex items-center font-medium rounded-full'
-  
+
   const variants = {
     forest: 'bg-forest-50 text-forest-500',
     sage: 'bg-sage-50 text-sage-400',
@@ -36,3 +30,9 @@ const badgeClasses = computed(() => {
   return [base, variants[props.variant], sizes[props.size]]
 })
 </script>
+
+<template>
+  <span :class="badgeClasses">
+    <slot />
+  </span>
+</template>
