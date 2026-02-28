@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run generate",
+  "outputDirectory": ".output/public",
+  "framework": "nuxt",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "regions": ["iad1"]
+}
