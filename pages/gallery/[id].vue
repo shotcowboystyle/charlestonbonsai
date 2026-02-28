@@ -59,11 +59,12 @@
             </div>
 
             <!-- 3D Viewer -->
-            <div v-if="tree.model_3d_url" class="bg-white rounded-2xl p-6 shadow-soft">
+            <div v-if="tree.model3dUrl" class="bg-white rounded-2xl p-6 shadow-soft">
               <h3 class="font-serif text-lg text-charcoal mb-4">3D View</h3>
-              <div ref="threeContainer" class="aspect-square bg-cream-100 rounded-xl overflow-hidden">
-                <!-- Three.js canvas will be mounted here -->
-              </div>
+              <GalleryTreeViewer3D
+                :model-url="tree.model3dUrl"
+                class="aspect-square"
+              />
               <p class="text-sm text-stone-500 mt-3 text-center">
                 Drag to rotate • Scroll to zoom
               </p>
@@ -233,14 +234,4 @@ watch(tree, async (newTree) => {
   }
 }, { immediate: true })
 
-// 3D viewer (placeholder - Three.js integration)
-const threeContainer = ref<HTMLElement | null>(null)
-
-onMounted(() => {
-  if (tree.value?.model_3d_url && threeContainer.value) {
-    // Three.js viewer would be initialized here
-    // For now, just show a placeholder
-    console.log('3D model URL:', tree.value.model_3d_url)
-  }
-})
 </script>

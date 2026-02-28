@@ -13,18 +13,18 @@
         <div class="max-w-3xl">
           <h1 
             ref="heroTitle"
-            class="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight"
+            class="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight opacity-0"
           >
             Cultivating Living Art in the Heart of Charleston
           </h1>
           <p 
             ref="heroSubtitle"
-            class="text-lg md:text-xl text-white/80 mb-8 max-w-2xl"
+            class="text-lg md:text-xl text-white/80 mb-8 max-w-2xl opacity-0"
           >
             Each bonsai in our collection represents years of patience, artistry, and dedication. 
             Discover your perfect companion in tranquility.
           </p>
-          <div ref="heroCta" class="flex flex-wrap gap-4">
+          <div ref="heroCta" class="flex flex-wrap gap-4 opacity-0">
             <NuxtLink to="/gallery" class="btn bg-white text-forest hover:bg-cream">
               Explore Collection
             </NuxtLink>
@@ -36,10 +36,12 @@
       </div>
 
       <!-- Scroll indicator -->
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+      <div ref="scrollIndicator" class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0">
+        <div class="animate-bounce">
+          <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
       </div>
     </section>
 
@@ -47,8 +49,8 @@
     <section class="section-padding bg-cream">
       <div class="container-custom">
         <div class="text-center mb-12">
-          <h2 ref="featuredTitle" class="section-heading">Featured Trees</h2>
-          <p ref="featuredSubtitle" class="section-subheading mx-auto">
+          <h2 ref="featuredTitle" class="section-heading opacity-0">Featured Trees</h2>
+          <p ref="featuredSubtitle" class="section-subheading mx-auto opacity-0">
             Hand-selected specimens showcasing the finest in bonsai artistry
           </p>
         </div>
@@ -59,9 +61,11 @@
 
         <div v-else-if="featuredTrees?.length" ref="featuredGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <HomeFeaturedTreeCard
-            v-for="tree in featuredTrees"
+            v-for="(tree, index) in featuredTrees"
             :key="tree.id"
             :tree="tree"
+            class="opacity-0"
+            :style="{ '--stagger-index': index }"
           />
         </div>
 
@@ -69,7 +73,7 @@
           <p>No featured trees available at the moment.</p>
         </div>
 
-        <div class="text-center mt-12">
+        <div ref="featuredCta" class="text-center mt-12 opacity-0">
           <NuxtLink to="/gallery" class="btn btn-outline">
             View Full Collection
           </NuxtLink>
@@ -81,7 +85,7 @@
     <section id="about" class="section-padding bg-white">
       <div class="container-custom">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div ref="aboutImage" class="relative">
+          <div ref="aboutImage" class="relative opacity-0">
             <div class="aspect-[4/3] bg-gradient-to-br from-sage-100 to-cream rounded-2xl overflow-hidden">
               <img
                 src="/images/hero/pattern.svg"
@@ -92,7 +96,7 @@
             <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-forest rounded-2xl -z-10" />
           </div>
 
-          <div ref="aboutContent">
+          <div ref="aboutContent" class="opacity-0">
             <span class="text-sage font-medium tracking-wide uppercase text-sm">Our Story</span>
             <h2 class="section-heading mt-2">Where Art Meets Nature</h2>
             <div class="space-y-4 text-stone-600">
@@ -113,16 +117,16 @@
                 living sculptures.
               </p>
             </div>
-            <div class="mt-8 flex gap-8">
-              <div>
+            <div ref="stats" class="mt-8 flex gap-8">
+              <div class="opacity-0">
                 <div class="text-3xl font-serif text-forest">15+</div>
                 <div class="text-sm text-stone-500">Years Experience</div>
               </div>
-              <div>
+              <div class="opacity-0">
                 <div class="text-3xl font-serif text-forest">200+</div>
                 <div class="text-sm text-stone-500">Trees Cultivated</div>
               </div>
-              <div>
+              <div class="opacity-0">
                 <div class="text-3xl font-serif text-forest">50+</div>
                 <div class="text-sm text-stone-500">Species</div>
               </div>
@@ -136,51 +140,19 @@
     <section class="section-padding bg-cream">
       <div class="container-custom">
         <div class="text-center mb-12">
-          <h2 class="section-heading">Find Your Level</h2>
-          <p class="section-subheading mx-auto">
+          <h2 ref="careTitle" class="section-heading opacity-0">Find Your Level</h2>
+          <p ref="careSubtitle" class="section-subheading mx-auto opacity-0">
             From beginner-friendly to expert challenges, we have trees for every skill level
           </p>
         </div>
 
-        <div ref="careLevels" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="card p-6 text-center">
+        <div ref="careGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div v-for="(level, index) in careLevels" :key="level.name" class="card p-6 text-center opacity-0">
             <div class="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span class="text-3xl">🌱</span>
+              <span class="text-3xl">{{ level.icon }}</span>
             </div>
-            <h3 class="font-serif text-xl text-charcoal mb-2">Beginner</h3>
-            <p class="text-stone-500 text-sm">
-              Forgiving species that tolerate occasional neglect. Perfect for learning the basics.
-            </p>
-          </div>
-
-          <div class="card p-6 text-center">
-            <div class="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span class="text-3xl">🌿</span>
-            </div>
-            <h3 class="font-serif text-xl text-charcoal mb-2">Intermediate</h3>
-            <p class="text-stone-500 text-sm">
-              Requires consistent care and attention. Great for developing your skills.
-            </p>
-          </div>
-
-          <div class="card p-6 text-center">
-            <div class="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span class="text-3xl">🌳</span>
-            </div>
-            <h3 class="font-serif text-xl text-charcoal mb-2">Advanced</h3>
-            <p class="text-stone-500 text-sm">
-              Demands precision and experience. Rewarding for dedicated enthusiasts.
-            </p>
-          </div>
-
-          <div class="card p-6 text-center">
-            <div class="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span class="text-3xl">🌲</span>
-            </div>
-            <h3 class="font-serif text-xl text-charcoal mb-2">Expert</h3>
-            <p class="text-stone-500 text-sm">
-              Master-level specimens requiring specialized knowledge and care.
-            </p>
+            <h3 class="font-serif text-xl text-charcoal mb-2">{{ level.name }}</h3>
+            <p class="text-stone-500 text-sm">{{ level.description }}</p>
           </div>
         </div>
       </div>
@@ -190,7 +162,7 @@
     <section id="contact" class="section-padding bg-forest text-white">
       <div class="container-custom">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          <div>
+          <div ref="contactContent" class="opacity-0">
             <span class="text-sage-200 font-medium tracking-wide uppercase text-sm">Visit Us</span>
             <h2 class="font-serif text-3xl md:text-4xl mt-2 mb-6">Our Nursery</h2>
             <p class="text-white/70 mb-8">
@@ -241,8 +213,8 @@
           </div>
 
           <!-- Map placeholder -->
-          <div class="bg-white/10 rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-auto">
-            <div class="w-full h-full flex items-center justify-center text-white/40">
+          <div ref="contactMap" class="bg-white/10 rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-auto opacity-0">
+            <div class="w-full h-full min-h-[300px] flex items-center justify-center text-white/40">
               <div class="text-center">
                 <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -269,6 +241,30 @@ useHead({
   ],
 })
 
+// Care levels data
+const careLevels = [
+  {
+    name: 'Beginner',
+    icon: '🌱',
+    description: 'Forgiving species that tolerate occasional neglect. Perfect for learning the basics.',
+  },
+  {
+    name: 'Intermediate',
+    icon: '🌿',
+    description: 'Requires consistent care and attention. Great for developing your skills.',
+  },
+  {
+    name: 'Advanced',
+    icon: '🌳',
+    description: 'Demands precision and experience. Rewarding for dedicated enthusiasts.',
+  },
+  {
+    name: 'Expert',
+    icon: '🌲',
+    description: 'Master-level specimens requiring specialized knowledge and care.',
+  },
+]
+
 // Fetch featured trees
 const { data: featuredTrees, pending } = await useFetch('/api/trees/featured')
 
@@ -276,27 +272,118 @@ const { data: featuredTrees, pending } = await useFetch('/api/trees/featured')
 const { $gsap, ScrollTrigger } = useNuxtApp()
 
 onMounted(() => {
-  // Hero animations
-  const tl = $gsap.timeline()
+  // Hero timeline
+  const heroTl = $gsap.timeline()
   
-  tl.from('.section-heading', {
-    opacity: 0,
-    y: 30,
-    duration: 0.8,
-    ease: 'power2.out',
+  heroTl
+    .to('.section-heading', {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power2.out',
+    })
+    .to(heroSubtitle.value, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+    }, '-=0.4')
+    .to(heroCta.value, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+    }, '-=0.3')
+    .to(scrollIndicator.value, {
+      opacity: 1,
+      duration: 0.5,
+    }, '-=0.2')
+
+  // Featured section
+  const featuredTl = $gsap.timeline({
+    scrollTrigger: {
+      trigger: '.section-padding',
+      start: 'top 70%',
+    }
   })
   
-  // Featured section
-  $gsap.from('#about .grid > div', {
+  featuredTl
+    .to(featuredTitle.value, { opacity: 1, y: 0, duration: 0.6 })
+    .to(featuredSubtitle.value, { opacity: 1, y: 0, duration: 0.6 }, '-=0.3')
+    .to('#featuredGrid .card', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.15,
+    }, '-=0.3')
+    .to(featuredCta.value, { opacity: 1, duration: 0.5 }, '-=0.2')
+
+  // About section
+  $gsap.timeline({
     scrollTrigger: {
       trigger: '#about',
-      start: 'top 80%',
+      start: 'top 60%',
+    }
+  })
+    .to(aboutImage.value, { opacity: 1, x: 0, duration: 0.8 })
+    .to(aboutContent.value, { opacity: 1, x: 0, duration: 0.8 }, '-=0.5')
+    .to('#stats > div', { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, '-=0.3')
+
+  // Care levels
+  $gsap.timeline({
+    scrollTrigger: {
+      trigger: careTitle.value,
+      start: 'top 70%',
+    }
+  })
+    .to(careTitle.value, { opacity: 1, duration: 0.6 })
+    .to(careSubtitle.value, { opacity: 1, duration: 0.6 }, '-=0.3')
+    .to('#careGrid .card', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: 0.1,
+    }, '-=0.3')
+
+  // Contact section
+  $gsap.to(contactContent.value, {
+    scrollTrigger: {
+      trigger: '#contact',
+      start: 'top 60%',
     },
-    opacity: 0,
-    y: 40,
+    opacity: 1,
+    x: 0,
     duration: 0.8,
-    stagger: 0.2,
-    ease: 'power2.out',
+  })
+  
+  $gsap.to(contactMap.value, {
+    scrollTrigger: {
+      trigger: '#contact',
+      start: 'top 60%',
+    },
+    opacity: 1,
+    x: 0,
+    duration: 0.8,
+    delay: 0.2,
   })
 })
-</script>
+
+// Template refs
+const heroTitle = ref<HTMLElement | null>(null)
+const heroSubtitle = ref<HTMLElement | null>(null)
+const heroCta = ref<HTMLElement | null>(null)
+const scrollIndicator = ref<HTMLElement | null>(null)
+
+const featuredTitle = ref<HTMLElement | null>(null)
+const featuredSubtitle = ref<HTMLElement | null>(null)
+const featuredGrid = ref<HTMLElement | null>(null)
+const featuredCta = ref<HTMLElement | null>(null)
+
+const aboutImage = ref<HTMLElement | null>(null)
+const aboutContent = ref<HTMLElement | null>(null)
+const stats = ref<HTMLElement | null>(null)
+
+const careTitle = ref<HTMLElement | null>(null)
+const careSubtitle = ref<HTMLElement | null>(null)
+const careGrid = ref<HTMLElement | null>(null)
+
+const contactContent = ref<HTMLElement | null>(null)
+const contactMap = ref<HTMLElement | null>(null)
