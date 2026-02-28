@@ -1,4 +1,5 @@
 import type { Tree } from '~/types'
+import { createClient } from '@supabase/supabase-js'
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
@@ -19,7 +20,7 @@ export default defineEventHandler(async () => {
       throw error
 
     // Transform snake_case to camelCase
-    const trees: Tree[] = (data || []).map(item => ({
+    const trees: Tree[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       slug: item.slug,

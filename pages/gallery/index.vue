@@ -168,7 +168,7 @@ function loadMore() {
 
 // Filter management
 function removeFilter(type: keyof Pick<FilterState, 'sizes' | 'careLevels' | 'treeTypes'>, value: string) {
-  const index = filters.value[type].indexOf(value as any)
+  const index = (filters.value[type] as string[]).indexOf(value)
   if (index > -1) {
     filters.value[type].splice(index, 1)
     fetchTrees()

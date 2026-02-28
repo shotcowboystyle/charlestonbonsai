@@ -26,7 +26,7 @@ const hasActiveFilters = computed(() => {
 })
 
 function isSelected(type: keyof Pick<FilterState, 'sizes' | 'careLevels' | 'treeTypes'>, value: string): boolean {
-  return props.modelValue[type].includes(value as any)
+  return (props.modelValue[type] as string[]).includes(value)
 }
 
 function toggleFilter(type: keyof Pick<FilterState, 'sizes' | 'careLevels' | 'treeTypes'>, value: string) {

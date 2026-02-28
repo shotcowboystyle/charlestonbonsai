@@ -14,7 +14,7 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: computed(() => tree.value?.short_description || 'Bonsai tree details'),
+      content: computed(() => tree.value?.shortDescription || 'Bonsai tree details'),
     },
   ],
 })
@@ -55,7 +55,7 @@ watch(tree, async (newTree) => {
     const { data } = await supabase
       .from('trees')
       .select('*')
-      .eq('tree_type', newTree.tree_type)
+      .eq('tree_type', newTree.treeType)
       .neq('id', newTree.id)
       .eq('in_stock', true)
       .limit(4)
@@ -157,7 +157,7 @@ watch(tree, async (newTree) => {
                 <UiBadge v-if="tree.featured" variant="sage">
                   Featured
                 </UiBadge>
-                <UiBadge v-if="!tree.in_stock" variant="error">
+                <UiBadge v-if="!tree.inStock" variant="error">
                   Sold
                 </UiBadge>
                 <UiBadge v-else variant="success">
@@ -219,7 +219,7 @@ watch(tree, async (newTree) => {
                     Care Level
                   </dt>
                   <dd class="font-medium text-charcoal">
-                    {{ CARE_LEVEL_LABELS[tree.care_level] }}
+                    {{ CARE_LEVEL_LABELS[tree.careLevel] }}
                   </dd>
                 </div>
                 <div>
@@ -227,7 +227,7 @@ watch(tree, async (newTree) => {
                     Pot Type
                   </dt>
                   <dd class="font-medium text-charcoal">
-                    {{ tree.pot_type }}
+                    {{ tree.potType }}
                   </dd>
                 </div>
                 <div>
@@ -235,7 +235,7 @@ watch(tree, async (newTree) => {
                     Species
                   </dt>
                   <dd class="font-medium text-charcoal">
-                    {{ TREE_TYPE_LABELS[tree.tree_type] }}
+                    {{ TREE_TYPE_LABELS[tree.treeType] }}
                   </dd>
                 </div>
               </dl>

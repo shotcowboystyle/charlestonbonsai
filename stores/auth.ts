@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
         throw new Error(loginError.value?.statusMessage || 'Login failed')
       }
 
-      const result = data.value as { success: boolean, user: { id: string, email: string }, token: string }
+      const result = data.value as unknown as { success: boolean, user: { id: string, email: string }, token: string }
 
       user.value = result.user
       token.value = result.token

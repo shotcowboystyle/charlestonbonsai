@@ -5,9 +5,9 @@ const { $gsap } = useNuxtApp()
 onMounted(() => {
   // Smooth scroll behavior for anchor links
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener('click', function (e) {
+    anchor.addEventListener('click', (e) => {
       e.preventDefault()
-      const target = document.querySelector(this.getAttribute('href') as string)
+      const target = document.querySelector(anchor.getAttribute('href') as string)
       if (target) {
         $gsap.to(window, {
           duration: 0.8,

@@ -73,6 +73,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const ScrollTrigger = nuxtApp.$ScrollTrigger
 
   if (gsap && ScrollTrigger) {
-    gsap.registerPlugin(ScrollTrigger)
+    (gsap as any).registerPlugin(ScrollTrigger)
   }
 })
