@@ -57,11 +57,13 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  // Enable SSG for static hosting
+  // Configure Nitro for server API routes
   nitro: {
+    // Don't prerender API routes
     prerender: {
       crawlLinks: true,
       routes: ['/'],
+      ignore: ['/api'],
     },
   },
 })
