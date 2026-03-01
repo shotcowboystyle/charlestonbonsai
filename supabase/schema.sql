@@ -42,8 +42,23 @@ CREATE TABLE IF NOT EXISTS admin_users (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
+  last_password_change TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Password reset tokens table
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  token_hash VARCHAR(255) NOT NULL UNIQUE,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  used BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Index for faster token lookups
+CREATE INDEX idx_password_reset_tokens_hash ON password_reset_tokens(token_hash);
+CREATE INDEX idx_password_reset_tokens_user ON password_reset_tokens(user_id);
 
 -- Insert default admin user
 -- Password: 'admin123' (change this in production!)
@@ -70,6 +85,10 @@ CREATE POLICY "Admin can manage trees" ON trees
 
 -- Admin users table is private
 CREATE POLICY "Admin users private" ON admin_users
+  FOR ALL USING (false);
+
+-- Password reset tokens are private
+CREATE POLICY "Reset tokens private" ON password_reset_tokens
   FOR ALL USING (false);
 
 -- Function to update updated_at timestamp

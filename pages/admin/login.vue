@@ -127,6 +127,13 @@ async function handleLogin() {
           >
             Sign In
           </UiButton>
+
+          <!-- Forgot password link -->
+          <div class="mt-4 text-center">
+            <NuxtLink to="/admin/forgot-password" class="text-sm text-sage hover:text-sage-400 transition-colors">
+              Forgot password?
+            </NuxtLink>
+          </div>
         </form>
       </div>
 

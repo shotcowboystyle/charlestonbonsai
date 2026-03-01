@@ -156,7 +156,7 @@ onMounted(async () => {
     </div>
 
     <!-- Recent Listings -->
-    <div class="bg-white rounded-xl shadow-soft overflow-hidden">
+    <div class="bg-white rounded-xl shadow-soft overflow-hidden mb-8">
       <div class="p-6 border-b border-stone-200">
         <div class="flex items-center justify-between">
           <h2 class="font-serif text-lg text-charcoal">
@@ -236,5 +236,8 @@ onMounted(async () => {
         </tbody>
       </table>
     </div>
+
+    <!-- Account Settings -->
+    <AdminChangePasswordForm />
   </div>
 </template>
