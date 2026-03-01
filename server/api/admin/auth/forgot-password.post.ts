@@ -1,3 +1,4 @@
+import { createClient } from '@supabase/supabase-js'
 import { generateResetToken, hashToken } from '~/server/utils/tokens'
 
 export default defineEventHandler(async (event) => {
