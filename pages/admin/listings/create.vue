@@ -37,10 +37,87 @@ const sizeOptions = Object.entries(TREE_SIZE_LABELS).map(([value, label]) => ({ 
 
 function addImage() {
   form.value.images.push('')
+  uploadingImages.value.push(false)
 }
 
 function removeImage(index: number) {
   form.value.images.splice(index, 1)
+  uploadingImages.value.splice(index, 1)
+}
+
+const uploadingThumbnail = ref(false)
+const uploadingImages = ref<boolean[]>([])
+const uploadingModel = ref(false)
+
+async function uploadFile(file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const tokenCookie = useCookie('admin_token')
+
+  const response = await $fetch('/api/admin/upload', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${tokenCookie.value}`,
+    },
+    body: formData,
+  })
+
+  return (response as any).url
+}
+
+async function handleThumbnailUpload(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file)
+    return
+
+  uploadingThumbnail.value = true
+  try {
+    const url = await uploadFile(file)
+    form.value.thumbnail = url
+  }
+  catch (e) {
+    console.error('Upload failed:', e)
+  }
+  finally {
+    uploadingThumbnail.value = false
+  }
+}
+
+async function handleImageUpload(event: Event, index: number) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file)
+    return
+
+  uploadingImages.value[index] = true
+  try {
+    const url = await uploadFile(file)
+    form.value.images[index] = url
+  }
+  catch (e) {
+    console.error('Upload failed:', e)
+  }
+  finally {
+    uploadingImages.value[index] = false
+  }
+}
+
+async function handleModelUpload(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file)
+    return
+
+  uploadingModel.value = true
+  try {
+    const url = await uploadFile(file)
+    form.value.model3dUrl = url
+  }
+  catch (e) {
+    console.error('Upload failed:', e)
+  }
+  finally {
+    uploadingModel.value = false
+  }
 }
 
 function addFeature() {
@@ -76,12 +153,15 @@ async function handleSubmit() {
 
   saving.value = true
 
-  const supabase = useSupabaseClient()
+  const tokenCookie = useCookie('admin_token')
 
   try {
-    const { error } = await supabase
-      .from('trees')
-      .insert({
+    const { error: createError } = await useFetch('/api/admin/listings/create', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+      body: {
         name: form.value.name,
         slug: generateSlug(form.value.name),
         species: form.value.species,
@@ -100,10 +180,11 @@ async function handleSubmit() {
         features: form.value.features.filter(Boolean),
         in_stock: form.value.inStock,
         featured: form.value.featured,
-      })
+      },
+    })
 
-    if (error)
-      throw error
+    if (createError.value)
+      throw createError.value
 
     router.push('/admin/listings')
   }
@@ -232,18 +313,44 @@ async function handleSubmit() {
                 hint="Main image shown in gallery cards"
               />
               <div>
+                <label class="block text-sm font-medium text-charcoal mb-1.5">Thumbnail Image <span class="text-red-500">*</span></label>
+                <div class="flex gap-2 items-center">
+                  <input
+                    v-model="form.thumbnail"
+                    type="text"
+                    placeholder="https://example.com/image.jpg"
+                    class="input flex-1"
+                    required
+                  >
+                  <label class="btn btn-outline cursor-pointer whitespace-nowrap" :class="{ 'opacity-50 pointer-events-none': uploadingThumbnail }">
+                    <span v-if="uploadingThumbnail">Uploading...</span>
+                    <span v-else>Browse...</span>
+                    <input type="file" class="hidden" accept="image/*" @change="handleThumbnailUpload">
+                  </label>
+                </div>
+                <p class="text-xs text-stone-500 mt-1">
+                  Main image shown in gallery cards
+                </p>
+              </div>
+
+              <div>
                 <label class="block text-sm font-medium text-charcoal mb-1.5">Gallery Images</label>
                 <div class="space-y-2">
-                  <div v-for="(image, index) in form.images" :key="index" class="flex gap-2">
+                  <div v-for="(image, index) in form.images" :key="index" class="flex gap-2 items-center">
                     <input
                       v-model="form.images[index]"
                       type="text"
                       placeholder="https://example.com/image.jpg"
                       class="input flex-1"
                     >
+                    <label class="btn btn-outline cursor-pointer whitespace-nowrap" :class="{ 'opacity-50 pointer-events-none': uploadingImages[index] }">
+                      <span v-if="uploadingImages[index]">Uploading...</span>
+                      <span v-else>Browse...</span>
+                      <input type="file" class="hidden" accept="image/*" @change="e => handleImageUpload(e, index)">
+                    </label>
                     <button
                       type="button"
-                      class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
                       @click="removeImage(index)"
                     >
                       Remove
@@ -258,12 +365,26 @@ async function handleSubmit() {
                   + Add another image
                 </button>
               </div>
-              <UiInput
-                v-model="form.model3dUrl"
-                label="3D Model URL (optional)"
-                placeholder="https://example.com/model.glb"
-                hint="GLTF/GLB file for 3D viewer"
-              />
+
+              <div>
+                <label class="block text-sm font-medium text-charcoal mb-1.5">3D Model URL (optional)</label>
+                <div class="flex gap-2 items-center">
+                  <input
+                    v-model="form.model3dUrl"
+                    type="text"
+                    placeholder="https://example.com/model.glb"
+                    class="input flex-1"
+                  >
+                  <label class="btn btn-outline cursor-pointer whitespace-nowrap" :class="{ 'opacity-50 pointer-events-none': uploadingModel }">
+                    <span v-if="uploadingModel">Uploading...</span>
+                    <span v-else>Browse...</span>
+                    <input type="file" class="hidden" accept=".glb,.gltf" @change="handleModelUpload">
+                  </label>
+                </div>
+                <p class="text-xs text-stone-500 mt-1">
+                  GLTF/GLB file for 3D viewer
+                </p>
+              </div>
             </div>
           </div>
         </div>

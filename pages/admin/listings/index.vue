@@ -89,16 +89,21 @@ async function fetchTrees() {
 }
 
 async function toggleFeatured(tree: Tree) {
-  const supabase = useSupabaseClient()
+  const tokenCookie = useCookie('admin_token')
 
   try {
-    const { error } = await supabase
-      .from('trees')
-      .update({ featured: !tree.featured })
-      .eq('id', tree.id)
+    const { error } = await useFetch(`/api/admin/listings/${tree.id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+      body: {
+        featured: !tree.featured,
+      },
+    })
 
-    if (error)
-      throw error
+    if (error.value)
+      throw error.value
 
     tree.featured = !tree.featured
   }
@@ -116,16 +121,18 @@ async function handleDelete() {
   if (!treeToDelete.value)
     return
 
-  const supabase = useSupabaseClient()
+  const tokenCookie = useCookie('admin_token')
 
   try {
-    const { error } = await supabase
-      .from('trees')
-      .delete()
-      .eq('id', treeToDelete.value.id)
+    const { error } = await useFetch(`/api/admin/listings/${treeToDelete.value.id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+    })
 
-    if (error)
-      throw error
+    if (error.value)
+      throw error.value
 
     trees.value = trees.value.filter(t => t.id !== treeToDelete.value!.id)
     deleteModalOpen.value = false
