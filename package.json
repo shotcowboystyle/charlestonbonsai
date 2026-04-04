@@ -16,6 +16,7 @@
   "dependencies": {
     "@pinia/nuxt": "^0.5.5",
     "@supabase/supabase-js": "^2.45.0",
+    "@vercel/blob": "^2.3.3",
     "@vueuse/nuxt": "^11.0.0",
     "bcryptjs": "^2.4.3",
     "gsap": "^3.12.5",
