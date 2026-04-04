@@ -221,7 +221,7 @@ const contactMap = ref<HTMLElement | null>(null)
           <UiLoadingSpinner />
         </div>
 
-        <div v-else-if="featuredTrees?.length" ref="featuredGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div v-else-if="featuredTrees?.length" id="featuredGrid" ref="featuredGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <HomeFeaturedTreeCard
             v-for="(tree, index) in featuredTrees"
             :key="tree.id"
