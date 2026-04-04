@@ -176,65 +176,67 @@ onMounted(async () => {
         <p>No trees yet. Add your first listing!</p>
       </div>
 
-      <table v-else class="w-full">
-        <thead class="bg-cream-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
-              Tree
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
-              Type
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
-              Price
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-stone-100">
-          <tr v-for="tree in recentTrees" :key="tree.id" class="hover:bg-cream-50 transition-colors">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-cream rounded-lg overflow-hidden flex-shrink-0">
-                  <img :src="tree.thumbnail" :alt="tree.name" class="w-full h-full object-cover">
-                </div>
-                <div>
-                  <div class="font-medium text-charcoal">
-                    {{ tree.name }}
+      <div v-else class="overflow-x-auto w-full">
+        <table class="w-full">
+          <thead class="bg-cream-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
+                Tree
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
+                Type
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
+                Price
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <tr v-for="tree in recentTrees" :key="tree.id" class="hover:bg-cream-50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-cream rounded-lg overflow-hidden flex-shrink-0">
+                    <img :src="tree.thumbnail" :alt="tree.name" class="w-full h-full object-cover">
                   </div>
-                  <div class="text-xs text-stone-500">
-                    {{ tree.species }}
+                  <div>
+                    <div class="font-medium text-charcoal whitespace-nowrap">
+                      {{ tree.name }}
+                    </div>
+                    <div class="text-xs text-stone-500 whitespace-nowrap">
+                      {{ tree.species }}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </td>
-            <td class="px-6 py-4 text-sm text-stone-600 capitalize">
-              {{ tree.treeType }}
-            </td>
-            <td class="px-6 py-4 text-sm font-medium text-charcoal">
-              ${{ tree.price.toLocaleString() }}
-            </td>
-            <td class="px-6 py-4">
-              <span :class="tree.inStock ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'" class="badge">
-                {{ tree.inStock ? 'In Stock' : 'Sold' }}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <NuxtLink
-                :to="`/admin/listings/${tree.id}`"
-                class="text-sage hover:text-sage-400 transition-colors"
-              >
-                Edit
-              </NuxtLink>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td class="px-6 py-4 text-sm text-stone-600 capitalize whitespace-nowrap">
+                {{ tree.treeType }}
+              </td>
+              <td class="px-6 py-4 text-sm font-medium text-charcoal whitespace-nowrap">
+                ${{ tree.price.toLocaleString() }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span :class="tree.inStock ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'" class="badge">
+                  {{ tree.inStock ? 'In Stock' : 'Sold' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right whitespace-nowrap">
+                <NuxtLink
+                  :to="`/admin/listings/${tree.id}`"
+                  class="text-sage hover:text-sage-400 transition-colors"
+                >
+                  Edit
+                </NuxtLink>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Account Settings -->

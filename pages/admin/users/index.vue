@@ -55,7 +55,7 @@ async function handleDelete(id: string) {
 <template>
   <div>
     <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="font-serif text-3xl text-charcoal mb-2">
           Admin Users
@@ -64,12 +64,14 @@ async function handleDelete(id: string) {
           Manage system administrators
         </p>
       </div>
-      <NuxtLink to="/admin/users/create" class="btn btn-primary flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Add Admin
-      </NuxtLink>
+      <div class="flex">
+        <NuxtLink to="/admin/users/create" class="btn btn-primary flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Admin
+        </NuxtLink>
+      </div>
     </div>
 
     <!-- Content -->
@@ -109,9 +111,9 @@ async function handleDelete(id: string) {
           </thead>
           <tbody class="divide-y divide-stone-100">
             <tr v-for="user in response.users" :key="user.id" class="hover:bg-cream-50 transition-colors">
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-sage-100 text-sage-600 flex items-center justify-center font-medium">
+                  <div class="w-8 h-8 rounded-full bg-sage-100 text-sage-600 flex items-center justify-center font-medium flex-shrink-0">
                     {{ user.email.charAt(0).toUpperCase() }}
                   </div>
                   <div>
@@ -124,10 +126,10 @@ async function handleDelete(id: string) {
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 text-stone-500 text-sm">
+              <td class="px-6 py-4 text-stone-500 text-sm whitespace-nowrap">
                 {{ new Date(user.created_at).toLocaleDateString() }}
               </td>
-              <td class="px-6 py-4 text-right">
+              <td class="px-6 py-4 text-right whitespace-nowrap">
                 <button
                   v-if="user.id !== authStore.user?.id"
                   :disabled="deleting === user.id"
