@@ -24,6 +24,12 @@ async function handleLogout() {
   router.push('/admin/login')
 }
 
+const isMobileMenuOpen = ref(false)
+
+watch(() => route.path, () => {
+  isMobileMenuOpen.value = false
+})
+
 // Check auth on mount
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
@@ -36,9 +42,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-cream-100 flex">
+  <div class="min-h-screen bg-cream-100 flex relative">
+    <!-- Mobile Overlay -->
+    <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm" @click="isMobileMenuOpen = false" />
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-stone-200 flex-shrink-0">
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-stone-200 flex-shrink-0 transform transition-transform duration-300 md:relative md:translate-x-0" :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'">
       <div class="h-full flex flex-col">
         <!-- Logo -->
         <div class="p-6 border-b border-stone-200">
@@ -135,12 +144,19 @@ onMounted(async () => {
     </aside>
 
     <!-- Main content -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col min-w-0 max-w-full">
       <!-- Top bar -->
-      <header class="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6">
-        <h1 class="font-serif text-xl text-charcoal">
-          {{ pageTitle }}
-        </h1>
+      <header class="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-4 md:px-6">
+        <div class="flex items-center gap-3">
+          <button class="md:hidden text-stone-500 hover:text-charcoal focus:outline-none p-1 -ml-1 rounded-md" @click="isMobileMenuOpen = true">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h1 class="font-serif text-xl text-charcoal">
+            {{ pageTitle }}
+          </h1>
+        </div>
         <div class="flex items-center gap-4">
           <NuxtLink
             to="/"
