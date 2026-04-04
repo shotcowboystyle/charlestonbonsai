@@ -13,7 +13,6 @@ export default defineEventHandler(async () => {
       .from('trees')
       .select('*')
       .eq('featured', true)
-      .eq('in_stock', true)
       .limit(5)
 
     if (error)
