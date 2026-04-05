@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Tree } from '~/types'
+import { useToastStore } from '~/stores/toast'
 import { TREE_SIZE_LABELS, TREE_TYPE_LABELS } from '~/types'
 
 definePageMeta({
   layout: 'admin',
 })
 
+const toast = useToastStore()
 const loading = ref(true)
 const trees = ref<Tree[]>([])
 const search = ref('')
@@ -80,8 +82,8 @@ async function fetchTrees() {
       updatedAt: item.updated_at,
     })) as Tree[]
   }
-  catch (e) {
-    console.error('Error fetching trees:', e)
+  catch {
+    toast.error('Failed to load listings', 'Could not fetch tree data. Please refresh the page to try again.')
   }
   finally {
     loading.value = false
@@ -106,9 +108,10 @@ async function toggleFeatured(tree: Tree) {
       throw error.value
 
     tree.featured = !tree.featured
+    toast.success(tree.featured ? 'Marked as featured' : 'Removed from featured')
   }
-  catch (e) {
-    console.error('Error updating featured status:', e)
+  catch {
+    toast.error('Update failed', 'Could not update featured status. Please try again.')
   }
 }
 
@@ -134,12 +137,14 @@ async function handleDelete() {
     if (error.value)
       throw error.value
 
+    const deletedName = treeToDelete.value.name
     trees.value = trees.value.filter(t => t.id !== treeToDelete.value!.id)
     deleteModalOpen.value = false
     treeToDelete.value = null
+    toast.success('Tree deleted', `"${deletedName}" has been removed from the collection.`)
   }
-  catch (e) {
-    console.error('Error deleting tree:', e)
+  catch {
+    toast.error('Delete failed', 'Could not delete the listing. Please try again.')
   }
 }
 </script>
