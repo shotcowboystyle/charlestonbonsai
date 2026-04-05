@@ -262,11 +262,10 @@ async function handleSubmit() {
                 required
                 :error="errors.species"
               />
-              <UiTextarea
+              <UiRichTextEditor
                 v-model="form.description"
                 label="Description"
                 placeholder="Describe the tree's characteristics, history, and unique features..."
-                :rows="5"
                 required
                 :error="errors.description"
               />
