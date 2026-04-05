@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useToastStore } from '~/stores/toast'
 import { CARE_LEVEL_LABELS, TREE_SIZE_LABELS, TREE_TYPE_LABELS } from '~/types'
 
 definePageMeta({
@@ -6,6 +7,10 @@ definePageMeta({
 })
 
 const router = useRouter()
+const toast = useToastStore()
+
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_MODEL_SIZE = 50 * 1024 * 1024 // 50MB
 
 const form = ref({
   name: '',
@@ -49,6 +54,15 @@ const uploadingThumbnail = ref(false)
 const uploadingImages = ref<boolean[]>([])
 const uploadingModel = ref(false)
 
+function validateFileSize(file: File, maxSize: number, label: string): boolean {
+  if (file.size > maxSize) {
+    const maxMB = Math.round(maxSize / (1024 * 1024))
+    toast.warning('File too large', `${label} must be under ${maxMB}MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`)
+    return false
+  }
+  return true
+}
+
 async function uploadFile(file: File) {
   const formData = new FormData()
   formData.append('file', file)
@@ -71,13 +85,17 @@ async function handleThumbnailUpload(event: Event) {
   if (!file)
     return
 
+  if (!validateFileSize(file, MAX_IMAGE_SIZE, 'Thumbnail image'))
+    return
+
   uploadingThumbnail.value = true
   try {
     const url = await uploadFile(file)
     form.value.thumbnail = url
+    toast.success('Thumbnail uploaded')
   }
-  catch (e) {
-    console.error('Upload failed:', e)
+  catch {
+    toast.error('Thumbnail upload failed', 'Could not upload the thumbnail image. Check your connection and try again.')
   }
   finally {
     uploadingThumbnail.value = false
@@ -89,13 +107,17 @@ async function handleImageUpload(event: Event, index: number) {
   if (!file)
     return
 
+  if (!validateFileSize(file, MAX_IMAGE_SIZE, `Gallery image #${index + 1}`))
+    return
+
   uploadingImages.value[index] = true
   try {
     const url = await uploadFile(file)
     form.value.images[index] = url
+    toast.success('Image uploaded')
   }
-  catch (e) {
-    console.error('Upload failed:', e)
+  catch {
+    toast.error('Image upload failed', `Could not upload gallery image #${index + 1}. Check your connection and try again.`)
   }
   finally {
     uploadingImages.value[index] = false
@@ -107,13 +129,17 @@ async function handleModelUpload(event: Event) {
   if (!file)
     return
 
+  if (!validateFileSize(file, MAX_MODEL_SIZE, '3D model file'))
+    return
+
   uploadingModel.value = true
   try {
     const url = await uploadFile(file)
     form.value.model3dUrl = url
+    toast.success('3D model uploaded')
   }
-  catch (e) {
-    console.error('Upload failed:', e)
+  catch {
+    toast.error('Model upload failed', 'Could not upload the 3D model. Ensure the file is a valid GLB/GLTF format and try again.')
   }
   finally {
     uploadingModel.value = false
@@ -186,11 +212,11 @@ async function handleSubmit() {
     if (createError.value)
       throw createError.value
 
+    toast.success('Listing created', `"${form.value.name}" has been added to the collection.`)
     router.push('/admin/listings')
   }
-  catch (e) {
-    console.error('Error creating tree:', e)
-    errors.value.submit = 'Failed to create listing. Please try again.'
+  catch {
+    toast.error('Failed to create listing', 'Something went wrong while saving. Check all required fields and try again.')
   }
   finally {
     saving.value = false

@@ -43,6 +43,9 @@ onMounted(async () => {
 
 <template>
   <div class="min-h-screen bg-cream-100 flex relative">
+    <!-- Global Toast Notifications -->
+    <AdminToast />
+
     <!-- Mobile Overlay -->
     <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm" @click="isMobileMenuOpen = false" />
 

@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useToastStore } from '~/stores/toast'
+
 definePageMeta({
   layout: 'admin',
 })
 
 const router = useRouter()
 const tokenCookie = useCookie('admin_token')
+const toast = useToastStore()
 
 const form = ref({
   email: '',
@@ -50,15 +53,16 @@ async function handleSubmit() {
         errors.value.email = 'A user with this email already exists'
       }
       else {
-        errors.value.submit = createError.value.statusMessage || 'Failed to create user'
+        toast.error('Failed to create user', createError.value.statusMessage || 'An unexpected error occurred. Please try again.')
       }
       return
     }
 
+    toast.success('User created', `Admin user "${form.value.email}" has been added.`)
     router.push('/admin/users')
   }
   catch {
-    errors.value.submit = 'An unexpected error occurred'
+    toast.error('Unexpected error', 'Something went wrong while creating the user. Please try again.')
   }
   finally {
     saving.value = false
@@ -109,10 +113,6 @@ async function handleSubmit() {
           required
           :error="errors.confirmPassword"
         />
-
-        <div v-if="errors.submit" class="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
-          {{ errors.submit }}
-        </div>
 
         <div class="pt-4 flex gap-4">
           <NuxtLink

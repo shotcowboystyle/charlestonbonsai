@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useToastStore } from '~/stores/toast'
+
 definePageMeta({
   layout: 'admin',
 })
 
 const tokenCookie = useCookie('admin_token')
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 interface AdminUser {
   id: string
@@ -37,14 +40,15 @@ async function handleDelete(id: string) {
     })
 
     if (delError.value) {
-      console.error(delError.value.statusMessage || 'Failed to delete user')
+      toast.error('Delete failed', delError.value.statusMessage || 'Could not delete the user. Please try again.')
     }
     else {
+      toast.success('User deleted', 'The admin user has been removed.')
       await refresh()
     }
   }
   catch {
-    console.error('Failed to delete user')
+    toast.error('Unexpected error', 'Something went wrong while deleting the user.')
   }
   finally {
     deleting.value = null

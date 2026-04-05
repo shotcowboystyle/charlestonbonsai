@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useToastStore } from '~/stores/toast'
 
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 // Form state
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
 const loading = ref(false)
-const success = ref(false)
 const errorMessage = ref<string | null>(null)
 
 // Reset form
@@ -17,7 +18,6 @@ function resetForm() {
   newPassword.value = ''
   confirmPassword.value = ''
   errorMessage.value = null
-  success.value = false
 }
 
 // Submit form
@@ -42,7 +42,6 @@ async function handleSubmit() {
 
   loading.value = true
   errorMessage.value = null
-  success.value = false
 
   try {
     const token = authStore.token
@@ -68,7 +67,7 @@ async function handleSubmit() {
       errorMessage.value = error.value.statusMessage || 'An error occurred'
     }
     else {
-      success.value = true
+      toast.success('Password changed', 'Your password has been updated successfully.')
       resetForm()
     }
   }
@@ -86,16 +85,6 @@ async function handleSubmit() {
     <h3 class="text-lg font-serif font-bold text-gray-900 mb-4">
       Change Password
     </h3>
-
-    <!-- Success message -->
-    <div v-if="success" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-      <div class="flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        Password changed successfully!
-      </div>
-    </div>
 
     <form @submit.prevent="handleSubmit">
       <!-- Current Password -->

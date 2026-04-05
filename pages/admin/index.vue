@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Tree } from '~/types'
+import { useToastStore } from '~/stores/toast'
 
 definePageMeta({
   layout: 'admin',
 })
 
+const toast = useToastStore()
 const loading = ref(true)
 const recentTrees = ref<Tree[]>([])
 const stats = ref({
@@ -61,8 +63,8 @@ onMounted(async () => {
       totalValue: trees.reduce((sum, t) => sum + t.price, 0),
     }
   }
-  catch (e) {
-    console.error('Error fetching dashboard data:', e)
+  catch {
+    toast.error('Dashboard load failed', 'Could not fetch dashboard data. Please refresh the page to try again.')
   }
   finally {
     loading.value = false
