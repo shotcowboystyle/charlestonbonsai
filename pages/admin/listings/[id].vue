@@ -313,7 +313,7 @@ async function handleSubmit() {
                   required
                   :error="errors.species"
                 />
-                <UiTextarea
+                <UiRichTextEditor
                   v-model="form.description"
                   label="Description"
                   :rows="5"
