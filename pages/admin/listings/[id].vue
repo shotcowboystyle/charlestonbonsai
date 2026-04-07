@@ -548,6 +548,7 @@ async function handleSubmit() {
                 View on site
               </NuxtLink>
               <button
+                type="button"
                 class="text-sm text-sage hover:text-sage-400 transition-colors flex items-center gap-1"
                 @click="qrModalOpen = true"
               >
