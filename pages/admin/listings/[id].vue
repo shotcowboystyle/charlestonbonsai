@@ -18,6 +18,7 @@ const MAX_MODEL_SIZE = 50 * 1024 * 1024 // 50MB
 const loading = ref(true)
 const saving = ref(false)
 const tree = ref<Tree | null>(null)
+const qrModalOpen = ref(false)
 const form = ref<any>(null)
 const errors = ref<Record<string, string>>({})
 
@@ -535,7 +536,7 @@ async function handleSubmit() {
             </div>
 
             <!-- Preview -->
-            <div class="bg-cream-50 rounded-xl p-4">
+            <div class="bg-cream-50 rounded-xl p-4 space-y-2">
               <NuxtLink
                 :to="`/gallery/${tree?.slug}`"
                 target="_blank"
@@ -546,6 +547,15 @@ async function handleSubmit() {
                 </svg>
                 View on site
               </NuxtLink>
+              <button
+                class="text-sm text-sage hover:text-sage-400 transition-colors flex items-center gap-1"
+                @click="qrModalOpen = true"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                Print QR code
+              </button>
             </div>
           </div>
         </div>
@@ -561,5 +571,8 @@ async function handleSubmit() {
         Back to Listings
       </NuxtLink>
     </div>
+
+    <!-- QR Code Modal -->
+    <AdminQrCodeModal v-model="qrModalOpen" :tree="tree" />
   </div>
 </template>

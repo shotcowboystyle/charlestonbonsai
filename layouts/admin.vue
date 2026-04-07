@@ -42,7 +42,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-cream-100 flex relative">
+  <div class="min-h-screen bg-cream-100 flex relative print:hidden">
     <!-- Global Toast Notifications -->
     <AdminToast />
 
