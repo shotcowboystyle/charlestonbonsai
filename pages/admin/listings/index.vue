@@ -15,6 +15,13 @@ const filterStatus = ref('')
 const filterType = ref('')
 const deleteModalOpen = ref(false)
 const treeToDelete = ref<Tree | null>(null)
+const qrModalOpen = ref(false)
+const treeForQr = ref<Tree | null>(null)
+
+function openQrModal(tree: Tree) {
+  treeForQr.value = tree
+  qrModalOpen.value = true
+}
 
 const filteredTrees = computed(() => {
   let result = trees.value
@@ -299,6 +306,15 @@ async function handleDelete() {
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </NuxtLink>
+                  <button
+                    class="text-stone-400 hover:text-charcoal transition-colors"
+                    title="Print QR code"
+                    @click="openQrModal(tree)"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
+                  </button>
                   <NuxtLink
                     :to="`/admin/listings/${tree.id}`"
                     class="text-sage hover:text-sage-400 transition-colors"
@@ -335,5 +351,8 @@ async function handleDelete() {
         </div>
       </template>
     </UiModal>
+
+    <!-- QR Code Modal -->
+    <AdminQrCodeModal v-model="qrModalOpen" :tree="treeForQr" />
   </div>
 </template>
