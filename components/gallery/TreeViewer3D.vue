@@ -34,7 +34,7 @@ onMounted(async () => {
     const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
     const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
 
-    const container = containerRef.value
+    const container = containerRef.value!
     const canvas = canvasRef.value
     const width = container.clientWidth
     const height = container.clientHeight
@@ -152,7 +152,7 @@ onMounted(async () => {
       camera.updateProjectionMatrix()
       renderer.setSize(newWidth, newHeight)
     })
-    resizeObserver.observe(container)
+    resizeObserver.observe(container as unknown as Element)
 
     // Cleanup on unmount
     onUnmounted(() => {

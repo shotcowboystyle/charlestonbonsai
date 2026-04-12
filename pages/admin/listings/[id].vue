@@ -19,8 +19,13 @@ const loading = ref(true)
 const saving = ref(false)
 const tree = ref<Tree | null>(null)
 const qrModalOpen = ref(false)
+const pricingDrawerOpen = ref(false)
 const form = ref<any>(null)
 const errors = ref<Record<string, string>>({})
+
+function applyCalculatedPrice(price: number) {
+  form.value.price = price.toString()
+}
 
 const treeTypeOptions = Object.entries(TREE_TYPE_LABELS).map(([value, label]) => ({ value, label }))
 const careLevelOptions = Object.entries(CARE_LEVEL_LABELS).map(([value, label]) => ({ value, label }))
@@ -460,6 +465,16 @@ async function handleSubmit() {
                 required
                 :error="errors.price"
               />
+              <button
+                type="button"
+                class="mt-3 text-sm text-sage hover:text-sage-400 transition-colors flex items-center gap-1.5"
+                @click="pricingDrawerOpen = true"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Pricing calculator
+              </button>
             </div>
 
             <!-- Features -->
@@ -575,5 +590,8 @@ async function handleSubmit() {
 
     <!-- QR Code Modal -->
     <AdminQrCodeModal v-model="qrModalOpen" :tree="tree" />
+
+    <!-- Pricing Calculator Drawer -->
+    <AdminPricingDrawer v-model="pricingDrawerOpen" @apply="applyCalculatedPrice" />
   </div>
 </template>
