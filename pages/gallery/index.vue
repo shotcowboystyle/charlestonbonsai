@@ -18,6 +18,7 @@ const loadingMore = ref(false)
 const hasMore = ref(false)
 const page = ref(1)
 const pageSize = 12
+const mobileFiltersOpen = ref(false)
 
 const filters = ref<FilterState>({
   sizes: [],
@@ -39,7 +40,17 @@ const hasActiveFilters = computed(() => {
     || filters.value.careLevels.length > 0
     || filters.value.treeTypes.length > 0
     || filters.value.search !== ''
+    || filters.value.inStockOnly
   )
+})
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filters.value.sizes.length > 0) count++
+  if (filters.value.careLevels.length > 0) count++
+  if (filters.value.treeTypes.length > 0) count++
+  if (filters.value.inStockOnly) count++
+  return count
 })
 
 // Fetch trees
@@ -75,6 +86,9 @@ async function fetchTrees(append = false) {
     }
     if (filters.value.search) {
       query = query.or(`name.ilike.%${filters.value.search}%,species.ilike.%${filters.value.search}%`)
+    }
+    if (filters.value.inStockOnly) {
+      query = query.eq('in_stock', true)
     }
 
     // Sort
@@ -191,7 +205,7 @@ function resetFilters() {
 }
 
 // Watch filters
-watch([() => filters.value.sizes, () => filters.value.careLevels, () => filters.value.treeTypes], () => {
+watch([() => filters.value.sizes, () => filters.value.careLevels, () => filters.value.treeTypes, () => filters.value.inStockOnly], () => {
   fetchTrees()
 }, { deep: true })
 
@@ -217,8 +231,8 @@ onMounted(() => {
 
     <div class="container-custom py-8">
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Filters Sidebar -->
-        <aside class="lg:w-72 flex-shrink-0">
+        <!-- Filters Sidebar (desktop only) -->
+        <aside class="hidden lg:block lg:w-72 flex-shrink-0">
           <GalleryFilterSidebar
             v-model="filters"
             @reset="resetFilters"
@@ -229,10 +243,25 @@ onMounted(() => {
         <main class="flex-1">
           <!-- Toolbar -->
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <p class="text-stone-500">
-              <span v-if="pending">Loading...</span>
-              <span v-else>{{ total }} tree{{ total !== 1 ? 's' : '' }} found</span>
-            </p>
+            <div class="flex items-center gap-3">
+              <!-- Mobile Filter Button -->
+              <button
+                class="lg:hidden inline-flex items-center gap-2 btn btn-outline py-2 px-3 text-sm"
+                @click="mobileFiltersOpen = true"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                Filters
+                <span v-if="activeFilterCount > 0" class="bg-forest text-white text-xs rounded-full w-5 h-5 inline-flex items-center justify-center font-medium">
+                  {{ activeFilterCount }}
+                </span>
+              </button>
+              <p class="text-stone-500 text-sm">
+                <span v-if="pending">Loading...</span>
+                <span v-else>{{ trees.length }} of {{ total }} tree{{ total !== 1 ? 's' : '' }}</span>
+              </p>
+            </div>
 
             <div class="flex items-center gap-4">
               <!-- Search -->
@@ -316,15 +345,31 @@ onMounted(() => {
             <div class="text-6xl mb-4">
               🌲
             </div>
-            <h3 class="font-serif text-xl text-charcoal mb-2">
-              No trees found
-            </h3>
-            <p class="text-stone-500 mb-6">
-              Try adjusting your filters or search terms
-            </p>
-            <button class="btn btn-outline" @click="resetFilters">
-              Clear Filters
-            </button>
+            <template v-if="filters.inStockOnly">
+              <h3 class="font-serif text-xl text-charcoal mb-2">
+                No trees available right now
+              </h3>
+              <p class="text-stone-500 mb-6">
+                Matching trees may exist but are currently sold. Try showing all trees including sold inventory.
+              </p>
+              <button
+                class="btn btn-outline"
+                @click="filters.inStockOnly = false"
+              >
+                Show All Trees
+              </button>
+            </template>
+            <template v-else>
+              <h3 class="font-serif text-xl text-charcoal mb-2">
+                No trees found
+              </h3>
+              <p class="text-stone-500 mb-6">
+                Try adjusting your filters or search terms
+              </p>
+              <button class="btn btn-outline" @click="resetFilters">
+                Clear Filters
+              </button>
+            </template>
           </div>
 
           <!-- Grid -->
@@ -344,11 +389,83 @@ onMounted(() => {
               @click="loadMore"
             >
               <span v-if="loadingMore">Loading...</span>
-              <span v-else>Load More Trees</span>
+              <span v-else>Load More Trees (showing {{ trees.length }} of {{ total }})</span>
             </button>
           </div>
         </main>
       </div>
     </div>
+
+    <!-- Mobile Filter Drawer -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="mobileFiltersOpen"
+          class="lg:hidden fixed inset-0 z-50 flex flex-col justify-end"
+          @click.self="mobileFiltersOpen = false"
+        >
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/50" @click="mobileFiltersOpen = false" />
+
+          <!-- Drawer -->
+          <Transition
+            enter-active-class="transition-transform duration-300 ease-out"
+            enter-from-class="translate-y-full"
+            enter-to-class="translate-y-0"
+            leave-active-class="transition-transform duration-200 ease-in"
+            leave-from-class="translate-y-0"
+            leave-to-class="translate-y-full"
+          >
+            <div v-if="mobileFiltersOpen" class="relative bg-white rounded-t-2xl max-h-[85vh] flex flex-col">
+              <!-- Handle bar -->
+              <div class="flex justify-center pt-3 pb-1">
+                <div class="w-10 h-1 bg-stone-300 rounded-full" />
+              </div>
+
+              <!-- Header -->
+              <div class="flex items-center justify-between px-5 py-3 border-b border-stone-100">
+                <h3 class="font-serif text-lg text-charcoal">
+                  Filters
+                </h3>
+                <button
+                  class="p-2 rounded-lg hover:bg-cream transition-colors text-stone-500"
+                  @click="mobileFiltersOpen = false"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Content -->
+              <div class="overflow-y-auto flex-1 px-5 py-4">
+                <GalleryFilterSidebar
+                  v-model="filters"
+                  class="!shadow-none !rounded-none !p-0 !static"
+                  @reset="resetFilters"
+                />
+              </div>
+
+              <!-- Footer -->
+              <div class="px-5 py-4 border-t border-stone-100">
+                <button
+                  class="btn btn-primary w-full"
+                  @click="mobileFiltersOpen = false"
+                >
+                  Show {{ total }} tree{{ total !== 1 ? 's' : '' }}
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>

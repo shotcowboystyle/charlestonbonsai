@@ -76,7 +76,7 @@ watch(() => route.path, () => {
         </div>
 
         <!-- CTA Button -->
-        <div class="hidden md:block">
+        <div v-if="route.path !== '/gallery'" class="hidden md:block">
           <NuxtLink
             to="/gallery"
             class="btn transition-all duration-300"
@@ -135,6 +135,7 @@ watch(() => route.path, () => {
               {{ link.label }}
             </NuxtLink>
             <NuxtLink
+              v-if="route.path !== '/gallery'"
               to="/gallery"
               class="btn btn-primary w-full"
               @click="mobileMenuOpen = false"

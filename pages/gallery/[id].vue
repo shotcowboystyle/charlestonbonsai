@@ -125,8 +125,10 @@ watch(tree, async (newTree) => {
               <button
                 v-for="(image, index) in allImages"
                 :key="index"
-                class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all" :class="[
-                  currentImageIndex === index ? 'border-forest' : 'border-transparent hover:border-stone-300',
+                class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ring-offset-1" :class="[
+                  currentImageIndex === index
+                    ? 'border-forest ring-2 ring-forest opacity-100'
+                    : 'border-transparent opacity-60 hover:opacity-90 hover:border-stone-300',
                 ]"
                 @click="currentImageIndex = index"
               >
@@ -144,7 +146,7 @@ watch(tree, async (newTree) => {
                 class="aspect-square"
               />
               <p class="text-sm text-stone-500 mt-3 text-center">
-                Drag to rotate • Scroll to zoom
+                Drag to rotate • Click viewer to enable zoom
               </p>
             </div>
           </div>
@@ -259,12 +261,37 @@ watch(tree, async (newTree) => {
 
             <!-- CTA -->
             <div class="space-y-4">
-              <a
-                :href="inquireLink"
-                class="btn btn-primary w-full"
-              >
-                Inquire About This Tree
-              </a>
+              <template v-if="tree.inStock">
+                <a
+                  :href="inquireLink"
+                  class="btn btn-primary w-full inline-flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  Inquire About This Tree
+                </a>
+                <p class="text-xs text-stone-400 text-center">
+                  Opens in your email app
+                </p>
+              </template>
+              <template v-else>
+                <button
+                  disabled
+                  class="btn w-full bg-stone-200 text-stone-400 cursor-not-allowed"
+                >
+                  This Tree Has Been Sold
+                </button>
+                <a
+                  :href="`mailto:hello@charlestonbonsai.com?subject=${encodeURIComponent('Notify me: similar ' + tree.treeType + ' available')}&body=${encodeURIComponent('Hi, I was interested in ' + tree.name + ' but see it has been sold. Please let me know when similar trees become available.')}`"
+                  class="btn btn-outline w-full inline-flex items-center justify-center gap-2 text-sm"
+                >
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  Get notified when similar trees arrive
+                </a>
+              </template>
               <p class="text-sm text-stone-500 text-center">
                 Questions? Call us at <a href="tel:+18435551234" class="text-forest hover:underline">(843) 555-1234</a>
               </p>
