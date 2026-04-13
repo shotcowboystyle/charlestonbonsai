@@ -16,13 +16,14 @@ const containerRef = ref<HTMLElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
+const activated = ref(false)
 
-// Three.js variables
+// Three.js variables (non-reactive, managed manually)
 let scene: any = null
 let camera: any = null
 let renderer: any = null
-let controls: any = null
 let animationId: number | null = null
+const controls = ref<any>(null)
 
 onMounted(async () => {
   if (!canvasRef.value || !containerRef.value)
@@ -80,16 +81,16 @@ onMounted(async () => {
     scene.add(ground)
 
     // Controls
-    controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true
-    controls.dampingFactor = 0.05
-    controls.autoRotate = props.autoRotate
-    controls.autoRotateSpeed = 1
-    controls.enableZoom = props.enableZoom
-    controls.enablePan = props.enablePan
-    controls.minDistance = 1
-    controls.maxDistance = 10
-    controls.maxPolarAngle = Math.PI / 2
+    controls.value = new OrbitControls(camera, renderer.domElement)
+    controls.value.enableDamping = true
+    controls.value.dampingFactor = 0.05
+    controls.value.autoRotate = props.autoRotate
+    controls.value.autoRotateSpeed = 1
+    controls.value.enableZoom = false // enabled only after user clicks into the viewer
+    controls.value.enablePan = props.enablePan
+    controls.value.minDistance = 1
+    controls.value.maxDistance = 10
+    controls.value.maxPolarAngle = Math.PI / 2
 
     // Load model
     const loader = new GLTFLoader()
@@ -137,7 +138,7 @@ onMounted(async () => {
     // Animation loop
     function animate() {
       animationId = requestAnimationFrame(animate)
-      controls.update()
+      controls.value.update()
       renderer.render(scene, camera)
     }
     animate()
@@ -163,8 +164,8 @@ onMounted(async () => {
       if (renderer) {
         renderer.dispose()
       }
-      if (controls) {
-        controls.dispose()
+      if (controls.value) {
+        controls.value.dispose()
       }
     })
   }
@@ -177,11 +178,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div ref="containerRef" class="w-full h-full min-h-[300px] bg-cream-100 rounded-xl overflow-hidden">
-    <div v-if="loading" class="w-full h-full flex items-center justify-center">
+  <div ref="containerRef" class="relative w-full h-full min-h-[300px] bg-cream-100 rounded-xl overflow-hidden">
+    <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
       <UiLoadingSpinner text="Loading 3D model..." />
     </div>
-    <div v-if="error" class="w-full h-full flex flex-col items-center justify-center text-stone-500">
+    <div v-if="error" class="absolute inset-0 flex flex-col items-center justify-center text-stone-500">
       <svg class="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
       </svg>
@@ -190,5 +191,18 @@ onMounted(async () => {
       </p>
     </div>
     <canvas ref="canvasRef" :class="{ 'opacity-0': loading || error }" class="w-full h-full transition-opacity duration-300" />
+    <!-- Click-to-interact overlay: prevents scroll hijack until user explicitly engages -->
+    <Transition enter-active-class="transition-opacity duration-200" leave-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-to-class="opacity-0">
+      <div
+        v-if="!activated && !loading && !error"
+        class="absolute inset-0 flex flex-col items-center justify-center gap-2 cursor-pointer bg-black/10 hover:bg-black/20 transition-colors"
+        @click="activated = true; controls && (controls.enableZoom = true)"
+      >
+        <svg class="w-8 h-8 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+        </svg>
+        <span class="text-white text-sm font-medium drop-shadow">Click to interact</span>
+      </div>
+    </Transition>
   </div>
 </template>
