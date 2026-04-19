@@ -107,8 +107,9 @@
             © {{ new Date().getFullYear() }} Charleston Bonsai. All rights reserved.
           </p>
           <div class="flex gap-6 text-sm text-white/50">
-            <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+            <NuxtLink to="/privacy-policy" class="hover:text-white transition-colors">Privacy Policy</NuxtLink>
+            <NuxtLink to="/terms-of-service" class="hover:text-white transition-colors">Terms of Service</NuxtLink>
+            <NuxtLink to="/data-removal" class="hover:text-white transition-colors">Data Removal</NuxtLink>
           </div>
         </div>
       </div>
