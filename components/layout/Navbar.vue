@@ -34,30 +34,27 @@ watch(() => route.path, () => {
   <header
     ref="navbar"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :class="scrolled ? 'bg-white/95 backdrop-blur-md shadow-soft' : 'bg-transparent'"
+    :class="scrolled ? 'bg-cream/95 backdrop-blur-md shadow-soft' : 'bg-transparent'"
   >
     <nav class="container-custom">
-      <div class="flex items-center justify-between h-20">
-        <!-- Logo -->
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo — typographic monogram -->
         <NuxtLink to="/" class="flex items-center gap-3 group">
           <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300"
-            :class="scrolled ? 'bg-forest' : 'bg-white/20 backdrop-blur-sm'"
+            class="w-9 h-9 border-2 flex items-center justify-center transition-all duration-300"
+            :class="scrolled ? 'border-charcoal' : 'border-white/60'"
           >
-            <span class="text-2xl">🌲</span>
+            <span
+              class="font-serif text-sm font-bold tracking-tight transition-colors duration-300"
+              :class="scrolled ? 'text-charcoal' : 'text-white'"
+            >CB</span>
           </div>
           <div>
             <div
-              class="font-serif font-semibold transition-colors duration-300"
+              class="font-serif font-semibold text-sm transition-colors duration-300"
               :class="scrolled ? 'text-charcoal' : 'text-white'"
             >
               Charleston Bonsai
-            </div>
-            <div
-              class="text-xs transition-colors duration-300"
-              :class="scrolled ? 'text-stone-500' : 'text-white/70'"
-            >
-              Living Art
             </div>
           </div>
         </NuxtLink>
@@ -68,7 +65,7 @@ watch(() => route.path, () => {
             v-for="link in navLinks"
             :key="link.to"
             :to="link.to"
-            class="font-medium transition-colors duration-300 link-underline"
+            class="text-xs tracking-widest uppercase font-medium transition-colors duration-300 link-underline"
             :class="scrolled ? 'text-charcoal hover:text-forest' : 'text-white/90 hover:text-white'"
           >
             {{ link.label }}
@@ -79,7 +76,7 @@ watch(() => route.path, () => {
         <div v-if="route.path !== '/gallery'" class="hidden md:block">
           <NuxtLink
             to="/gallery"
-            class="btn transition-all duration-300"
+            class="btn text-xs tracking-widest uppercase transition-all duration-300"
             :class="scrolled ? 'btn-primary' : 'bg-white text-forest hover:bg-cream'"
           >
             Explore Collection
@@ -122,14 +119,14 @@ watch(() => route.path, () => {
       >
         <div
           v-if="mobileMenuOpen"
-          class="md:hidden absolute top-full left-0 right-0 bg-white shadow-soft-lg border-t border-stone-100"
+          class="md:hidden absolute top-full left-0 right-0 bg-cream/95 backdrop-blur-md shadow-soft-lg border-t border-stone-100"
         >
           <div class="container-custom py-4 space-y-4">
             <NuxtLink
               v-for="link in navLinks"
               :key="link.to"
               :to="link.to"
-              class="block py-2 font-medium text-charcoal hover:text-forest transition-colors"
+              class="block py-2 text-xs tracking-widest uppercase font-medium text-charcoal hover:text-forest transition-colors"
               @click="mobileMenuOpen = false"
             >
               {{ link.label }}
@@ -137,7 +134,7 @@ watch(() => route.path, () => {
             <NuxtLink
               v-if="route.path !== '/gallery'"
               to="/gallery"
-              class="btn btn-primary w-full"
+              class="btn btn-primary w-full text-xs tracking-widest uppercase"
               @click="mobileMenuOpen = false"
             >
               Explore Collection

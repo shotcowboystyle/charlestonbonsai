@@ -14,22 +14,22 @@ useHead({
 const careLevels = [
   {
     name: 'Beginner',
-    icon: '🌱',
+    number: '01',
     description: 'Forgiving species that tolerate occasional neglect. Perfect for learning the basics.',
   },
   {
     name: 'Intermediate',
-    icon: '🌿',
+    number: '02',
     description: 'Requires consistent care and attention. Great for developing your skills.',
   },
   {
     name: 'Advanced',
-    icon: '🌳',
+    number: '03',
     description: 'Demands precision and experience. Rewarding for dedicated enthusiasts.',
   },
   {
     name: 'Expert',
-    icon: '🌲',
+    number: '04',
     description: 'Master-level specimens requiring specialized knowledge and care.',
   },
 ]
@@ -45,12 +45,18 @@ onMounted(() => {
   const heroTl = $gsap.timeline()
 
   heroTl
+    .to(heroLabel.value, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    })
     .to('.section-heading', {
       opacity: 1,
       y: 0,
       duration: 0.8,
       ease: 'power2.out',
-    })
+    }, '-=0.2')
     .to(heroSubtitle.value, {
       opacity: 1,
       y: 0,
@@ -136,6 +142,7 @@ onMounted(() => {
 })
 
 // Template refs
+const heroLabel = ref<HTMLElement | null>(null)
 const heroTitle = ref<HTMLElement | null>(null)
 const heroSubtitle = ref<HTMLElement | null>(null)
 const heroCta = ref<HTMLElement | null>(null)
@@ -161,61 +168,64 @@ const contactMap = ref<HTMLElement | null>(null)
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center">
+    <section class="relative min-h-screen flex flex-col justify-end grain-overlay">
       <!-- Background -->
-      <div class="absolute inset-0 bg-gradient-to-br from-forest via-forest-400 to-forest-500">
-        <div class="absolute inset-0 bg-hero-pattern opacity-10" />
-        <div class="absolute inset-0 bg-gradient-to-t from-forest-500/50 to-transparent" />
+      <div class="absolute inset-0 bg-gradient-to-br from-forest-500 via-forest to-charcoal">
+        <div class="absolute inset-0 bg-hero-pattern opacity-5" />
       </div>
 
       <!-- Content -->
-      <div class="relative container-custom py-32 md:py-40">
-        <div class="max-w-3xl">
+      <div class="relative px-6 sm:px-10 lg:px-16 pb-16 md:pb-24">
+        <div class="max-w-5xl">
+          <span
+            ref="heroLabel"
+            class="inline-block text-xs tracking-[0.3em] uppercase text-white/50 mb-6 opacity-0"
+          >
+            Charleston, South Carolina
+          </span>
           <h1
             ref="heroTitle"
-            class="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight opacity-0"
+            class="display-text text-white mb-8 opacity-0"
           >
-            Cultivating Living Art in the Heart of Charleston
+            Cultivating<br>Living<br>Art.
           </h1>
+          <div class="w-16 h-px bg-white/30 mb-8" />
           <p
             ref="heroSubtitle"
-            class="text-lg md:text-xl text-white/80 mb-8 max-w-2xl opacity-0"
+            class="text-lg md:text-xl text-white/60 mb-10 max-w-lg opacity-0"
           >
             Each bonsai in our collection represents years of patience, artistry, and dedication.
-            Discover your perfect companion in tranquility.
           </p>
-          <div ref="heroCta" class="flex flex-wrap gap-4 opacity-0">
-            <NuxtLink to="/gallery" class="btn bg-white text-forest hover:bg-cream text-base px-8 py-3">
+          <div ref="heroCta" class="flex flex-wrap gap-6 opacity-0">
+            <NuxtLink to="/gallery" class="btn bg-white text-forest hover:bg-cream text-sm uppercase tracking-[0.15em] px-8 py-4">
               Explore Collection
             </NuxtLink>
-            <a href="#about" class="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm font-medium py-3">
+            <a href="#about" class="btn border border-white/30 text-white/80 hover:text-white hover:border-white/60 text-sm uppercase tracking-[0.15em] px-8 py-4">
               Learn More
-              <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- Scroll indicator -->
-      <div ref="scrollIndicator" class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0">
-        <div class="animate-bounce">
-          <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
+      <!-- Scroll indicator — vertical text on right -->
+      <div ref="scrollIndicator" class="absolute bottom-8 right-8 opacity-0 hidden md:flex flex-col items-center gap-3">
+        <span class="text-xs tracking-[0.2em] uppercase text-white/40" style="writing-mode: vertical-lr;">Scroll</span>
+        <div class="w-px h-8 bg-white/20" />
       </div>
     </section>
 
     <!-- Featured Collection -->
     <section class="section-padding bg-cream">
-      <div class="container-custom">
-        <div class="text-center mb-12">
-          <h2 ref="featuredTitle" class="section-heading opacity-0">
-            Featured Trees
-          </h2>
-          <p ref="featuredSubtitle" class="section-subheading mx-auto opacity-0">
+      <div class="px-6 sm:px-10 lg:px-16">
+        <!-- Header: left-aligned with subtitle at opposite end -->
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-16">
+          <div>
+            <span class="text-xs tracking-[0.3em] uppercase text-sage mb-4 block">Selected Works</span>
+            <h2 ref="featuredTitle" class="section-heading opacity-0">
+              Featured<br>Trees
+            </h2>
+          </div>
+          <p ref="featuredSubtitle" class="section-subheading lg:text-right lg:max-w-sm opacity-0 mt-4 lg:mt-0">
             Hand-selected specimens showcasing the finest in bonsai artistry
           </p>
         </div>
@@ -238,35 +248,43 @@ const contactMap = ref<HTMLElement | null>(null)
           <p>No featured trees available at the moment.</p>
         </div>
 
-        <div ref="featuredCta" class="text-center mt-12 opacity-0">
-          <NuxtLink to="/gallery" class="btn btn-outline">
+        <div ref="featuredCta" class="text-center mt-16 opacity-0">
+          <NuxtLink to="/gallery" class="btn btn-outline group text-sm uppercase tracking-[0.15em]">
             View Full Collection
+            <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </NuxtLink>
         </div>
       </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="section-padding bg-white">
-      <div class="container-custom">
+    <!-- About Section — Dark editorial -->
+    <section id="about" class="section-padding bg-charcoal text-white relative overflow-hidden">
+      <!-- Decorative symbol -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/[0.03] font-serif select-none pointer-events-none" style="font-size: 30vw;">
+        ∞
+      </div>
+
+      <div class="relative px-6 sm:px-10 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div ref="aboutImage" class="relative opacity-0">
-            <div class="aspect-[4/3] bg-gradient-to-br from-sage-100 to-cream rounded-2xl overflow-hidden">
+            <div class="aspect-[4/5] bg-gradient-to-br from-forest-300 to-forest rounded-lg overflow-hidden grain-overlay">
               <img
                 src="/images/hero/pattern.svg"
                 alt="Bonsai cultivation"
-                class="w-full h-full object-cover opacity-50"
+                class="w-full h-full object-cover opacity-30"
               >
             </div>
-            <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-forest rounded-2xl -z-10" />
+            <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-bark rounded-lg -z-10" />
           </div>
 
           <div ref="aboutContent" class="opacity-0">
-            <span class="text-sage font-medium tracking-wide uppercase text-sm">Our Story</span>
-            <h2 class="section-heading mt-2">
-              Where Art Meets Nature
+            <span class="text-xs tracking-[0.3em] uppercase text-sage-200 mb-4 block">Our Story</span>
+            <h2 class="section-heading text-white mt-2">
+              Where Art<br>Meets Nature
             </h2>
-            <div class="space-y-4 text-stone-600">
+            <div class="space-y-4 text-white/60 mt-6">
               <p>
                 Charleston Bonsai was founded on a simple belief: that the ancient art of bonsai
                 can bring profound peace and beauty into modern life. What began as a personal
@@ -275,8 +293,6 @@ const contactMap = ref<HTMLElement | null>(null)
               <p>
                 Each specimen in our nursery has been carefully cultivated over years—some over
                 decades—to achieve the perfect balance of form, proportion, and natural beauty.
-                We believe every tree tells a story, and we're here to help you find one that
-                resonates with yours.
               </p>
               <p>
                 Whether you're a seasoned collector or just beginning your bonsai journey,
@@ -284,28 +300,28 @@ const contactMap = ref<HTMLElement | null>(null)
                 living sculptures.
               </p>
             </div>
-            <div ref="stats" class="mt-8 flex gap-8">
-              <div class="opacity-0">
-                <div class="text-3xl font-serif text-forest">
+            <div id="stats" ref="stats" class="mt-10 grid grid-cols-3 gap-0">
+              <div class="opacity-0 border-t border-white/10 pt-6">
+                <div class="text-5xl font-serif text-white tracking-tight">
                   15+
                 </div>
-                <div class="text-sm text-stone-500">
+                <div class="text-xs tracking-[0.2em] uppercase text-white/40 mt-2">
                   Years Experience
                 </div>
               </div>
-              <div class="opacity-0">
-                <div class="text-3xl font-serif text-forest">
+              <div class="opacity-0 border-t border-white/10 pt-6">
+                <div class="text-5xl font-serif text-white tracking-tight">
                   200+
                 </div>
-                <div class="text-sm text-stone-500">
+                <div class="text-xs tracking-[0.2em] uppercase text-white/40 mt-2">
                   Trees Cultivated
                 </div>
               </div>
-              <div class="opacity-0">
-                <div class="text-3xl font-serif text-forest">
+              <div class="opacity-0 border-t border-white/10 pt-6">
+                <div class="text-5xl font-serif text-white tracking-tight">
                   50+
                 </div>
-                <div class="text-sm text-stone-500">
+                <div class="text-xs tracking-[0.2em] uppercase text-white/40 mt-2">
                   Species
                 </div>
               </div>
@@ -315,44 +331,57 @@ const contactMap = ref<HTMLElement | null>(null)
       </div>
     </section>
 
-    <!-- Care Levels -->
+    <!-- Care Levels — Numbered editorial list -->
     <section class="section-padding bg-cream">
-      <div class="container-custom">
-        <div class="text-center mb-12">
+      <div class="px-6 sm:px-10 lg:px-16">
+        <div class="mb-12">
+          <span class="text-xs tracking-[0.3em] uppercase text-sage mb-4 block">Skill Levels</span>
           <h2 ref="careTitle" class="section-heading opacity-0">
-            Find Your Level
+            Find Your<br>Level
           </h2>
-          <p ref="careSubtitle" class="section-subheading mx-auto opacity-0">
+          <p ref="careSubtitle" class="section-subheading mt-4 opacity-0">
             From beginner-friendly to expert challenges, we have trees for every skill level
           </p>
         </div>
 
-        <div ref="careGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="level in careLevels" :key="level.name" class="card p-6 text-center opacity-0">
-            <div class="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span class="text-3xl">{{ level.icon }}</span>
-            </div>
-            <h3 class="font-serif text-xl text-charcoal mb-2">
+        <div id="careGrid" ref="careGrid" class="divide-y divide-stone-200">
+          <div
+            v-for="level in careLevels"
+            :key="level.name"
+            class="card group flex items-center gap-6 md:gap-10 py-6 md:py-8 opacity-0 !bg-transparent !shadow-none !rounded-none hover:!translate-y-0 hover:!shadow-none"
+          >
+            <span class="text-sm font-sans text-stone-300 tracking-wide w-8 flex-shrink-0">
+              {{ level.number }}
+            </span>
+            <h3 class="font-serif text-xl md:text-2xl text-charcoal min-w-[140px]">
               {{ level.name }}
             </h3>
-            <p class="text-stone-500 text-sm">
+            <p class="text-stone-500 text-sm flex-1 hidden md:block">
               {{ level.description }}
             </p>
+            <svg class="w-5 h-5 text-stone-300 group-hover:text-forest group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Location / Contact -->
-    <section id="contact" class="section-padding bg-forest text-white">
-      <div class="container-custom">
+    <!-- Location / Contact — Typographic weight -->
+    <section id="contact" class="section-padding bg-forest text-white relative overflow-hidden grain-overlay">
+      <!-- Decorative text -->
+      <div class="absolute top-1/2 right-0 -translate-y-1/2 text-white/[0.03] font-serif select-none pointer-events-none" style="font-size: 20vw; line-height: 1;">
+        Visit
+      </div>
+
+      <div class="relative px-6 sm:px-10 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           <div ref="contactContent" class="opacity-0">
-            <span class="text-sage-200 font-medium tracking-wide uppercase text-sm">Visit Us</span>
-            <h2 class="font-serif text-3xl md:text-4xl mt-2 mb-6">
+            <span class="text-xs tracking-[0.3em] uppercase text-sage-200 mb-4 block">Find Us</span>
+            <h2 class="font-serif text-5xl md:text-6xl tracking-tight leading-none mt-2 mb-8">
               Our Nursery
             </h2>
-            <p class="text-white/70 mb-8">
+            <p class="text-white/50 mb-10 max-w-md">
               Experience our collection in person. Schedule a visit to stroll through
               our gardens and find your perfect bonsai companion.
             </p>
@@ -369,7 +398,7 @@ const contactMap = ref<HTMLElement | null>(null)
                   <div class="font-medium">
                     Address
                   </div>
-                  <div class="text-white/60">
+                  <div class="text-white/50">
                     123 Bonsai Lane, Charleston, SC 29401
                   </div>
                 </div>
@@ -385,7 +414,7 @@ const contactMap = ref<HTMLElement | null>(null)
                   <div class="font-medium">
                     Hours
                   </div>
-                  <div class="text-white/60">
+                  <div class="text-white/50">
                     Open Daily: 9am - 6pm (By Appointment)
                   </div>
                 </div>
@@ -401,7 +430,7 @@ const contactMap = ref<HTMLElement | null>(null)
                   <div class="font-medium">
                     Contact
                   </div>
-                  <a href="mailto:hello@charlestonbonsai.com" class="text-white/60 hover:text-white transition-colors">
+                  <a href="mailto:hello@charlestonbonsai.com" class="text-white/50 hover:text-white transition-colors">
                     hello@charlestonbonsai.com
                   </a>
                 </div>
@@ -410,14 +439,14 @@ const contactMap = ref<HTMLElement | null>(null)
           </div>
 
           <!-- Map placeholder -->
-          <div ref="contactMap" class="bg-white/10 rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-auto opacity-0">
-            <div class="w-full h-full min-h-[300px] flex items-center justify-center text-white/40">
+          <div ref="contactMap" class="bg-white/5 border border-white/10 rounded-lg overflow-hidden aspect-[4/3] lg:aspect-auto opacity-0">
+            <div class="w-full h-full min-h-[300px] flex items-center justify-center text-white/30">
               <div class="text-center">
-                <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-12 h-12 mx-auto mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
-                <p class="text-sm">
-                  Map placeholder
+                <p class="text-xs tracking-[0.2em] uppercase">
+                  Map Coming Soon
                 </p>
               </div>
             </div>

@@ -56,7 +56,8 @@ export const useToastStore = defineStore('toast', () => {
     // Enforce max toasts — remove oldest first
     while (toasts.value.length >= MAX_TOASTS) {
       const oldest = toasts.value[0]
-      if (oldest) removeToast(oldest.id)
+      if (oldest)
+        removeToast(oldest.id)
     }
 
     toasts.value.push(toast)

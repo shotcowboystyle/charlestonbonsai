@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
   'https://xhderhlscsreyylyucvb.supabase.co',
-  'sb_publishable_ERYNxpVpCDlF17CT_VwCgg_ogPIzCg7'
+  'sb_publishable_ERYNxpVpCDlF17CT_VwCgg_ogPIzCg7',
 )
 
 async function test() {
@@ -12,9 +12,14 @@ async function test() {
     .eq('featured', true)
     .eq('in_stock', true)
     .limit(5)
-    
-  console.log('Error:', error)
-  console.log('Data:', data)
+
+  if (error) {
+    console.error('Error:', error)
+    return
+  }
+
+  // eslint-disable-next-line no-console
+  console.info('Data:', data)
 }
 
 test()
