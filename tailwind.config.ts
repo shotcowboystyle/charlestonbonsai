@@ -77,10 +77,17 @@ export default <Config>{
       },
       fontFamily: {
         serif: ['Playfair Display', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+        '7xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.04em' }],
+        '8xl': ['6rem', { lineHeight: '1', letterSpacing: '-0.05em' }],
+        '9xl': ['8rem', { lineHeight: '0.9', letterSpacing: '-0.06em' }],
+      },
+      letterSpacing: {
+        tightest: '-0.06em',
+        tighter: '-0.04em',
       },
       spacing: {
         18: '4.5rem',
@@ -92,9 +99,11 @@ export default <Config>{
         '4xl': '2rem',
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'soft-lg': '0 10px 40px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+        'soft': '0 2px 15px -3px rgba(45, 71, 57, 0.07), 0 10px 20px -2px rgba(45, 71, 57, 0.04)',
+        'soft-lg': '0 10px 40px -3px rgba(45, 71, 57, 0.1), 0 4px 6px -2px rgba(45, 71, 57, 0.05)',
+        'inner-soft': 'inset 0 2px 4px 0 rgba(45, 71, 57, 0.06)',
+        'warm': '0 4px 20px -2px rgba(92, 64, 51, 0.08), 0 2px 8px -2px rgba(92, 64, 51, 0.04)',
+        'dramatic': '0 20px 60px -10px rgba(45, 71, 57, 0.2), 0 8px 20px -6px rgba(92, 64, 51, 0.1)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

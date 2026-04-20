@@ -46,10 +46,14 @@ const hasActiveFilters = computed(() => {
 
 const activeFilterCount = computed(() => {
   let count = 0
-  if (filters.value.sizes.length > 0) count++
-  if (filters.value.careLevels.length > 0) count++
-  if (filters.value.treeTypes.length > 0) count++
-  if (filters.value.inStockOnly) count++
+  if (filters.value.sizes.length > 0)
+    count++
+  if (filters.value.careLevels.length > 0)
+    count++
+  if (filters.value.treeTypes.length > 0)
+    count++
+  if (filters.value.inStockOnly)
+    count++
   return count
 })
 
@@ -217,13 +221,18 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-cream">
-    <!-- Header -->
-    <div class="bg-white border-b border-stone-200 pt-28 pb-8">
-      <div class="container-custom">
-        <h1 class="section-heading">
+    <!-- Header — Bold forest block -->
+    <div class="bg-forest pt-28 pb-12 relative overflow-hidden">
+      <!-- Decorative letter -->
+      <div class="absolute top-1/2 right-0 -translate-y-1/2 text-white/[0.03] font-serif select-none pointer-events-none" style="font-size: 25vw; line-height: 1;">
+        G
+      </div>
+      <div class="relative px-6 sm:px-10 lg:px-16">
+        <span class="text-xs tracking-[0.3em] uppercase text-white/40 mb-4 block">Browse</span>
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-white tracking-tight leading-none mb-4">
           Our Collection
         </h1>
-        <p class="section-subheading">
+        <p class="text-white/50 max-w-md">
           Explore our curated selection of exceptional bonsai trees
         </p>
       </div>

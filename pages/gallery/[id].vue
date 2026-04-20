@@ -90,19 +90,19 @@ watch(tree, async (newTree) => {
 
     <!-- Tree Detail -->
     <div v-else>
-      <!-- Breadcrumb -->
-      <div class="bg-white border-b border-stone-200 pt-24 pb-4">
+      <!-- Breadcrumb — dark forest background -->
+      <div class="bg-forest pt-24 pb-4">
         <div class="container-custom">
-          <nav class="flex items-center gap-2 text-sm text-stone-500">
-            <NuxtLink to="/" class="hover:text-charcoal transition-colors">
+          <nav class="flex items-center gap-2 text-sm text-white/50">
+            <NuxtLink to="/" class="hover:text-white transition-colors">
               Home
             </NuxtLink>
-            <span>/</span>
-            <NuxtLink to="/gallery" class="hover:text-charcoal transition-colors">
+            <span class="text-white/30">/</span>
+            <NuxtLink to="/gallery" class="hover:text-white transition-colors">
               Gallery
             </NuxtLink>
-            <span>/</span>
-            <span class="text-charcoal">{{ tree.name }}</span>
+            <span class="text-white/30">/</span>
+            <span class="text-white/80">{{ tree.name }}</span>
           </nav>
         </div>
       </div>
@@ -112,7 +112,7 @@ watch(tree, async (newTree) => {
           <!-- Images & 3D -->
           <div class="space-y-6">
             <!-- Main Image -->
-            <div class="aspect-square bg-white rounded-2xl overflow-hidden shadow-soft">
+            <div class="aspect-square bg-white rounded-lg overflow-hidden shadow-soft">
               <img
                 :src="currentImage"
                 :alt="tree.name"
@@ -137,7 +137,7 @@ watch(tree, async (newTree) => {
             </div>
 
             <!-- 3D Viewer -->
-            <div v-if="tree.model3dUrl" class="bg-white rounded-2xl p-6 shadow-soft">
+            <div v-if="tree.model3dUrl" class="bg-white rounded-lg p-6 shadow-soft">
               <h3 class="font-serif text-lg text-charcoal mb-4">
                 3D View
               </h3>
@@ -166,7 +166,7 @@ watch(tree, async (newTree) => {
                   In Stock
                 </UiBadge>
               </div>
-              <h1 class="font-serif text-3xl md:text-4xl text-charcoal mb-2">
+              <h1 class="font-serif text-4xl md:text-5xl text-charcoal mb-2 tracking-tight">
                 {{ tree.name }}
               </h1>
               <p class="text-lg text-stone-500 italic">
@@ -174,8 +174,9 @@ watch(tree, async (newTree) => {
               </p>
             </div>
 
-            <!-- Price -->
-            <div class="mb-8">
+            <!-- Price — broken out with label -->
+            <div class="border-y border-stone-200 py-6 mb-8">
+              <span class="text-xs tracking-[0.2em] uppercase text-stone-400 block mb-1">Price</span>
               <span class="text-3xl font-semibold text-forest">${{ tree.price.toLocaleString() }}</span>
             </div>
 
@@ -187,7 +188,7 @@ watch(tree, async (newTree) => {
             </div>
 
             <!-- Specs -->
-            <div class="bg-cream-50 rounded-xl p-6 mb-8">
+            <div class="bg-cream-50 rounded-lg p-6 mb-8">
               <h3 class="font-serif text-lg text-charcoal mb-4">
                 Specifications
               </h3>
@@ -283,7 +284,7 @@ watch(tree, async (newTree) => {
                   This Tree Has Been Sold
                 </button>
                 <a
-                  :href="`mailto:hello@charlestonbonsai.com?subject=${encodeURIComponent('Notify me: similar ' + tree.treeType + ' available')}&body=${encodeURIComponent('Hi, I was interested in ' + tree.name + ' but see it has been sold. Please let me know when similar trees become available.')}`"
+                  :href="`mailto:hello@charlestonbonsai.com?subject=${encodeURIComponent(`Notify me: similar ${tree.treeType} available`)}&body=${encodeURIComponent(`Hi, I was interested in ${tree.name} but see it has been sold. Please let me know when similar trees become available.`)}`"
                   class="btn btn-outline w-full inline-flex items-center justify-center gap-2 text-sm"
                 >
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

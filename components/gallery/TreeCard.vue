@@ -32,10 +32,12 @@ function handleImageError(e: Event) {
       <img
         :src="tree.thumbnail"
         :alt="tree.name"
-        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         loading="lazy"
         @error="handleImageError"
       >
+      <!-- Forest-tinted overlay on hover -->
+      <div class="absolute inset-0 bg-forest/0 group-hover:bg-forest/10 transition-colors duration-700" />
       <!-- Badges -->
       <div class="absolute top-3 left-3 flex flex-col gap-2">
         <UiBadge v-if="tree.featured" variant="sage" size="sm">
@@ -49,14 +51,9 @@ function handleImageError(e: Event) {
 
     <!-- Content -->
     <div class="p-5">
-      <div class="flex items-start justify-between gap-2 mb-2">
-        <h3 class="font-serif text-lg text-charcoal group-hover:text-forest transition-colors">
-          {{ tree.name }}
-        </h3>
-        <span class="font-semibold text-forest whitespace-nowrap">
-          ${{ tree.price.toLocaleString() }}
-        </span>
-      </div>
+      <h3 class="font-serif text-lg text-charcoal group-hover:text-forest transition-colors mb-1">
+        {{ tree.name }}
+      </h3>
 
       <p class="text-sm text-stone-500 italic mb-3">
         {{ tree.species }}
@@ -75,16 +72,17 @@ function handleImageError(e: Event) {
         </UiBadge>
       </div>
 
-      <div class="flex items-center justify-between">
-        <span v-if="tree.inStock" class="text-xs text-sage font-medium">
-          Available now
+      <!-- Price + CTA in border-t area -->
+      <div class="flex items-center justify-between border-t border-stone-100 pt-4">
+        <span class="font-semibold text-forest">
+          ${{ tree.price.toLocaleString() }}
         </span>
-        <div class="flex items-center text-sage text-sm font-medium group-hover:text-forest transition-colors ml-auto">
-          See This Tree
-          <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        <span class="text-xs tracking-widest uppercase text-stone-400 group-hover:text-forest transition-colors flex items-center gap-1">
+          View
+          <svg class="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
-        </div>
+        </span>
       </div>
     </div>
   </NuxtLink>
