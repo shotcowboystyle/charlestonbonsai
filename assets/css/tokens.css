@@ -23,34 +23,36 @@
        PRIMITIVE INK SCALE — text and stroke values.
        Light theme: deep warm sumi black descending to faint marks.
        Dark theme: warm bone descending to deep ink.
-       Both tinted faintly toward the vermillion accent (hue ~50-60).
+       Both tinted faintly toward the mossy accent (hue ~120-145)
+       so neutrals and accent share lineage without reading as green.
        -------------------------------------------------------- */
-    --ink-1: light-dark(oklch(0.18 0.008 50), oklch(0.94 0.006 75));
-    --ink-2: light-dark(oklch(0.40 0.010 55), oklch(0.76 0.008 70));
-    --ink-3: light-dark(oklch(0.58 0.012 60), oklch(0.58 0.010 65));
-    --ink-4: light-dark(oklch(0.78 0.008 65), oklch(0.36 0.012 60));
+    --ink-1: light-dark(oklch(0.20 0.006 130), oklch(0.94 0.005 130));
+    --ink-2: light-dark(oklch(0.42 0.008 130), oklch(0.76 0.006 130));
+    --ink-3: light-dark(oklch(0.60 0.010 135), oklch(0.58 0.008 130));
+    --ink-4: light-dark(oklch(0.80 0.008 135), oklch(0.36 0.010 130));
 
     /* --------------------------------------------------------
        PRIMITIVE PAPER / GALLERY SCALE — surface values.
-       Light: bone / unbleached paper, warmly tinted (washi).
-       Dark: deep near-black gallery wall, faintly warm.
+       Light: bone / unbleached paper, faintly tinted toward moss.
+       Dark: deep near-black gallery wall, same faint tint.
        Pure #fff and #000 are forbidden — both are tinted.
        -------------------------------------------------------- */
-    --paper-1: light-dark(oklch(0.972 0.008 75), oklch(0.180 0.006 50));
-    --paper-2: light-dark(oklch(0.952 0.009 73), oklch(0.215 0.008 50));
-    --paper-3: light-dark(oklch(0.928 0.010 70), oklch(0.260 0.010 50));
+    --paper-1: light-dark(oklch(0.974 0.006 120), oklch(0.180 0.005 130));
+    --paper-2: light-dark(oklch(0.954 0.007 120), oklch(0.215 0.007 130));
+    --paper-3: light-dark(oklch(0.930 0.008 125), oklch(0.260 0.008 130));
 
     /* --------------------------------------------------------
-       ACCENT — vermillion seal.
-       References the artist's red hanko stamp on sumi-e paintings.
-       Used sparingly (10% of visual weight at most). The accent
-       has thematic meaning, not decorative purpose.
-       Chroma reduced at extreme lightness per OKLCH discipline.
+       ACCENT — mossy stone-green.
+       Deep, desaturated foliage / patinated bronze. Sits naturally
+       with photography of trees without competing for color. Used
+       sparingly (≤10% of visual weight). Never as a body-text fill,
+       never as a gradient, never as a background wash.
+       Chroma kept low at extreme lightness per OKLCH discipline.
        -------------------------------------------------------- */
-    --accent: light-dark(oklch(0.52 0.16 28), oklch(0.62 0.17 28));
-    --accent-press: light-dark(oklch(0.46 0.17 28), oklch(0.56 0.18 28));
-    --accent-ink: oklch(0.97 0.02 30);
-    --accent-quiet: light-dark(oklch(0.94 0.04 30), oklch(0.30 0.07 28));
+    --accent: light-dark(oklch(0.42 0.055 145), oklch(0.62 0.060 145));
+    --accent-press: light-dark(oklch(0.36 0.060 145), oklch(0.56 0.065 145));
+    --accent-ink: oklch(0.97 0.012 135);
+    --accent-quiet: light-dark(oklch(0.93 0.018 135), oklch(0.30 0.030 145));
 
     /* --------------------------------------------------------
        SEMANTIC SURFACES — what the rest of the system reads.

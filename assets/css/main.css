@@ -1,12 +1,12 @@
+/* Sumi-e design tokens (see assets/css/tokens.css and .impeccable.md).
+   PostCSS requires @import to precede other statements (besides @charset
+   and @layer). Token definitions live in their own @layer so Tailwind's
+   preflight does not clobber them. */
+@import './tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Sumi-e design tokens (see assets/css/tokens.css and .impeccable.md).
-   Loaded after Tailwind base so token-consuming styles can override
-   preflight defaults. Components currently still use legacy classes;
-   migration is a follow-up pass. */
-@import './tokens.css';
 
 @layer base {
   html {
@@ -14,28 +14,38 @@
   }
 
   body {
-    @apply bg-cream text-charcoal font-sans antialiased;
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    font-family: var(--font-display);
+    color: var(--text);
   }
 
-  /* Custom scrollbar */
+  /* Sumi-e scrollbar: a thin ink rule on a bone gutter */
   ::-webkit-scrollbar {
-    @apply w-2;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-cream-100;
+    background: var(--surface-sunken);
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-forest-100 rounded-full;
+    background: var(--ink-4);
+    border: 3px solid var(--surface-sunken);
+    border-radius: var(--radius-pill);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-forest-200;
+    background: var(--ink-3);
   }
 }
 

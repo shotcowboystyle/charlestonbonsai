@@ -3,10 +3,9 @@ const scrolled = ref(false)
 const mobileMenuOpen = ref(false)
 
 const navLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/gallery', label: 'Gallery' },
-  { to: '/#about', label: 'About' },
-  { to: '/#contact', label: 'Contact' },
+  { to: '/', label: 'Index' },
+  { to: '/gallery', label: 'Catalog' },
+  { to: '/#visit', label: 'Visit' },
 ]
 
 // Handle scroll
@@ -33,60 +32,33 @@ watch(() => route.path, () => {
 <template>
   <header
     ref="navbar"
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :class="scrolled ? 'bg-cream/95 backdrop-blur-md shadow-soft' : 'bg-transparent'"
+    class="cb-nav"
+    :class="scrolled ? 'cb-nav--scrolled' : ''"
   >
-    <nav class="container-custom">
-      <div class="flex items-center justify-between h-16">
+    <nav class="cb-nav__inner">
+      <div class="cb-nav__row">
         <!-- Logo — typographic monogram -->
-        <NuxtLink to="/" class="flex items-center gap-3 group">
-          <div
-            class="w-9 h-9 border-2 flex items-center justify-center transition-all duration-300"
-            :class="scrolled ? 'border-charcoal' : 'border-white/60'"
-          >
-            <span
-              class="font-serif text-sm font-bold tracking-tight transition-colors duration-300"
-              :class="scrolled ? 'text-charcoal' : 'text-white'"
-            >CB</span>
-          </div>
-          <div>
-            <div
-              class="font-serif font-semibold text-sm transition-colors duration-300"
-              :class="scrolled ? 'text-charcoal' : 'text-white'"
-            >
-              Charleston Bonsai
-            </div>
-          </div>
+        <NuxtLink to="/" class="cb-nav__logo group">
+          <span class="cb-nav__mark" aria-hidden="true">CB</span>
+          <span class="cb-nav__wordmark">Charleston Bonsai</span>
         </NuxtLink>
 
         <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center gap-8">
+        <div class="cb-nav__links">
           <NuxtLink
             v-for="link in navLinks"
             :key="link.to"
             :to="link.to"
-            class="text-xs tracking-widest uppercase font-medium transition-colors duration-300 link-underline"
-            :class="scrolled ? 'text-charcoal hover:text-forest' : 'text-white/90 hover:text-white'"
+            class="cb-nav__link"
           >
             {{ link.label }}
           </NuxtLink>
         </div>
 
-        <!-- CTA Button -->
-        <div v-if="route.path !== '/gallery'" class="hidden md:block">
-          <NuxtLink
-            to="/gallery"
-            class="btn text-xs tracking-widest uppercase transition-all duration-300"
-            :class="scrolled ? 'btn-primary' : 'bg-white text-forest hover:bg-cream'"
-          >
-            Explore Collection
-          </NuxtLink>
-        </div>
-
         <!-- Mobile Menu Button -->
         <button
-          class="md:hidden p-2 rounded-lg transition-colors"
-          :class="scrolled ? 'text-charcoal hover:bg-cream' : 'text-white hover:bg-white/10'"
+          class="cb-nav__menu-btn"
+          aria-label="Toggle navigation"
           @click="mobileMenuOpen = !mobileMenuOpen"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,25 +91,17 @@ watch(() => route.path, () => {
       >
         <div
           v-if="mobileMenuOpen"
-          class="md:hidden absolute top-full left-0 right-0 bg-cream/95 backdrop-blur-md shadow-soft-lg border-t border-stone-100"
+          class="cb-nav__mobile"
         >
-          <div class="container-custom py-4 space-y-4">
+          <div class="cb-nav__mobile-inner">
             <NuxtLink
               v-for="link in navLinks"
               :key="link.to"
               :to="link.to"
-              class="block py-2 text-xs tracking-widest uppercase font-medium text-charcoal hover:text-forest transition-colors"
+              class="cb-nav__mobile-link"
               @click="mobileMenuOpen = false"
             >
               {{ link.label }}
-            </NuxtLink>
-            <NuxtLink
-              v-if="route.path !== '/gallery'"
-              to="/gallery"
-              class="btn btn-primary w-full text-xs tracking-widest uppercase"
-              @click="mobileMenuOpen = false"
-            >
-              Explore Collection
             </NuxtLink>
           </div>
         </div>
@@ -145,3 +109,163 @@ watch(() => route.path, () => {
     </nav>
   </header>
 </template>
+
+<style scoped>
+.cb-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+  background: transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart);
+  border-bottom: 1px solid transparent;
+}
+
+.cb-nav--scrolled {
+  background: color-mix(in oklch, var(--surface) 92%, transparent);
+  border-bottom-color: var(--border-hair);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.cb-nav__inner {
+  max-width: 96rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+}
+
+.cb-nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4.5rem;
+}
+
+.cb-nav__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.cb-nav__mark {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink-2);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.cb-nav__wordmark {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: var(--text);
+}
+
+.cb-nav__links {
+  display: none;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 768px) {
+  .cb-nav__links {
+    display: flex;
+  }
+}
+
+.cb-nav__link {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  position: relative;
+  padding: var(--space-2xs) 0;
+  transition: color var(--duration-base) var(--ease-out-quart);
+  font-feature-settings: var(--feat-small-caps);
+}
+
+.cb-nav__link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-out-quart);
+}
+
+.cb-nav__link:hover,
+.cb-nav__link:focus-visible,
+.cb-nav__link.router-link-exact-active {
+  color: var(--text);
+}
+
+.cb-nav__link:hover::after,
+.cb-nav__link:focus-visible::after,
+.cb-nav__link.router-link-exact-active::after {
+  transform: scaleX(1);
+}
+
+.cb-nav__menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xs);
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .cb-nav__menu-btn {
+    display: none;
+  }
+}
+
+.cb-nav__mobile {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border-hair);
+}
+
+.cb-nav__mobile-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) clamp(1.25rem, 4vw, 3rem);
+}
+
+.cb-nav__mobile-link {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  padding: var(--space-2xs) 0;
+  font-feature-settings: var(--feat-small-caps);
+}
+</style>

@@ -1,121 +1,190 @@
+<script setup lang="ts">
+const year = new Date().getFullYear()
+</script>
+
 <template>
-  <footer class="bg-charcoal text-white">
-    <!-- Main Footer -->
-    <div class="px-6 sm:px-10 lg:px-16 section-padding">
-      <!-- Large typographic brand -->
-      <div class="mb-16">
-        <h2 class="font-serif text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-none">
-          Charleston<br>Bonsai
-        </h2>
-        <p class="text-white/40 mt-4 max-w-md">
-          Cultivating exceptional bonsai trees with patience, artistry, and dedication.
+  <footer class="cb-footer">
+    <div class="cb-footer__inner">
+      <div class="cb-footer__brand">
+        <span class="cb-footer__mark" aria-hidden="true">CB</span>
+        <span class="cb-footer__name">Charleston Bonsai</span>
+      </div>
+
+      <nav class="cb-footer__nav" aria-label="Footer">
+        <NuxtLink to="/gallery">
+          Catalog
+        </NuxtLink>
+        <NuxtLink to="/#visit">
+          Visit
+        </NuxtLink>
+        <a href="mailto:hello@charlestonbonsai.com">
+          Write
+        </a>
+        <NuxtLink to="/admin/login">
+          Admin
+        </NuxtLink>
+      </nav>
+
+      <div class="cb-footer__legal">
+        <p class="cb-footer__copy">
+          &copy; {{ year }} Charleston Bonsai
         </p>
-      </div>
-
-      <!-- Links grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-white/10 pt-12">
-        <!-- Quick Links -->
-        <div>
-          <h4 class="text-xs tracking-[0.3em] uppercase text-white/40 mb-6">
-            Navigate
-          </h4>
-          <ul class="space-y-3">
-            <li>
-              <NuxtLink to="/gallery" class="text-white/60 hover:text-white transition-colors">
-                View Collection
-              </NuxtLink>
-            </li>
-            <li>
-              <a href="#about" class="text-white/60 hover:text-white transition-colors">
-                Our Story
-              </a>
-            </li>
-            <li>
-              <a href="#contact" class="text-white/60 hover:text-white transition-colors">
-                Contact Us
-              </a>
-            </li>
-            <li>
-              <NuxtLink to="/admin/login" class="text-white/60 hover:text-white transition-colors">
-                Admin Login
-              </NuxtLink>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Contact -->
-        <div>
-          <h4 class="text-xs tracking-[0.3em] uppercase text-white/40 mb-6">
-            Visit Us
-          </h4>
-          <address class="not-italic text-white/60 space-y-3">
-            <p>
-              123 Bonsai Lane<br>
-              Charleston, SC 29401
-            </p>
-            <p>
-              <a href="tel:+18435551234" class="hover:text-white transition-colors">
-                (843) 555-1234
-              </a>
-            </p>
-            <p>
-              <a href="mailto:hello@charlestonbonsai.com" class="hover:text-white transition-colors">
-                hello@charlestonbonsai.com
-              </a>
-            </p>
-            <p class="text-sm text-white/40">
-              Open Daily: 9am - 6pm<br>
-              By Appointment
-            </p>
-          </address>
-        </div>
-
-        <!-- Social -->
-        <div>
-          <h4 class="text-xs tracking-[0.3em] uppercase text-white/40 mb-6">
-            Follow
-          </h4>
-          <div class="flex gap-4">
-            <a href="#" class="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-white/30 transition-colors">
-              <svg class="w-4 h-4 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-            </a>
-            <a href="#" class="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-white/30 transition-colors">
-              <svg class="w-4 h-4 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-              </svg>
-            </a>
-            <a href="#" class="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-white/30 transition-colors">
-              <svg class="w-4 h-4 text-white/60" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.053 5.56-5.023c.242-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.828.94z" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Bar -->
-    <div class="border-t border-white/10">
-      <div class="px-6 sm:px-10 lg:px-16 py-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p class="text-sm text-white/30">
-            © {{ new Date().getFullYear() }} Charleston Bonsai. All rights reserved.
-          </p>
-          <div class="flex gap-6 text-sm text-white/30">
-            <NuxtLink to="/privacy-policy" class="hover:text-white transition-colors">
-              Privacy Policy
-            </NuxtLink>
-            <NuxtLink to="/terms-of-service" class="hover:text-white transition-colors">
-              Terms of Service
-            </NuxtLink>
-            <NuxtLink to="/data-removal" class="hover:text-white transition-colors">
-              Data Removal
-            </NuxtLink>
-          </div>
+        <div class="cb-footer__policies">
+          <NuxtLink to="/privacy-policy">
+            Privacy
+          </NuxtLink>
+          <NuxtLink to="/terms-of-service">
+            Terms
+          </NuxtLink>
+          <NuxtLink to="/data-removal">
+            Data removal
+          </NuxtLink>
         </div>
       </div>
     </div>
   </footer>
 </template>
+
+<style scoped>
+.cb-footer {
+  background: var(--surface-sunken);
+  border-top: 1px solid var(--border-hair);
+  color: var(--text-muted);
+}
+
+.cb-footer__inner {
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
+  display: grid;
+  gap: var(--space-xl);
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+
+@media (min-width: 720px) {
+  .cb-footer__inner {
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-2xl);
+  }
+}
+
+.cb-footer__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text);
+}
+
+.cb-footer__mark {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink-2);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cb-footer__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+.cb-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-xl);
+  justify-content: flex-start;
+}
+
+@media (min-width: 720px) {
+  .cb-footer__nav {
+    justify-content: center;
+  }
+}
+
+.cb-footer__nav a {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: var(--space-3xs);
+  font-feature-settings: var(--feat-small-caps);
+  transition: color var(--duration-base) var(--ease-out-quart);
+}
+
+.cb-footer__nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-out-quart);
+}
+
+.cb-footer__nav a:hover,
+.cb-footer__nav a:focus-visible {
+  color: var(--text);
+}
+
+.cb-footer__nav a:hover::after,
+.cb-footer__nav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.cb-footer__legal {
+  display: grid;
+  gap: var(--space-2xs);
+  justify-items: start;
+}
+
+@media (min-width: 720px) {
+  .cb-footer__legal {
+    justify-items: end;
+    text-align: right;
+  }
+}
+
+.cb-footer__copy {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  margin: 0;
+  font-feature-settings: var(--feat-spec-data);
+}
+
+.cb-footer__policies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.cb-footer__policies a {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-decoration: none;
+  font-feature-settings: var(--feat-small-caps);
+  transition: color var(--duration-base) var(--ease-out-quart);
+}
+
+.cb-footer__policies a:hover,
+.cb-footer__policies a:focus-visible {
+  color: var(--text);
+}
+</style>
