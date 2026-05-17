@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Sumi-e design tokens (see assets/css/tokens.css and .impeccable.md).
+   Loaded after Tailwind base so token-consuming styles can override
+   preflight defaults. Components currently still use legacy classes;
+   migration is a follow-up pass. */
+@import './tokens.css';
+
 @layer base {
   html {
     @apply scroll-smooth;
@@ -144,11 +150,6 @@
 }
 
 @layer utilities {
-  /* Text gradient */
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-forest to-sage;
-  }
-
   /* Aspect ratios */
   .aspect-tree {
     aspect-ratio: 3/4;

@@ -37,7 +37,11 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap' },
+        // Sumi-e atelier type system. Cardo (Renaissance-revival serif with
+        // small-caps and oldstyle figures) pairs with Albert Sans (restrained
+        // humanist body). Legacy Playfair + Outfit families are retired with
+        // the design reset (see .impeccable.md).
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Albert+Sans:wght@300;400;500;600;700&display=swap' },
       ],
     },
     pageTransition: { name: 'page', mode: 'out-in' },

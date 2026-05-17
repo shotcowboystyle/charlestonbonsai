@@ -15,6 +15,10 @@ export default antfu({
     '**/.nuxt/**',
     '**/.git/**',
     '**/*.md',
+    '**/.agent/**',
+    '**/.agents/**',
+    '**/.claude/**',
+    '**/.cursor/**',
   ],
   rules: {
     // Nuxt uses process.env convention
@@ -22,7 +26,7 @@ export default antfu({
     // Allow unused refs that may be used in templates
     'vue/no-unused-refs': 'off',
     // Allow unused vars that start with underscore
-    'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'unused-imports/no-unused-vars': ['error', {argsIgnorePattern: '^_', varsIgnorePattern: '^_'}],
     // Vue refs are often used in onMounted before declaration
     'ts/no-use-before-define': 'off',
   },

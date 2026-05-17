@@ -1,0 +1,280 @@
+/* ============================================================
+   Charleston Bonsai — Design Tokens
+   ------------------------------------------------------------
+   Sumi-e ink wash aesthetic for serious bonsai collectors.
+   See .impeccable.md for full design context.
+
+   Bans enforced by this system:
+   - No pure #000 or #fff (always tinted)
+   - No gradient text (background-clip: text + gradient)
+   - No side-stripe borders > 1px as decoration
+   - No high-chroma colors at extreme lightness
+
+   Color space: OKLCH (perceptually uniform).
+   Theme strategy: light-dark() with [data-theme] override.
+   ============================================================ */
+
+@layer tokens {
+
+  :root {
+    color-scheme: light dark;
+
+    /* --------------------------------------------------------
+       PRIMITIVE INK SCALE — text and stroke values.
+       Light theme: deep warm sumi black descending to faint marks.
+       Dark theme: warm bone descending to deep ink.
+       Both tinted faintly toward the vermillion accent (hue ~50-60).
+       -------------------------------------------------------- */
+    --ink-1: light-dark(oklch(0.18 0.008 50), oklch(0.94 0.006 75));
+    --ink-2: light-dark(oklch(0.40 0.010 55), oklch(0.76 0.008 70));
+    --ink-3: light-dark(oklch(0.58 0.012 60), oklch(0.58 0.010 65));
+    --ink-4: light-dark(oklch(0.78 0.008 65), oklch(0.36 0.012 60));
+
+    /* --------------------------------------------------------
+       PRIMITIVE PAPER / GALLERY SCALE — surface values.
+       Light: bone / unbleached paper, warmly tinted (washi).
+       Dark: deep near-black gallery wall, faintly warm.
+       Pure #fff and #000 are forbidden — both are tinted.
+       -------------------------------------------------------- */
+    --paper-1: light-dark(oklch(0.972 0.008 75), oklch(0.180 0.006 50));
+    --paper-2: light-dark(oklch(0.952 0.009 73), oklch(0.215 0.008 50));
+    --paper-3: light-dark(oklch(0.928 0.010 70), oklch(0.260 0.010 50));
+
+    /* --------------------------------------------------------
+       ACCENT — vermillion seal.
+       References the artist's red hanko stamp on sumi-e paintings.
+       Used sparingly (10% of visual weight at most). The accent
+       has thematic meaning, not decorative purpose.
+       Chroma reduced at extreme lightness per OKLCH discipline.
+       -------------------------------------------------------- */
+    --accent: light-dark(oklch(0.52 0.16 28), oklch(0.62 0.17 28));
+    --accent-press: light-dark(oklch(0.46 0.17 28), oklch(0.56 0.18 28));
+    --accent-ink: oklch(0.97 0.02 30);
+    --accent-quiet: light-dark(oklch(0.94 0.04 30), oklch(0.30 0.07 28));
+
+    /* --------------------------------------------------------
+       SEMANTIC SURFACES — what the rest of the system reads.
+       Components migrate to these, never to raw primitives.
+       -------------------------------------------------------- */
+    --surface: var(--paper-1);
+    --surface-raised: var(--paper-2);
+    --surface-sunken: var(--paper-3);
+
+    --text: var(--ink-1);
+    --text-muted: var(--ink-2);
+    --text-faint: var(--ink-3);
+
+    --border: var(--ink-4);
+    --border-hair: color-mix(in oklch, var(--ink-1) 12%, transparent);
+
+    /* --------------------------------------------------------
+       TYPE FAMILIES.
+       Display: Cardo (Renaissance revival, small-caps, oldstyle figures).
+       Body: Albert Sans (humanist sans, tabular figures available).
+       Both via Google Fonts. No monospace third family — use
+       Albert Sans tabular figures for spec data instead.
+       -------------------------------------------------------- */
+    --font-display: 'Cardo', 'Hoefler Text', 'Times New Roman', serif;
+    --font-body: 'Albert Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+    /* OpenType features for genuine typographic detail */
+    --feat-spec-data: 'tnum' 1, 'lnum' 1;          /* tabular lining figures */
+    --feat-running-text: 'kern' 1, 'liga' 1, 'onum' 1; /* oldstyle figures in copy */
+    --feat-small-caps: 'smcp' 1, 'c2sc' 1;
+
+    /* --------------------------------------------------------
+       TYPE SCALE — display (fluid for marketing/content pages).
+       Five steps with ≥1.25 ratio per typography principles.
+       Editorial pages use these; product UI uses --type-ui-*.
+       -------------------------------------------------------- */
+    --type-display-1: clamp(3rem, 8vw, 6rem);
+    --type-display-2: clamp(2.25rem, 5vw, 4rem);
+    --type-display-3: clamp(1.75rem, 3vw, 2.5rem);
+    --type-display-4: clamp(1.375rem, 2vw, 1.875rem);
+    --type-display-5: clamp(1.125rem, 1.5vw, 1.375rem);
+
+    --leading-display: 0.95;
+    --leading-display-tight: 1.05;
+    --tracking-display: -0.025em;
+    --tracking-display-large: -0.04em;
+
+    /* --------------------------------------------------------
+       TYPE SCALE — UI (fixed rem for app surfaces).
+       Admin dashboard, forms, dense tables use these.
+       -------------------------------------------------------- */
+    --type-ui-h1: 1.875rem;     /* 30px */
+    --type-ui-h2: 1.5rem;       /* 24px */
+    --type-ui-h3: 1.25rem;      /* 20px */
+    --type-ui-body: 1rem;       /* 16px */
+    --type-ui-small: 0.875rem;  /* 14px */
+    --type-ui-micro: 0.75rem;   /* 12px — spec labels, small caps */
+
+    --leading-ui-tight: 1.25;
+    --leading-ui-base: 1.5;
+    --leading-ui-loose: 1.7;
+
+    /* Body line-height for dark theme adds ~0.07 per typography
+       principles (light text on dark reads as lighter weight). */
+    --leading-body: 1.55;
+
+    /* --------------------------------------------------------
+       SPACING — 4pt scale with semantic names.
+       Avoid pixel-named tokens in product code; use semantic.
+       -------------------------------------------------------- */
+    --space-3xs: 0.25rem;  /*  4px */
+    --space-2xs: 0.5rem;   /*  8px */
+    --space-xs:  0.75rem;  /* 12px */
+    --space-sm:  1rem;     /* 16px */
+    --space-md:  1.5rem;   /* 24px */
+    --space-lg:  2rem;     /* 32px */
+    --space-xl:  3rem;     /* 48px */
+    --space-2xl: 4rem;     /* 64px */
+    --space-3xl: 6rem;     /* 96px */
+
+    /* Section rhythm for editorial pages */
+    --section-y: clamp(4rem, 10vw, 8rem);
+
+    /* Reading width — caps body copy at ~68ch for tracking ease */
+    --measure-reading: 68ch;
+
+    /* --------------------------------------------------------
+       RADIUS — sumi-e atelier wants sharper edges than typical web.
+       The aesthetic is paper and ink, not pillows and buttons.
+       -------------------------------------------------------- */
+    --radius-none: 0;
+    --radius-sm: 2px;
+    --radius-md: 4px;
+    --radius-pill: 9999px;
+
+    /* --------------------------------------------------------
+       SHADOWS — single ink lines and pressed-state insets only.
+       No soft drop shadows. The "rounded rectangle with drop shadow"
+       pattern is forbidden.
+       -------------------------------------------------------- */
+    --shadow-none: none;
+    --shadow-ink-line: 0 1px 0 color-mix(in oklch, var(--ink-1) 8%, transparent);
+    --shadow-press: inset 0 1px 0 color-mix(in oklch, var(--ink-1) 10%, transparent);
+    --shadow-lift: 0 1px 2px color-mix(in oklch, var(--ink-1) 6%, transparent),
+                   0 4px 12px color-mix(in oklch, var(--ink-1) 4%, transparent);
+
+    /* --------------------------------------------------------
+       MOTION — exponential easing, prefers-reduced-motion respected.
+       No bounce, no elastic. Only transform and opacity animate.
+       -------------------------------------------------------- */
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
+
+    --duration-instant: 100ms;
+    --duration-fast: 180ms;
+    --duration-base: 240ms;
+    --duration-slow: 400ms;
+    --duration-deliberate: 700ms;
+
+    /* --------------------------------------------------------
+       FOCUS — visible at AAA, never relies on color alone.
+       Double ring: paper-color halo then accent ring, so it
+       reads on any surface including over photography.
+       -------------------------------------------------------- */
+    --focus-ring:
+      0 0 0 2px var(--surface),
+      0 0 0 4px var(--accent);
+    --focus-ring-offset: 2px;
+
+    /* --------------------------------------------------------
+       Z-LAYERS — explicit stacking, no z-index inflation.
+       -------------------------------------------------------- */
+    --z-base: 0;
+    --z-raised: 10;
+    --z-sticky: 100;
+    --z-overlay: 1000;
+    --z-modal: 1100;
+    --z-toast: 1200;
+  }
+
+  /* Manual theme override (toggle by setting [data-theme] on <html>).
+     light-dark() respects this via color-scheme. */
+  [data-theme='light'] {
+    color-scheme: light;
+  }
+
+  [data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  /* --------------------------------------------------------
+     REDUCED MOTION — full path, not partial.
+     The teach context requires this: motion fully degrades
+     to instant state changes when the user opts out.
+     -------------------------------------------------------- */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-instant: 0ms;
+      --duration-fast: 0ms;
+      --duration-base: 0ms;
+      --duration-slow: 0ms;
+      --duration-deliberate: 0ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer base {
+
+  /* --------------------------------------------------------
+     Reset-adjacent globals that consume the token system.
+     Sized to coexist with Tailwind's @tailwind base preflight.
+     -------------------------------------------------------- */
+  html {
+    /* tabular figures in spec contexts, oldstyle elsewhere */
+    font-feature-settings: var(--feat-running-text);
+  }
+
+  /* Visible focus on keyboard, not on click — the accessibility
+     contract from the teach flow. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Selection color uses the accent but at reduced strength */
+  ::selection {
+    background: color-mix(in oklch, var(--accent) 22%, transparent);
+    color: var(--text);
+  }
+
+  /* Screen-reader-only utility (not visually hidden via display:none
+     which would also hide from AT) */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Reveal on focus — useful for skip links */
+  .sr-only:focus,
+  .sr-only:focus-visible {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
