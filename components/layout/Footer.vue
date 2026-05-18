@@ -1,45 +1,93 @@
 <script setup lang="ts">
+/**
+ * Site footer — printed-catalog colophon.
+ *
+ * Three columns on desktop:
+ *   1. Imprint — address, hours
+ *   2. Notified — single-field email signup with inline state machine
+ *   3. Colophon — typefaces, established year, location, theme toggle, legal
+ *
+ * Surface is --surface-sunken; the column rule is the colophon page's
+ * masthead. Mobile collapses to a single stacked column separated by
+ * hairline rules.
+ */
 const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="cb-footer">
+  <footer class="cb-footer" role="contentinfo">
     <div class="cb-footer__inner">
-      <div class="cb-footer__brand">
-        <span class="cb-footer__mark" aria-hidden="true">CB</span>
-        <span class="cb-footer__name">Charleston Bonsai</span>
-      </div>
+      <div class="cb-footer__rule" aria-hidden="true" />
 
-      <nav class="cb-footer__nav" aria-label="Footer">
-        <NuxtLink to="/gallery">
-          Catalog
-        </NuxtLink>
-        <NuxtLink to="/#visit">
-          Visit
-        </NuxtLink>
-        <a href="mailto:hello@charlestonbonsai.com">
-          Write
-        </a>
-        <NuxtLink to="/admin/login">
-          Admin
-        </NuxtLink>
-      </nav>
+      <div class="cb-footer__grid">
+        <!-- Column 1: Imprint -->
+        <section class="cb-footer__col cb-footer__col--imprint" aria-labelledby="footer-imprint">
+          <h2 id="footer-imprint" class="cb-footer__heading">
+            Visit
+          </h2>
+          <address class="cb-footer__address">
+            <span class="cb-footer__place">
+              Charleston, South Carolina
+            </span>
+            <span>943 Godber Street</span>
+            <span>Charleston, SC 29412</span>
+          </address>
+          <p class="cb-footer__hours">
+            By appointment, Tuesday through Saturday.
+          </p>
+          <p class="cb-footer__write">
+            <a href="mailto:hello@charlestonbonsai.com">
+              hello@charlestonbonsai.com
+            </a>
+          </p>
+        </section>
+
+        <!-- Column 2: Notified -->
+        <section class="cb-footer__col cb-footer__col--notify" aria-labelledby="footer-notify">
+          <h2 id="footer-notify" class="cb-footer__heading">
+            Notified
+          </h2>
+          <LayoutSubscribeForm />
+        </section>
+
+        <!-- Column 3: Colophon -->
+        <section class="cb-footer__col cb-footer__col--colophon" aria-labelledby="footer-colophon">
+          <h2 id="footer-colophon" class="cb-footer__heading">
+            Colophon
+          </h2>
+          <div class="cb-footer__colophon">
+            <p>Set in Cardo &amp; Albert Sans.</p>
+            <p>Established 2015.</p>
+            <p>Made in Charleston, South Carolina.</p>
+          </div>
+          <div class="cb-footer__theme">
+            <span class="cb-footer__theme-label">Theme</span>
+            <LayoutThemeToggle />
+          </div>
+        </section>
+      </div>
 
       <div class="cb-footer__legal">
         <p class="cb-footer__copy">
           &copy; {{ year }} Charleston Bonsai
         </p>
-        <div class="cb-footer__policies">
+        <nav class="cb-footer__legal-nav" aria-label="Legal">
           <NuxtLink to="/privacy-policy">
             Privacy
           </NuxtLink>
+          <span class="cb-footer__legal-bullet" aria-hidden="true">·</span>
           <NuxtLink to="/terms-of-service">
             Terms
           </NuxtLink>
+          <span class="cb-footer__legal-bullet" aria-hidden="true">·</span>
           <NuxtLink to="/data-removal">
             Data removal
           </NuxtLink>
-        </div>
+          <span class="cb-footer__legal-bullet" aria-hidden="true">·</span>
+          <NuxtLink to="/admin/login">
+            Admin
+          </NuxtLink>
+        </nav>
       </div>
     </div>
   </footer>
@@ -48,131 +96,194 @@ const year = new Date().getFullYear()
 <style scoped>
 .cb-footer {
   background: var(--surface-sunken);
-  border-top: 1px solid var(--border-hair);
   color: var(--text-muted);
+  border-top: 1px solid var(--border-hair);
 }
 
 .cb-footer__inner {
-  max-width: 90rem;
+  max-width: 96rem;
   margin: 0 auto;
-  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
+  padding: clamp(3rem, 7vw, 5rem) clamp(1.5rem, 5vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+/* The page-wide masthead rule that the three columns sit under */
+.cb-footer__rule {
+  height: 1px;
+  background: var(--ink-4);
+  width: 100%;
+}
+
+.cb-footer__grid {
   display: grid;
-  gap: var(--space-xl);
   grid-template-columns: 1fr;
-  align-items: end;
+  gap: var(--space-2xl);
 }
 
-@media (min-width: 720px) {
-  .cb-footer__inner {
-    grid-template-columns: auto 1fr auto;
-    gap: var(--space-2xl);
+/* Hairline separators between stacked sections on mobile */
+@media (max-width: 719px) {
+  .cb-footer__col + .cb-footer__col {
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border-hair);
   }
 }
 
-.cb-footer__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  color: var(--text);
-}
-
-.cb-footer__mark {
-  width: 2rem;
-  height: 2rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--ink-2);
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.cb-footer__name {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 0.9375rem;
-  color: var(--text);
-}
-
-.cb-footer__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md) var(--space-xl);
-  justify-content: flex-start;
-}
-
 @media (min-width: 720px) {
-  .cb-footer__nav {
-    justify-content: center;
+  .cb-footer__grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-xl);
   }
 }
 
-.cb-footer__nav a {
+@media (min-width: 1100px) {
+  .cb-footer__grid {
+    grid-template-columns: 1.1fr 1.4fr 1fr;
+    gap: clamp(var(--space-xl), 5vw, var(--space-3xl));
+  }
+}
+
+.cb-footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cb-footer__heading {
   font-family: var(--font-body);
-  font-size: 0.6875rem;
-  letter-spacing: 0.22em;
+  font-size: 0.625rem;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  text-decoration: none;
-  position: relative;
-  padding-bottom: var(--space-3xs);
+  color: var(--text-faint);
   font-feature-settings: var(--feat-small-caps);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------
+   IMPRINT COLUMN
+   -------------------------------------------------------- */
+.cb-footer__address {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  font-style: normal;
+}
+
+.cb-footer__address > span {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--text);
+  font-feature-settings: var(--feat-running-text);
+}
+
+.cb-footer__place {
+  font-style: italic;
+  font-size: 1.125rem !important;
+  margin-bottom: var(--space-3xs);
+}
+
+.cb-footer__hours {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0;
+  font-feature-settings: var(--feat-running-text);
+}
+
+.cb-footer__write {
+  margin: 0;
+}
+
+.cb-footer__write a {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 1px;
   transition: color var(--duration-base) var(--ease-out-quart);
 }
 
-.cb-footer__nav a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--duration-base) var(--ease-out-quart);
+.cb-footer__write a:hover,
+.cb-footer__write a:focus-visible {
+  color: var(--accent);
 }
 
-.cb-footer__nav a:hover,
-.cb-footer__nav a:focus-visible {
-  color: var(--text);
+.cb-footer__write a:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 
-.cb-footer__nav a:hover::after,
-.cb-footer__nav a:focus-visible::after {
-  transform: scaleX(1);
+/* --------------------------------------------------------
+   COLOPHON COLUMN
+   -------------------------------------------------------- */
+.cb-footer__colophon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
 }
 
+.cb-footer__colophon p {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+  font-feature-settings: var(--feat-running-text);
+}
+
+.cb-footer__theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.cb-footer__theme-label {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-feature-settings: var(--feat-small-caps);
+}
+
+/* --------------------------------------------------------
+   LEGAL ROW
+   -------------------------------------------------------- */
 .cb-footer__legal {
-  display: grid;
-  gap: var(--space-2xs);
-  justify-items: start;
-}
-
-@media (min-width: 720px) {
-  .cb-footer__legal {
-    justify-items: end;
-    text-align: right;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  border-top: 1px solid var(--border-hair);
+  padding-top: var(--space-md);
 }
 
 .cb-footer__copy {
   font-family: var(--font-body);
   font-size: 0.6875rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   color: var(--text-faint);
   margin: 0;
   font-feature-settings: var(--feat-spec-data);
 }
 
-.cb-footer__policies {
-  display: flex;
+.cb-footer__legal-nav {
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--space-md);
+  align-items: baseline;
+  gap: var(--space-2xs);
 }
 
-.cb-footer__policies a {
+.cb-footer__legal-nav a {
   font-family: var(--font-body);
   font-size: 0.625rem;
   letter-spacing: 0.22em;
@@ -183,8 +294,19 @@ const year = new Date().getFullYear()
   transition: color var(--duration-base) var(--ease-out-quart);
 }
 
-.cb-footer__policies a:hover,
-.cb-footer__policies a:focus-visible {
+.cb-footer__legal-nav a:hover,
+.cb-footer__legal-nav a:focus-visible {
   color: var(--text);
+}
+
+.cb-footer__legal-nav a:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+.cb-footer__legal-bullet {
+  color: var(--text-faint);
+  opacity: 0.5;
 }
 </style>
