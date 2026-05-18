@@ -254,13 +254,13 @@ INSERT INTO trees (name, slug, species, tree_type, price, description, short_des
 );
 
 -- Verify data was inserted
-SELECT 
-  name, 
-  tree_type, 
-  price, 
-  care_level, 
-  size, 
-  featured,
-  in_stock
-FROM trees 
-ORDER BY featured DESC, created_at DESC;
+-- SELECT
+--   name,
+--   tree_type,
+--   price,
+--   care_level,
+--   size,
+--   featured,
+--   in_stock
+-- FROM trees
+-- ORDER BY featured DESC, created_at DESC;

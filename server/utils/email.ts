@@ -85,3 +85,93 @@ export async function sendPasswordResetEmail(
     return { success: false, error: 'Failed to send email' }
   }
 }
+
+/**
+ * Send the double-opt-in confirmation email to a new subscriber.
+ * Falls back to a console log in development when RESEND_API_KEY is unset.
+ */
+export async function sendSubscribeConfirmationEmail(
+  email: string,
+  confirmationToken: string,
+  unsubscribeToken: string,
+  siteUrl: string,
+): Promise<{ success: boolean, error?: string }> {
+  const resendApiKey = process.env.RESEND_API_KEY
+  const emailFrom = process.env.EMAIL_FROM || 'noreply@charlestonbonsai.com'
+
+  const confirmUrl = `${siteUrl}/api/subscribe/confirm?token=${confirmationToken}`
+  const unsubscribeUrl = `${siteUrl}/api/subscribe/unsubscribe?token=${unsubscribeToken}`
+
+  if (!resendApiKey) {
+    // eslint-disable-next-line no-console
+    console.log('===========================================')
+    // eslint-disable-next-line no-console
+    console.log('SUBSCRIBE CONFIRMATION (Development Mode)')
+    // eslint-disable-next-line no-console
+    console.log('===========================================')
+    // eslint-disable-next-line no-console
+    console.log(`Email: ${email}`)
+    // eslint-disable-next-line no-console
+    console.log(`Confirm:     ${confirmUrl}`)
+    // eslint-disable-next-line no-console
+    console.log(`Unsubscribe: ${unsubscribeUrl}`)
+    // eslint-disable-next-line no-console
+    console.log('===========================================')
+    return { success: true }
+  }
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: emailFrom,
+        to: email,
+        subject: 'Confirm your Charleston Bonsai subscription',
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .button { display: inline-block; padding: 12px 24px; background-color: #2d5a27; color: white; text-decoration: none; border-radius: 6px; }
+              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 14px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h2>One more step</h2>
+              <p>Please confirm you'd like to hear from Charleston Bonsai when a new tree is listed.</p>
+              <p><a href="${confirmUrl}" class="button">Confirm subscription</a></p>
+              <p>Or copy this link to your browser:</p>
+              <p style="word-break: break-all; color: #666;">${confirmUrl}</p>
+              <p>This link will expire in <strong>24 hours</strong>. If you didn't request this, you can safely ignore this email.</p>
+              <div class="footer">
+                <p>Charleston Bonsai Gallery</p>
+                <p>Not interested? <a href="${unsubscribeUrl}">Unsubscribe</a>.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('Failed to send confirmation email:', error)
+      return { success: false, error: 'Failed to send email' }
+    }
+
+    return { success: true }
+  }
+  catch (error) {
+    console.error('Error sending confirmation email:', error)
+    return { success: false, error: 'Failed to send email' }
+  }
+}

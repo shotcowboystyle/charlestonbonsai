@@ -109,3 +109,42 @@ CREATE TRIGGER update_trees_updated_at
 -- Grant permissions for anon key access
 GRANT SELECT ON trees TO anon;
 GRANT SELECT ON trees TO authenticated;
+
+-- Newsletter subscribers (double-opt-in).
+-- email is stored lowercased; unique index enforces one row per address.
+-- status: 'pending' until the user clicks the confirmation link, then
+--         'confirmed'; 'unsubscribed' after they opt out.
+-- confirmation_token_hash: sha256 of the token emailed out (single-use,
+--         24h TTL via confirmation_expires_at). Raw token never persisted.
+-- unsubscribe_token: opaque random string sent in every email so any link
+--         can opt out without authentication.
+CREATE TABLE IF NOT EXISTS subscribers (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  email VARCHAR(254) NOT NULL UNIQUE,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'confirmed', 'unsubscribed')),
+  confirmation_token_hash VARCHAR(64),
+  confirmation_expires_at TIMESTAMP WITH TIME ZONE,
+  unsubscribe_token VARCHAR(64) NOT NULL,
+  confirmed_at TIMESTAMP WITH TIME ZONE,
+  unsubscribed_at TIMESTAMP WITH TIME ZONE,
+  source VARCHAR(50),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_confirmation_hash
+  ON subscribers(confirmation_token_hash);
+CREATE INDEX IF NOT EXISTS idx_subscribers_unsubscribe_token
+  ON subscribers(unsubscribe_token);
+CREATE INDEX IF NOT EXISTS idx_subscribers_status ON subscribers(status);
+
+ALTER TABLE subscribers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Subscribers private" ON subscribers
+  FOR ALL USING (false);
+
+CREATE TRIGGER update_subscribers_updated_at
+    BEFORE UPDATE ON subscribers
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
