@@ -1,24 +1,26 @@
 <script setup lang="ts">
-import type { FilterState, SortOption, Tree } from '~/types'
-import { CARE_LEVEL_LABELS, SORT_OPTIONS, TREE_SIZE_LABELS, TREE_TYPE_LABELS } from '~/types'
+import type { FilterState, Tree } from '~/types'
 
-// Meta
 useHead({
-  title: 'Gallery - Charleston Bonsai',
+  title: 'Catalog — Charleston Bonsai',
   meta: [
-    { name: 'description', content: 'Browse our collection of premium bonsai trees. Filter by size, care level, and species to find your perfect tree.' },
+    {
+      name: 'description',
+      content: 'Working catalog of bonsai specimens cultivated and trained by hand in Charleston, South Carolina.',
+    },
   ],
 })
 
-// State
+// ── state ───────────────────────────────────────────────────────────────
+
 const trees = ref<Tree[]>([])
 const total = ref(0)
 const pending = ref(true)
 const loadingMore = ref(false)
 const hasMore = ref(false)
+const error = ref<string | null>(null)
 const page = ref(1)
 const pageSize = 12
-const mobileFiltersOpen = ref(false)
 
 const filters = ref<FilterState>({
   sizes: [],
@@ -27,37 +29,63 @@ const filters = ref<FilterState>({
   priceRange: [0, 10000],
   search: '',
   sortBy: 'newest',
-  inStockOnly: false,
+  // This page is the in-stock catalog. Sold specimens live in /archive,
+  // so the value is fixed true and not exposed in the UI.
+  inStockOnly: true,
 })
 
 const searchQuery = ref('')
-const sortBy = ref<SortOption>('newest')
+const mobileSheetOpen = ref(false)
 
-// Computed
-const hasActiveFilters = computed(() => {
-  return (
-    filters.value.sizes.length > 0
-    || filters.value.careLevels.length > 0
-    || filters.value.treeTypes.length > 0
-    || filters.value.search !== ''
-    || filters.value.inStockOnly
-  )
+// Toolbar reveal-on-scroll-up. Hidden when scrolling down past 120px;
+// re-pinned when scrolling up. Below the threshold the bar always shows.
+const toolbarVisible = ref(true)
+const toolbarPinned = ref(false)
+let lastScrollY = 0
+const SCROLL_DELTA = 6
+const PIN_THRESHOLD = 120
+
+function onScroll() {
+  const y = window.scrollY
+  if (y < PIN_THRESHOLD) {
+    toolbarVisible.value = true
+    toolbarPinned.value = false
+  }
+  else {
+    toolbarPinned.value = true
+    const delta = y - lastScrollY
+    if (Math.abs(delta) > SCROLL_DELTA) {
+      toolbarVisible.value = delta < 0
+    }
+  }
+  lastScrollY = y
+}
+
+// ── computed ────────────────────────────────────────────────────────────
+
+const activeFilterCount = computed(() =>
+  filters.value.sizes.length
+  + filters.value.careLevels.length
+  + filters.value.treeTypes.length,
+)
+
+const hasActiveFilters = computed(() =>
+  activeFilterCount.value > 0 || filters.value.search.length > 0,
+)
+
+const countLabel = computed(() => {
+  if (pending.value)
+    return 'loading'
+  const word = total.value === 1 ? 'specimen' : 'specimens'
+  // When the grid hasn't fully loaded (i.e. there are more pages), show
+  // progress; otherwise just the matching total.
+  if (trees.value.length < total.value)
+    return `${trees.value.length} of ${total.value} ${word}`
+  return `${total.value} ${word}`
 })
 
-const activeFilterCount = computed(() => {
-  let count = 0
-  if (filters.value.sizes.length > 0)
-    count++
-  if (filters.value.careLevels.length > 0)
-    count++
-  if (filters.value.treeTypes.length > 0)
-    count++
-  if (filters.value.inStockOnly)
-    count++
-  return count
-})
+// ── fetch ───────────────────────────────────────────────────────────────
 
-// Fetch trees
 async function fetchTrees(append = false) {
   if (append) {
     loadingMore.value = true
@@ -66,6 +94,7 @@ async function fetchTrees(append = false) {
     pending.value = true
     page.value = 1
   }
+  error.value = null
 
   try {
     const supabase = useSupabaseClient()
@@ -76,27 +105,21 @@ async function fetchTrees(append = false) {
     let query = supabase
       .from('trees')
       .select('*', { count: 'exact' })
+      .eq('in_stock', true)
       .range(from, to)
 
-    // Apply filters
-    if (filters.value.sizes.length > 0) {
+    if (filters.value.sizes.length > 0)
       query = query.in('size', filters.value.sizes)
-    }
-    if (filters.value.careLevels.length > 0) {
+    if (filters.value.careLevels.length > 0)
       query = query.in('care_level', filters.value.careLevels)
-    }
-    if (filters.value.treeTypes.length > 0) {
+    if (filters.value.treeTypes.length > 0)
       query = query.in('tree_type', filters.value.treeTypes)
-    }
     if (filters.value.search) {
-      query = query.or(`name.ilike.%${filters.value.search}%,species.ilike.%${filters.value.search}%`)
-    }
-    if (filters.value.inStockOnly) {
-      query = query.eq('in_stock', true)
+      const escaped = filters.value.search.replace(/[%_,]/g, '\\$&')
+      query = query.or(`name.ilike.%${escaped}%,species.ilike.%${escaped}%`)
     }
 
-    // Sort
-    switch (sortBy.value) {
+    switch (filters.value.sortBy) {
       case 'price-asc':
         query = query.order('price', { ascending: true })
         break
@@ -106,21 +129,20 @@ async function fetchTrees(append = false) {
       case 'name':
         query = query.order('name', { ascending: true })
         break
-      case 'newest':
-        query = query.order('created_at', { ascending: false })
-        break
       case 'oldest':
         query = query.order('created_at', { ascending: true })
+        break
+      case 'newest':
+      default:
+        query = query.order('created_at', { ascending: false })
         break
     }
 
     const { data, error: fetchError, count } = await query
-
     if (fetchError)
       throw fetchError
 
-    // Transform snake_case to camelCase
-    const transformedData = (data || []).map(item => ({
+    const transformed = (data || []).map(item => ({
       id: item.id,
       name: item.name,
       slug: item.slug,
@@ -144,18 +166,19 @@ async function fetchTrees(append = false) {
       updatedAt: item.updated_at,
     })) as Tree[]
 
-    if (append) {
-      trees.value = [...trees.value, ...transformedData]
-    }
-    else {
-      trees.value = transformedData
-    }
+    if (append)
+      trees.value = [...trees.value, ...transformed]
+    else
+      trees.value = transformed
 
     total.value = count || 0
-    hasMore.value = to < (count || 0)
+    hasMore.value = to < (count || 0) - 1
   }
   catch (e) {
-    console.error('Error fetching trees:', e)
+    console.error('Failed to load catalog:', e)
+    error.value = 'The catalog couldn’t load.'
+    if (!append)
+      trees.value = []
   }
   finally {
     pending.value = false
@@ -163,37 +186,37 @@ async function fetchTrees(append = false) {
   }
 }
 
-// Debounced fetch
-let searchTimeout: ReturnType<typeof setTimeout>
-function debouncedSearch() {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    filters.value.search = searchQuery.value
-    fetchTrees()
-  }, 300)
-}
-
-function fetchTreesDebounced() {
-  filters.value.sortBy = sortBy.value
-  fetchTrees()
-}
-
-// Load more
 function loadMore() {
   page.value++
   fetchTrees(true)
 }
 
-// Filter management
-function removeFilter(type: keyof Pick<FilterState, 'sizes' | 'careLevels' | 'treeTypes'>, value: string) {
-  const index = (filters.value[type] as string[]).indexOf(value)
-  if (index > -1) {
-    filters.value[type].splice(index, 1)
-    fetchTrees()
-  }
+// ── filter updates ──────────────────────────────────────────────────────
+
+function updateFilters(next: FilterState) {
+  filters.value = { ...next, inStockOnly: true }
+  fetchTrees()
 }
 
-function resetFilters() {
+function updateSearch(next: string) {
+  filters.value = { ...filters.value, search: next }
+  fetchTrees()
+}
+
+function removeSpecies(value: string) {
+  filters.value.treeTypes = filters.value.treeTypes.filter(v => v !== value)
+  fetchTrees()
+}
+function removeSize(value: string) {
+  filters.value.sizes = filters.value.sizes.filter(v => v !== value)
+  fetchTrees()
+}
+function removeCare(value: string) {
+  filters.value.careLevels = filters.value.careLevels.filter(v => v !== value)
+  fetchTrees()
+}
+
+function clearAll() {
   filters.value = {
     sizes: [],
     careLevels: [],
@@ -201,280 +224,434 @@ function resetFilters() {
     priceRange: [0, 10000],
     search: '',
     sortBy: 'newest',
-    inStockOnly: false,
+    inStockOnly: true,
   }
   searchQuery.value = ''
-  sortBy.value = 'newest'
   fetchTrees()
 }
 
-// Watch filters
-watch([() => filters.value.sizes, () => filters.value.careLevels, () => filters.value.treeTypes, () => filters.value.inStockOnly], () => {
-  fetchTrees()
-}, { deep: true })
+// ── lifecycle ───────────────────────────────────────────────────────────
 
-// Initial fetch
 onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
   fetchTrees()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+})
+
+// Empty-state branches
+const emptyState = computed<'narrow' | 'zero' | null>(() => {
+  if (pending.value || error.value || trees.value.length > 0)
+    return null
+  if (hasActiveFilters.value)
+    return 'narrow'
+  return 'zero'
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-cream">
-    <!-- Header — Bold forest block -->
-    <div class="bg-forest pt-28 pb-12 relative overflow-hidden">
-      <!-- Decorative letter -->
-      <div class="absolute top-1/2 right-0 -translate-y-1/2 text-white/[0.03] font-serif select-none pointer-events-none" style="font-size: 25vw; line-height: 1;">
-        G
+  <div class="catalog">
+    <!-- ───────── masthead ───────── -->
+    <header class="catalog__masthead">
+      <p class="catalog__eyebrow">
+        Catalog
+      </p>
+      <p class="catalog__count">
+        <span :class="{ 'catalog__count-num--quiet': pending }">{{ countLabel }}</span>
+        <span v-if="!pending && !hasActiveFilters" class="catalog__count-tag" aria-hidden="true">· in stock</span>
+      </p>
+    </header>
+
+    <!-- ───────── toolbar (sticky, reveal on scroll-up) ───────── -->
+    <div
+      class="catalog__toolbar-wrap"
+      :class="{
+        'is-pinned': toolbarPinned,
+        'is-hidden': toolbarPinned && !toolbarVisible,
+      }"
+    >
+      <div class="catalog__toolbar">
+        <GalleryFilterToolbar
+          :model-value="filters"
+          :search-query="searchQuery"
+          @update:model-value="updateFilters"
+          @update:search-query="updateSearch"
+          @open-mobile="mobileSheetOpen = true"
+        />
       </div>
-      <div class="relative px-6 sm:px-10 lg:px-16">
-        <span class="text-xs tracking-[0.3em] uppercase text-white/40 mb-4 block">Browse</span>
-        <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif text-white tracking-tight leading-none mb-4">
-          Our Collection
-        </h1>
-        <p class="text-white/50 max-w-md">
-          Explore our curated selection of exceptional bonsai trees
+    </div>
+
+    <!-- ───────── active filter pills ───────── -->
+    <div v-if="activeFilterCount > 0" class="catalog__pills">
+      <GalleryFilterPills
+        :model-value="filters"
+        @remove-species="removeSpecies"
+        @remove-size="removeSize"
+        @remove-care="removeCare"
+        @clear-all="clearAll"
+      />
+    </div>
+
+    <!-- ───────── grid / states ───────── -->
+    <section class="catalog__grid-wrap" :aria-busy="pending ? 'true' : 'false'">
+      <!-- loading: skeleton grid -->
+      <ul v-if="pending" class="catalog__grid" aria-label="Loading catalog">
+        <li v-for="n in 8" :key="n">
+          <GalleryCardSkeleton />
+        </li>
+      </ul>
+
+      <!-- error -->
+      <div v-else-if="error" class="catalog__notice" role="alert">
+        <p class="catalog__notice-line">
+          {{ error }}
+        </p>
+        <button type="button" class="catalog__notice-action" @click="fetchTrees()">
+          Try again
+        </button>
+      </div>
+
+      <!-- empty (filters narrow) -->
+      <div v-else-if="emptyState === 'narrow'" class="catalog__notice">
+        <p class="catalog__notice-line">
+          Nothing in stock matches that combination right now.
+        </p>
+        <p class="catalog__notice-body">
+          Clear the filters to see the full catalog, or visit the archive of past specimens.
+        </p>
+        <div class="catalog__notice-actions">
+          <button type="button" class="catalog__notice-action" @click="clearAll">
+            Clear filters
+          </button>
+          <NuxtLink to="/archive" class="catalog__notice-action">
+            Browse the archive
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- empty (zero stock) -->
+      <div v-else-if="emptyState === 'zero'" class="catalog__notice">
+        <p class="catalog__notice-line">
+          The bench is between specimens.
+        </p>
+        <p class="catalog__notice-body">
+          New trees come up most weeks — leave an address at the foot of the page and we’ll write when the next is ready.
         </p>
       </div>
-    </div>
 
-    <div class="container-custom py-8">
-      <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Filters Sidebar (desktop only) -->
-        <aside class="hidden lg:block lg:w-72 flex-shrink-0">
-          <GalleryFilterSidebar
-            v-model="filters"
-            @reset="resetFilters"
-          />
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1">
-          <!-- Toolbar -->
-          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-3">
-              <!-- Mobile Filter Button -->
-              <button
-                class="lg:hidden inline-flex items-center gap-2 btn btn-outline py-2 px-3 text-sm"
-                @click="mobileFiltersOpen = true"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
-                </svg>
-                Filters
-                <span v-if="activeFilterCount > 0" class="bg-forest text-white text-xs rounded-full w-5 h-5 inline-flex items-center justify-center font-medium">
-                  {{ activeFilterCount }}
-                </span>
-              </button>
-              <p class="text-stone-500 text-sm">
-                <span v-if="pending">Loading...</span>
-                <span v-else>{{ trees.length }} of {{ total }} tree{{ total !== 1 ? 's' : '' }}</span>
-              </p>
-            </div>
-
-            <div class="flex items-center gap-4">
-              <!-- Search -->
-              <div class="relative">
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Search trees..."
-                  class="input py-2 pl-10 pr-4 w-48 md:w-64"
-                  @input="debouncedSearch"
-                >
-                <svg class="w-5 h-5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-
-              <!-- Sort -->
-              <select
-                v-model="sortBy"
-                class="input py-2 px-4 w-44"
-                @change="fetchTreesDebounced"
-              >
-                <option v-for="option in SORT_OPTIONS" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Active Filters -->
-          <div v-if="hasActiveFilters" class="flex flex-wrap items-center gap-2 mb-6">
-            <span class="text-sm text-stone-500">Active filters:</span>
-            <button
-              v-for="size in filters.sizes"
-              :key="size"
-              class="badge bg-sage text-white hover:bg-sage-400 transition-colors"
-              @click="removeFilter('sizes', size)"
-            >
-              {{ TREE_SIZE_LABELS[size] }}
-              <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <button
-              v-for="level in filters.careLevels"
-              :key="level"
-              class="badge bg-sage text-white hover:bg-sage-400 transition-colors"
-              @click="removeFilter('careLevels', level)"
-            >
-              {{ CARE_LEVEL_LABELS[level] }}
-              <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <button
-              v-for="type in filters.treeTypes"
-              :key="type"
-              class="badge bg-sage text-white hover:bg-sage-400 transition-colors"
-              @click="removeFilter('treeTypes', type)"
-            >
-              {{ TREE_TYPE_LABELS[type] }}
-              <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <button
-              class="text-sm text-stone-500 hover:text-charcoal underline"
-              @click="resetFilters"
-            >
-              Clear all
-            </button>
-          </div>
-
-          <!-- Loading -->
-          <div v-if="pending" class="flex justify-center py-12">
-            <UiLoadingSpinner />
-          </div>
-
-          <!-- Empty State -->
-          <div v-else-if="trees.length === 0" class="text-center py-16">
-            <div class="text-6xl mb-4">
-              🌲
-            </div>
-            <template v-if="filters.inStockOnly">
-              <h3 class="font-serif text-xl text-charcoal mb-2">
-                No trees available right now
-              </h3>
-              <p class="text-stone-500 mb-6">
-                Matching trees may exist but are currently sold. Try showing all trees including sold inventory.
-              </p>
-              <button
-                class="btn btn-outline"
-                @click="filters.inStockOnly = false"
-              >
-                Show All Trees
-              </button>
-            </template>
-            <template v-else>
-              <h3 class="font-serif text-xl text-charcoal mb-2">
-                No trees found
-              </h3>
-              <p class="text-stone-500 mb-6">
-                Try adjusting your filters or search terms
-              </p>
-              <button class="btn btn-outline" @click="resetFilters">
-                Clear Filters
-              </button>
-            </template>
-          </div>
-
-          <!-- Grid -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <GalleryTreeCard
-              v-for="tree in trees"
-              :key="tree.id"
-              :tree="tree"
-            />
-          </div>
-
-          <!-- Pagination -->
-          <div v-if="hasMore" class="text-center mt-12">
-            <button
-              class="btn btn-outline"
-              :disabled="loadingMore"
-              @click="loadMore"
-            >
-              <span v-if="loadingMore">Loading...</span>
-              <span v-else>Load More Trees (showing {{ trees.length }} of {{ total }})</span>
-            </button>
-          </div>
-        </main>
-      </div>
-    </div>
-
-    <!-- Mobile Filter Drawer -->
-    <Teleport to="body">
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <div
-          v-if="mobileFiltersOpen"
-          class="lg:hidden fixed inset-0 z-50 flex flex-col justify-end"
-          @click.self="mobileFiltersOpen = false"
+      <!-- grid -->
+      <ul v-else class="catalog__grid">
+        <li
+          v-for="(tree, i) in trees"
+          :key="tree.id"
+          class="catalog__cell"
+          :style="{ animationDelay: `${Math.min(i, 11) * 25}ms` }"
         >
-          <!-- Backdrop -->
-          <div class="absolute inset-0 bg-black/50" @click="mobileFiltersOpen = false" />
+          <GalleryTreeCard :tree="tree" />
+        </li>
+        <!-- append skeletons while loading more -->
+        <template v-if="loadingMore">
+          <li v-for="n in 4" :key="`s-${n}`">
+            <GalleryCardSkeleton />
+          </li>
+        </template>
+      </ul>
 
-          <!-- Drawer -->
-          <Transition
-            enter-active-class="transition-transform duration-300 ease-out"
-            enter-from-class="translate-y-full"
-            enter-to-class="translate-y-0"
-            leave-active-class="transition-transform duration-200 ease-in"
-            leave-from-class="translate-y-0"
-            leave-to-class="translate-y-full"
-          >
-            <div v-if="mobileFiltersOpen" class="relative bg-white rounded-t-2xl max-h-[85vh] flex flex-col">
-              <!-- Handle bar -->
-              <div class="flex justify-center pt-3 pb-1">
-                <div class="w-10 h-1 bg-stone-300 rounded-full" />
-              </div>
+      <!-- load more -->
+      <div v-if="!pending && !error && hasMore" class="catalog__more">
+        <button
+          type="button"
+          class="catalog__more-btn"
+          :disabled="loadingMore"
+          @click="loadMore"
+        >
+          <span v-if="loadingMore">loading more</span>
+          <span v-else>load twelve more</span>
+          <span class="catalog__more-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
 
-              <!-- Header -->
-              <div class="flex items-center justify-between px-5 py-3 border-b border-stone-100">
-                <h3 class="font-serif text-lg text-charcoal">
-                  Filters
-                </h3>
-                <button
-                  class="p-2 rounded-lg hover:bg-cream transition-colors text-stone-500"
-                  @click="mobileFiltersOpen = false"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Content -->
-              <div class="overflow-y-auto flex-1 px-5 py-4">
-                <GalleryFilterSidebar
-                  v-model="filters"
-                  class="!shadow-none !rounded-none !p-0 !static"
-                  @reset="resetFilters"
-                />
-              </div>
-
-              <!-- Footer -->
-              <div class="px-5 py-4 border-t border-stone-100">
-                <button
-                  class="btn btn-primary w-full"
-                  @click="mobileFiltersOpen = false"
-                >
-                  Show {{ total }} tree{{ total !== 1 ? 's' : '' }}
-                </button>
-              </div>
-            </div>
-          </Transition>
-        </div>
-      </Transition>
-    </Teleport>
+    <!-- ───────── mobile filter sheet ───────── -->
+    <GalleryMobileFilterSheet
+      :open="mobileSheetOpen"
+      :model-value="filters"
+      @update:open="mobileSheetOpen = $event"
+      @update:model-value="updateFilters"
+    />
   </div>
 </template>
+
+<style scoped>
+.catalog {
+  --nav-h: 4.75rem;
+  --catalog-pad-x: clamp(1.25rem, 4vw, 3rem);
+  --catalog-max-w: 96rem;
+
+  min-height: 100vh;
+  padding-top: var(--nav-h);
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* ───────── masthead ───────── */
+
+.catalog__masthead {
+  max-width: var(--catalog-max-w);
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--catalog-pad-x) var(--space-xl);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--space-md);
+  border-bottom: 1px solid var(--border-hair);
+}
+
+@media (max-width: 480px) {
+  .catalog__masthead {
+    grid-template-columns: 1fr;
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-md);
+  }
+}
+
+.catalog__eyebrow {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-feature-settings: var(--feat-small-caps);
+}
+
+.catalog__count {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  font-feature-settings: var(--feat-spec-data);
+  letter-spacing: 0.01em;
+}
+
+.catalog__count-num--quiet {
+  opacity: 0.6;
+}
+
+.catalog__count-tag {
+  color: var(--text-faint);
+  font-style: normal;
+  margin-left: 0.2em;
+}
+
+/* ───────── toolbar (sticky, reveal on scroll-up) ───────── */
+
+.catalog__toolbar-wrap {
+  position: sticky;
+  top: var(--nav-h);
+  /* One layer below the fixed navbar so the navbar's solid surface
+     covers the toolbar as it slides out of view on scroll-down. */
+  z-index: var(--z-raised);
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition:
+    transform var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart),
+    background-color var(--duration-base) var(--ease-out-quart);
+}
+
+.catalog__toolbar-wrap.is-pinned {
+  background: color-mix(in oklch, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom-color: var(--border-hair);
+}
+
+.catalog__toolbar-wrap.is-hidden {
+  transform: translateY(-110%);
+}
+
+.catalog__toolbar {
+  max-width: var(--catalog-max-w);
+  margin: 0 auto;
+  padding: var(--space-sm) var(--catalog-pad-x);
+}
+
+/* ───────── pills ───────── */
+
+.catalog__pills {
+  max-width: var(--catalog-max-w);
+  margin: 0 auto;
+  padding: var(--space-sm) var(--catalog-pad-x) 0;
+}
+
+/* ───────── grid + states ───────── */
+
+.catalog__grid-wrap {
+  max-width: var(--catalog-max-w);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--catalog-pad-x) var(--space-3xl);
+}
+
+.catalog__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  column-gap: var(--space-lg);
+  row-gap: var(--space-xl);
+}
+
+.catalog__cell {
+  animation: card-in var(--duration-slow) var(--ease-out-quart) both;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ───────── notices (empty / error) ───────── */
+
+.catalog__notice {
+  padding: var(--space-3xl) 0;
+  display: grid;
+  gap: var(--space-md);
+  justify-items: start;
+  max-width: 46ch;
+}
+
+.catalog__notice-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  line-height: 1.15;
+  color: var(--text);
+  letter-spacing: -0.012em;
+}
+
+.catalog__notice-body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.catalog__notice-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-2xs);
+}
+
+.catalog__notice-action {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text);
+  font-feature-settings: var(--feat-small-caps);
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.25em;
+}
+
+.catalog__notice-action::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-out-quart);
+}
+
+.catalog__notice-action:hover::after {
+  transform: scaleX(0);
+  transform-origin: right;
+}
+
+.catalog__notice-action:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* ───────── load more ───────── */
+
+.catalog__more {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2xl);
+}
+
+.catalog__more-btn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+  background: transparent;
+  border: 0;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--text);
+  cursor: pointer;
+  position: relative;
+}
+
+.catalog__more-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.catalog__more-btn::after {
+  content: '';
+  position: absolute;
+  left: var(--space-md);
+  right: var(--space-md);
+  bottom: var(--space-2xs);
+  height: 1px;
+  background: var(--text-faint);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--duration-base) var(--ease-out-quart);
+}
+
+.catalog__more-btn:hover:not(:disabled)::after,
+.catalog__more-btn:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.catalog__more-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+.catalog__more-arrow {
+  display: inline-block;
+  transition: transform var(--duration-base) var(--ease-out-quart);
+  font-family: var(--font-body);
+  font-style: normal;
+  color: var(--accent);
+}
+
+.catalog__more-btn:hover:not(:disabled) .catalog__more-arrow {
+  transform: translateX(0.25em);
+}
+</style>
