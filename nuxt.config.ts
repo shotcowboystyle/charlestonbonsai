@@ -43,6 +43,16 @@ export default defineNuxtConfig({
         // the design reset (see .impeccable.md).
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Albert+Sans:wght@300;400;500;600;700&display=swap' },
       ],
+      script: [
+        // Pre-paint theme bootstrap. Runs synchronously in <head> before
+        // first paint to set data-theme on <html>, avoiding a flash on
+        // initial render. The composable useTheme owns runtime state;
+        // this only handles the very first paint.
+        {
+          tagPosition: 'head',
+          innerHTML: `(function(){try{var t=localStorage.getItem('cb-theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`,
+        },
+      ],
     },
     pageTransition: { name: 'page', mode: 'out-in' },
   },

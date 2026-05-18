@@ -1,49 +1,86 @@
 <script setup lang="ts">
-const scrolled = ref(false)
-const mobileMenuOpen = ref(false)
+/**
+ * Site chrome — header.
+ *
+ * Two modes:
+ *   - Editorial: transparent over the homepage's opening plate.
+ *     After scroll, fades to translucent bone with a hairline rule.
+ *   - Product: solid bone surface with a hairline rule from first paint.
+ *     Used on /gallery, /gallery/[id], /visit, and policy pages.
+ *
+ * The wordmark is a bracketed [CB] monogram set in Cardo italic with
+ * the wordmark to its right. No square enclosure, no symbol-and-text
+ * lockup that reads like a startup mark.
+ */
+const route = useRoute()
 
 const navLinks = [
   { to: '/', label: 'Index' },
   { to: '/gallery', label: 'Catalog' },
-  { to: '/#visit', label: 'Visit' },
-]
+  { to: '/visit', label: 'Visit' },
+] as const
 
-// Handle scroll
+// Editorial mode is the homepage only. Every other public route is product mode.
+const isEditorial = computed(() => route.path === '/')
+
+const scrolled = ref(false)
+const menuOpen = ref(false)
+
+function handleScroll() {
+  scrolled.value = window.scrollY > 80
+}
+
 onMounted(() => {
-  const handleScroll = () => {
-    scrolled.value = window.scrollY > 50
-  }
-
-  window.addEventListener('scroll', handleScroll)
-  handleScroll() // Check initial state
-
-  onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
-  })
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  handleScroll()
 })
 
-// Close mobile menu on route change
-const route = useRoute()
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
+// Close on route change. Vue's reactivity handles the watch cleanup
+// when the component unmounts.
 watch(() => route.path, () => {
-  mobileMenuOpen.value = false
+  menuOpen.value = false
 })
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
+
+function closeMenu() {
+  menuOpen.value = false
+}
 </script>
 
 <template>
   <header
-    ref="navbar"
     class="cb-nav"
-    :class="scrolled ? 'cb-nav--scrolled' : ''"
+    :class="{
+      'cb-nav--editorial': isEditorial,
+      'cb-nav--product': !isEditorial,
+      'cb-nav--scrolled': scrolled,
+      'cb-nav--menu-open': menuOpen,
+    }"
+    role="banner"
   >
-    <nav class="cb-nav__inner">
+    <a class="cb-nav__skip sr-only" href="#main-content">
+      Skip to content
+    </a>
+
+    <nav class="cb-nav__inner" aria-label="Primary">
       <div class="cb-nav__row">
-        <!-- Logo — typographic monogram -->
-        <NuxtLink to="/" class="cb-nav__logo group">
-          <span class="cb-nav__mark" aria-hidden="true">CB</span>
-          <span class="cb-nav__wordmark">Charleston Bonsai</span>
+        <NuxtLink to="/" class="cb-nav__wordmark" @click="closeMenu">
+          <span class="cb-nav__mark" aria-hidden="true">
+            <span class="cb-nav__bracket cb-nav__bracket--open">[</span>
+            <span class="cb-nav__monogram">CB</span>
+            <span class="cb-nav__bracket cb-nav__bracket--close">]</span>
+          </span>
+          <span class="cb-nav__rule" aria-hidden="true" />
+          <span class="cb-nav__name">Charleston Bonsai</span>
         </NuxtLink>
 
-        <!-- Desktop Navigation -->
         <div class="cb-nav__links">
           <NuxtLink
             v-for="link in navLinks"
@@ -55,58 +92,28 @@ watch(() => route.path, () => {
           </NuxtLink>
         </div>
 
-        <!-- Mobile Menu Button -->
+        <div class="cb-nav__trailing" aria-hidden="true" />
+
         <button
+          type="button"
           class="cb-nav__menu-btn"
+          :aria-expanded="menuOpen"
           aria-label="Toggle navigation"
-          @click="mobileMenuOpen = !mobileMenuOpen"
+          @click="toggleMenu"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              v-if="!mobileMenuOpen"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-            <path
-              v-else
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <span class="cb-nav__menu-rule" aria-hidden="true" />
+          <span class="cb-nav__menu-label">
+            {{ menuOpen ? 'Close' : 'Menu' }}
+          </span>
         </button>
       </div>
-
-      <!-- Mobile Menu -->
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 -translate-y-4"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-4"
-      >
-        <div
-          v-if="mobileMenuOpen"
-          class="cb-nav__mobile"
-        >
-          <div class="cb-nav__mobile-inner">
-            <NuxtLink
-              v-for="link in navLinks"
-              :key="link.to"
-              :to="link.to"
-              class="cb-nav__mobile-link"
-              @click="mobileMenuOpen = false"
-            >
-              {{ link.label }}
-            </NuxtLink>
-          </div>
-        </div>
-      </Transition>
     </nav>
+
+    <LayoutMobileMenu
+      :open="menuOpen"
+      :links="navLinks"
+      @close="closeMenu"
+    />
   </header>
 </template>
 
@@ -118,17 +125,44 @@ watch(() => route.path, () => {
   right: 0;
   z-index: var(--z-sticky);
   background: transparent;
+  border-bottom: 1px solid transparent;
   transition:
     background-color var(--duration-base) var(--ease-out-quart),
     border-color var(--duration-base) var(--ease-out-quart);
-  border-bottom: 1px solid transparent;
 }
 
-.cb-nav--scrolled {
+/* Product mode: solid bone from first paint. */
+.cb-nav--product {
+  background: var(--surface);
+  border-bottom-color: var(--border-hair);
+}
+
+/* Editorial mode (homepage): transparent until scroll, then translucent. */
+.cb-nav--editorial.cb-nav--scrolled {
   background: color-mix(in oklch, var(--surface) 92%, transparent);
   border-bottom-color: var(--border-hair);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* Menu open: surface becomes solid so the mobile takeover meets it cleanly. */
+.cb-nav--menu-open {
+  background: var(--surface);
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.cb-nav__skip {
+  background: var(--surface);
+  color: var(--text);
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--text);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-feature-settings: var(--feat-small-caps);
 }
 
 .cb-nav__inner {
@@ -138,14 +172,18 @@ watch(() => route.path, () => {
 }
 
 .cb-nav__row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  height: 4.5rem;
+  height: 4.75rem;
+  gap: var(--space-md);
 }
 
-.cb-nav__logo {
-  display: flex;
+/* --------------------------------------------------------
+   WORDMARK — bracketed monogram + hairline rule + name
+   -------------------------------------------------------- */
+.cb-nav__wordmark {
+  display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
   text-decoration: none;
@@ -153,29 +191,64 @@ watch(() => route.path, () => {
 }
 
 .cb-nav__mark {
-  width: 2rem;
-  height: 2rem;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--ink-2);
+  align-items: baseline;
   font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-style: italic;
+  font-size: 1rem;
   letter-spacing: 0.02em;
   color: var(--text);
+  line-height: 1;
 }
 
-.cb-nav__wordmark {
+.cb-nav__bracket {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.cb-nav__bracket--open {
+  margin-right: 0.075em;
+}
+
+.cb-nav__bracket--close {
+  margin-left: 0.075em;
+}
+
+.cb-nav__monogram {
+  font-feature-settings: 'smcp' 1;
+  letter-spacing: 0.08em;
+}
+
+.cb-nav__rule {
+  display: inline-block;
+  width: 1px;
+  height: 1rem;
+  background: var(--border-hair);
+}
+
+.cb-nav__name {
   font-family: var(--font-display);
-  font-size: 0.9375rem;
   font-style: italic;
+  font-size: 0.9375rem;
   color: var(--text);
+  line-height: 1;
 }
 
+@media (max-width: 480px) {
+  .cb-nav__rule,
+  .cb-nav__name {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------
+   LINKS (desktop only) — center column
+   -------------------------------------------------------- */
 .cb-nav__links {
   display: none;
   align-items: center;
+  justify-content: center;
   gap: var(--space-xl);
 }
 
@@ -186,6 +259,7 @@ watch(() => route.path, () => {
 }
 
 .cb-nav__link {
+  position: relative;
   font-family: var(--font-body);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -193,10 +267,9 @@ watch(() => route.path, () => {
   text-transform: uppercase;
   color: var(--text-muted);
   text-decoration: none;
-  position: relative;
   padding: var(--space-2xs) 0;
-  transition: color var(--duration-base) var(--ease-out-quart);
   font-feature-settings: var(--feat-small-caps);
+  transition: color var(--duration-base) var(--ease-out-quart);
 }
 
 .cb-nav__link::after {
@@ -224,15 +297,37 @@ watch(() => route.path, () => {
   transform: scaleX(1);
 }
 
+.cb-nav__link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* Right column kept deliberately empty on desktop — restraint is the slot */
+.cb-nav__trailing {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .cb-nav__trailing {
+    display: block;
+    width: 1px;
+  }
+}
+
+/* --------------------------------------------------------
+   MOBILE MENU BUTTON — typographic, not iconographic
+   -------------------------------------------------------- */
 .cb-nav__menu-btn {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2xs);
-  color: var(--text);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3xs);
+  padding: var(--space-2xs) 0;
   background: transparent;
   border: 0;
   cursor: pointer;
+  justify-self: end;
 }
 
 @media (min-width: 768px) {
@@ -241,31 +336,25 @@ watch(() => route.path, () => {
   }
 }
 
-.cb-nav__mobile {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border-hair);
+.cb-nav__menu-rule {
+  width: 1.5rem;
+  height: 1px;
+  background: var(--text);
+  transition: background-color var(--duration-base) var(--ease-out-quart);
 }
 
-.cb-nav__mobile-inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-md) clamp(1.25rem, 4vw, 3rem);
-}
-
-.cb-nav__mobile-link {
+.cb-nav__menu-label {
   font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.625rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--text);
-  text-decoration: none;
-  padding: var(--space-2xs) 0;
   font-feature-settings: var(--feat-small-caps);
+}
+
+.cb-nav__menu-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 </style>

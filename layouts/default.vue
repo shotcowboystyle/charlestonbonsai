@@ -48,7 +48,7 @@ watch(() => route.hash, (hash) => {
 <template>
   <div class="min-h-screen flex flex-col">
     <LayoutNavbar />
-    <main class="flex-grow">
+    <main id="main-content" class="flex-grow" tabindex="-1">
       <slot />
     </main>
     <LayoutFooter />
