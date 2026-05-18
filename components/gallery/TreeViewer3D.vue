@@ -4,21 +4,26 @@ interface Props {
   autoRotate?: boolean
   enableZoom?: boolean
   enablePan?: boolean
+  // When false, the viewer is interactive from first paint — appropriate
+  // when entry into 3D mode is itself a deliberate user action (e.g. a
+  // lens-toggle on a specimen page). When true (default), a small
+  // "click to interact" guard prevents accidental scroll capture.
+  requireActivation?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   autoRotate: true,
   enableZoom: true,
   enablePan: false,
+  requireActivation: true,
 })
 
 const containerRef = ref<HTMLElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
-const activated = ref(false)
+const activated = ref(!props.requireActivation)
 
-// Three.js variables (non-reactive, managed manually)
 let scene: any = null
 let camera: any = null
 let renderer: any = null
@@ -30,7 +35,6 @@ onMounted(async () => {
     return
 
   try {
-    // Dynamic import for client-side only
     const THREE = await import('three')
     const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
     const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
@@ -40,26 +44,25 @@ onMounted(async () => {
     const width = container.clientWidth
     const height = container.clientHeight
 
-    // Scene setup
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(0xF5F3EE) // cream-100
+    // Transparent — the surrounding plate surface shows through, so the
+    // viewer's backdrop matches the page in both light and dark themes.
+    scene.background = null
 
-    // Camera
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000)
     camera.position.set(0, 1, 3)
 
-    // Renderer
     renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       alpha: true,
     })
     renderer.setSize(width, height)
+    renderer.setClearColor(0x000000, 0)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-    // Lighting
     const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.6)
     scene.add(ambientLight)
 
@@ -72,7 +75,6 @@ onMounted(async () => {
     fillLight.position.set(-5, 5, -5)
     scene.add(fillLight)
 
-    // Ground plane (for shadows)
     const groundGeometry = new THREE.CircleGeometry(2, 64)
     const groundMaterial = new THREE.ShadowMaterial({ opacity: 0.1 })
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
@@ -80,62 +82,48 @@ onMounted(async () => {
     ground.receiveShadow = true
     scene.add(ground)
 
-    // Controls
     controls.value = new OrbitControls(camera, renderer.domElement)
     controls.value.enableDamping = true
     controls.value.dampingFactor = 0.05
     controls.value.autoRotate = props.autoRotate
     controls.value.autoRotateSpeed = 1
-    controls.value.enableZoom = false // enabled only after user clicks into the viewer
+    controls.value.enableZoom = !props.requireActivation
     controls.value.enablePan = props.enablePan
     controls.value.minDistance = 1
     controls.value.maxDistance = 10
     controls.value.maxPolarAngle = Math.PI / 2
 
-    // Load model
     const loader = new GLTFLoader()
 
     loader.load(
       props.modelUrl,
       (gltf: any) => {
         const model = gltf.scene
-
-        // Center and scale model
         const box = new THREE.Box3().setFromObject(model)
         const center = box.getCenter(new THREE.Vector3())
         const size = box.getSize(new THREE.Vector3())
-
         const maxDim = Math.max(size.x, size.y, size.z)
         const scale = 1.5 / maxDim
         model.scale.multiplyScalar(scale)
-
         model.position.sub(center.multiplyScalar(scale))
         model.position.y = 0
-
         model.traverse((child: any) => {
           if (child.isMesh) {
             child.castShadow = true
             child.receiveShadow = true
           }
         })
-
         scene.add(model)
         loading.value = false
       },
-      (progress: any) => {
-        // Loading progress
-        const percent = (progress.loaded / progress.total) * 100
-        // eslint-disable-next-line no-console
-        console.log(`Loading 3D model: ${percent.toFixed(0)}%`)
-      },
+      undefined,
       (err: any) => {
         console.error('Error loading 3D model:', err)
-        error.value = 'Failed to load 3D model'
+        error.value = 'The model couldn’t load.'
         loading.value = false
       },
     )
 
-    // Animation loop
     function animate() {
       animationId = requestAnimationFrame(animate)
       controls.value.update()
@@ -143,7 +131,6 @@ onMounted(async () => {
     }
     animate()
 
-    // Handle resize
     const resizeObserver = new ResizeObserver(() => {
       if (!container || !camera || !renderer)
         return
@@ -155,54 +142,117 @@ onMounted(async () => {
     })
     resizeObserver.observe(container as unknown as Element)
 
-    // Cleanup on unmount
     onUnmounted(() => {
       resizeObserver.disconnect()
-      if (animationId) {
+      if (animationId)
         cancelAnimationFrame(animationId)
-      }
-      if (renderer) {
+      if (renderer)
         renderer.dispose()
-      }
-      if (controls.value) {
+      if (controls.value)
         controls.value.dispose()
-      }
     })
   }
   catch (err) {
-    console.error('Three.js initialization error:', err)
-    error.value = 'Failed to initialize 3D viewer'
+    console.error('Three.js initialisation error:', err)
+    error.value = 'The 3D viewer couldn’t initialise.'
     loading.value = false
   }
 })
+
+function activate() {
+  activated.value = true
+  if (controls.value)
+    controls.value.enableZoom = true
+}
 </script>
 
 <template>
-  <div ref="containerRef" class="relative w-full h-full min-h-[300px] bg-cream-100 rounded-xl overflow-hidden">
-    <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
-      <UiLoadingSpinner text="Loading 3D model..." />
-    </div>
-    <div v-if="error" class="absolute inset-0 flex flex-col items-center justify-center text-stone-500">
-      <svg class="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-      </svg>
-      <p class="text-sm">
-        {{ error }}
-      </p>
-    </div>
-    <canvas ref="canvasRef" :class="{ 'opacity-0': loading || error }" class="w-full h-full transition-opacity duration-300" />
-    <!-- Click-to-interact overlay: prevents scroll hijack until user explicitly engages -->
-    <Transition enter-active-class="transition-opacity duration-200" leave-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-to-class="opacity-0">
-      <div
-        v-if="!activated && !loading && !error"
-        class="absolute inset-0 flex flex-col items-center justify-center gap-2 cursor-pointer bg-black/10 hover:bg-black/20 transition-colors"
-        @click="activated = true; controls && (controls.enableZoom = true)"
-      >
-        <svg class="w-8 h-8 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
-        </svg>
-        <span class="text-white text-sm font-medium drop-shadow">Click to interact</span>
-      </div>
-    </Transition>
+  <div ref="containerRef" class="viewer">
+    <p v-if="loading" class="viewer__state">
+      loading three-dimensional model…
+    </p>
+    <p v-else-if="error" class="viewer__state viewer__state--error">
+      {{ error }}
+    </p>
+    <canvas
+      ref="canvasRef"
+      class="viewer__canvas"
+      :class="{ 'viewer__canvas--quiet': loading || error }"
+    />
+    <button
+      v-if="!activated && !loading && !error"
+      type="button"
+      class="viewer__activate"
+      @click="activate"
+    >
+      tap to interact
+    </button>
   </div>
 </template>
+
+<style scoped>
+.viewer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 18rem;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.viewer__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity var(--duration-base) var(--ease-out-quart);
+}
+
+.viewer__canvas--quiet {
+  opacity: 0;
+}
+
+.viewer__state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.viewer__state--error {
+  color: var(--text-muted);
+}
+
+.viewer__activate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklch, var(--surface) 60%, transparent);
+  backdrop-filter: blur(1px);
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text);
+  font-feature-settings: var(--feat-small-caps);
+  transition: background-color var(--duration-base) var(--ease-out-quart);
+}
+
+.viewer__activate:hover {
+  background: color-mix(in oklch, var(--surface) 40%, transparent);
+}
+
+.viewer__activate:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+</style>

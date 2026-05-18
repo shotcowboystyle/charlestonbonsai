@@ -139,6 +139,16 @@ export const TREE_SIZE_LABELS: Record<TreeSize, string> = {
   'extra-large': 'Extra Large (24"+)',
 }
 
+// Short labels without dimension parentheticals — for dense card metadata
+// where the parenthetical range would crowd a single line of type.
+export const TREE_SIZE_SHORT_LABELS: Record<TreeSize, string> = {
+  'mini': 'Mini',
+  'small': 'Small',
+  'medium': 'Medium',
+  'large': 'Large',
+  'extra-large': 'Extra Large',
+}
+
 export const SORT_OPTIONS: { value: SortOption, label: string }[] = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
