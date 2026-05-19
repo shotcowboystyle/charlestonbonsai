@@ -148,3 +148,34 @@ CREATE TRIGGER update_subscribers_updated_at
     BEFORE UPDATE ON subscribers
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- Event rental inquiries (one submission = one row).
+-- Each row is an immutable record of a single inquiry from the /events
+-- landing page. Email is stored lowercased. RLS denies all client access;
+-- server-side endpoints use the service key.
+-- event_type values are constrained to the form's select options.
+-- headcount and table_count are optional and stored as smallint to keep
+-- the table compact (event sizes don't realistically exceed int2 range).
+CREATE TABLE IF NOT EXISTS event_inquiries (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(254) NOT NULL,
+  event_date DATE NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  event_type VARCHAR(30) NOT NULL
+    CHECK (event_type IN ('wedding', 'private_dinner', 'hospitality', 'corporate', 'other')),
+  headcount SMALLINT,
+  table_count SMALLINT,
+  notes TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_event_inquiries_created_at
+  ON event_inquiries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_event_inquiries_event_date
+  ON event_inquiries(event_date);
+
+ALTER TABLE event_inquiries ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Event inquiries private" ON event_inquiries
+  FOR ALL USING (false);
