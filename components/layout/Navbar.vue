@@ -17,6 +17,7 @@ const route = useRoute()
 const navLinks = [
   { to: '/', label: 'Index' },
   { to: '/gallery', label: 'Catalog' },
+  { to: '/events', label: 'Events' },
   { to: '/visit', label: 'Visit' },
 ] as const
 
