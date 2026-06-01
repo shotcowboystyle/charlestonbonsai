@@ -179,3 +179,32 @@ ALTER TABLE event_inquiries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Event inquiries private" ON event_inquiries
   FOR ALL USING (false);
+
+-- Mountain retreat inquiries (one submission = one row).
+-- Same posture as event_inquiries: immutable single-row records from the
+-- /retreats landing page, email lowercased, RLS denies all client access,
+-- writes go through server-side endpoints with the service key.
+-- preferred_dates is free-form text ("Late September", "Oct 10-14") because
+-- the actual date negotiation happens over email after first contact.
+-- party_size is capped at 6 — the mountain house tops out there.
+CREATE TABLE IF NOT EXISTS retreat_inquiries (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(254) NOT NULL,
+  preferred_dates VARCHAR(120) NOT NULL,
+  party_size SMALLINT NOT NULL CHECK (party_size BETWEEN 1 AND 6),
+  package_type VARCHAR(20) NOT NULL
+    CHECK (package_type IN ('weekend', 'immersion', 'private', 'undecided')),
+  skill_level VARCHAR(20) NOT NULL
+    CHECK (skill_level IN ('beginner', 'intermediate', 'advanced')),
+  notes TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_retreat_inquiries_created_at
+  ON retreat_inquiries(created_at DESC);
+
+ALTER TABLE retreat_inquiries ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Retreat inquiries private" ON retreat_inquiries
+  FOR ALL USING (false);
