@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PublicTreesResponse } from '~/server/api/trees/list.get'
 import type { FilterState, PublicTree } from '~/types'
 
 const { siteName } = useSite()
@@ -98,75 +99,26 @@ async function fetchTrees(append = false) {
   error.value = null
 
   try {
-    const supabase = useSupabaseClient()
-
-    const from = (page.value - 1) * pageSize
-    const to = from + pageSize - 1
-
-    let query = supabase
-      .from('trees')
-      .select('*', { count: 'exact' })
-      .eq('in_stock', true)
-      .range(from, to)
-
-    if (filters.value.sizes.length > 0)
-      query = query.in('size', filters.value.sizes)
-    if (filters.value.careLevels.length > 0)
-      query = query.in('care_level', filters.value.careLevels)
-    if (filters.value.treeTypes.length > 0)
-      query = query.in('tree_type', filters.value.treeTypes)
-    if (filters.value.search) {
-      const escaped = filters.value.search.replace(/[%_,]/g, '\\$&')
-      query = query.or(`name.ilike.%${escaped}%,species.ilike.%${escaped}%`)
-    }
-
-    switch (filters.value.sortBy) {
-      case 'name':
-        query = query.order('name', { ascending: true })
-        break
-      case 'oldest':
-        query = query.order('created_at', { ascending: true })
-        break
-      case 'newest':
-      default:
-        query = query.order('created_at', { ascending: false })
-        break
-    }
-
-    const { data, error: fetchError, count } = await query
-    if (fetchError)
-      throw fetchError
-
-    const transformed = (data || []).map(item => ({
-      id: item.id,
-      name: item.name,
-      slug: item.slug,
-      species: item.species,
-      treeType: item.tree_type,
-      description: item.description,
-      shortDescription: item.short_description,
-      careLevel: item.care_level,
-      size: item.size,
-      age: item.age,
-      height: item.height,
-      potType: item.pot_type,
-      images: item.images,
-      thumbnail: item.thumbnail,
-      model3dUrl: item.model_3d_url,
-      features: item.features,
-      inStock: item.in_stock,
-      featured: item.featured,
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    })) as PublicTree[]
+    const result = await $fetch<PublicTreesResponse>('/api/trees/list', {
+      query: {
+        page: page.value,
+        pageSize,
+        inStockOnly: true,
+        sizes: filters.value.sizes,
+        careLevels: filters.value.careLevels,
+        treeTypes: filters.value.treeTypes,
+        search: filters.value.search,
+        sortBy: filters.value.sortBy,
+      },
+    })
 
     if (append)
-      trees.value = [...trees.value, ...transformed]
+      trees.value = [...trees.value, ...result.trees]
     else
-      trees.value = transformed
+      trees.value = result.trees
 
-    total.value = count || 0
-    hasMore.value = to < (count || 0) - 1
+    total.value = result.total
+    hasMore.value = result.hasMore
   }
   catch (e) {
     console.error('Failed to load catalog:', e)

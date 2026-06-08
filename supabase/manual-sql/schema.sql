@@ -106,8 +106,17 @@ CREATE TRIGGER update_trees_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Grant permissions for anon key access
-GRANT SELECT ON trees TO anon;
+-- Grant permissions for anon key access.
+-- Anon SELECT is column-scoped: `price` is intentionally omitted so the
+-- public anon key (shipped in client bundles) cannot read pricing via a
+-- raw REST call. Server-side endpoints that need price use the service
+-- key (see server/api/admin/listings/*). Pricing is "by inquiry only" —
+-- see TODO.md history and server/api/trees/list.get.ts.
+GRANT SELECT (
+  id, name, slug, species, tree_type, description, short_description,
+  care_level, size, age, height, pot_type, images, thumbnail,
+  model_3d_url, features, in_stock, featured, created_at, updated_at
+) ON trees TO anon;
 GRANT SELECT ON trees TO authenticated;
 
 -- Newsletter subscribers (double-opt-in).

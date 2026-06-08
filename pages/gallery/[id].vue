@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
+import type { PublicTreesResponse } from '~/server/api/trees/list.get'
 import type { PublicTree } from '~/types'
 import { CARE_LEVEL_LABELS, TREE_SIZE_SHORT_LABELS, TREE_TYPE_LABELS } from '~/types'
 
@@ -126,36 +127,16 @@ const treeType = tree.value.treeType
 const { data: relatedTrees } = await useAsyncData<PublicTree[]>(
   `related-${slug}`,
   async () => {
-    const supabase = useSupabaseClient()
-    const { data } = await supabase
-      .from('trees')
-      .select('*')
-      .eq('tree_type', treeType)
-      .neq('id', treeId)
-      .eq('in_stock', true)
-      .limit(3)
-    return (data || []).map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      slug: item.slug,
-      species: item.species,
-      treeType: item.tree_type,
-      description: item.description,
-      shortDescription: item.short_description,
-      careLevel: item.care_level,
-      size: item.size,
-      age: item.age,
-      height: item.height,
-      potType: item.pot_type,
-      images: item.images,
-      thumbnail: item.thumbnail,
-      model3dUrl: item.model_3d_url,
-      features: item.features,
-      inStock: item.in_stock,
-      featured: item.featured,
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    })) as PublicTree[]
+    // Over-fetch by one so we can drop the current tree if it appears in
+    // the page, while still returning up to 3 related specimens.
+    const result = await $fetch<PublicTreesResponse>('/api/trees/list', {
+      query: {
+        treeTypes: [treeType],
+        inStockOnly: true,
+        pageSize: 4,
+      },
+    })
+    return result.trees.filter(t => t.id !== treeId).slice(0, 3)
   },
   { default: () => [] },
 )
