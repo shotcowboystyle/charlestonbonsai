@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 const router = useRouter()
+const { siteName } = useSite()
 
 // Compute page title from route
 const route = useRoute()
@@ -60,7 +61,7 @@ onMounted(async () => {
             </div>
             <div>
               <div class="font-serif font-semibold text-charcoal">
-                Charleston
+                {{ siteName }}
               </div>
               <div class="text-xs text-stone-500">
                 Admin Panel

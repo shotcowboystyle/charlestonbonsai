@@ -2,6 +2,7 @@
 type Status = 'confirmed' | 'already' | 'expired' | 'invalid'
 
 const route = useRoute()
+const { siteName } = useSite()
 const status = computed<Status>(() => {
   const raw = route.query.status
   if (raw === 'confirmed' || raw === 'already' || raw === 'expired' || raw === 'invalid')
@@ -34,7 +35,7 @@ const body = computed(() => {
 })
 
 useHead({
-  title: 'Subscription — Charleston Bonsai',
+  title: `Subscription — ${siteName}`,
   meta: [{ name: 'robots', content: 'noindex' }],
 })
 </script>

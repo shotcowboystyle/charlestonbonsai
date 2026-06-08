@@ -21,8 +21,10 @@ interface InquiryResponse {
   field?: 'name' | 'email' | 'eventDate' | 'location' | 'eventType' | 'notes'
 }
 
+const { siteName, contactEmail } = useSite()
+
 useHead({
-  title: 'Events — Charleston Bonsai',
+  title: `Events — ${siteName}`,
   meta: [
     {
       name: 'description',
@@ -197,14 +199,14 @@ async function handleSubmit() {
     }
 
     state.value = 'error'
-    submitError.value = 'Something didn’t get through. Please try again, or write directly to hello@charlestonbonsai.com.'
+    submitError.value = `Something didn’t get through. Please try again, or write directly to ${contactEmail}.`
   }
   catch (err) {
     // Defensive: $fetch errors should already be normalized above. Log
     // anything else loudly per the project's no-silent-swallow rule.
     console.error('[events/inquire] unexpected error:', err)
     state.value = 'error'
-    submitError.value = 'Something didn’t get through. Please try again, or write directly to hello@charlestonbonsai.com.'
+    submitError.value = `Something didn’t get through. Please try again, or write directly to ${contactEmail}.`
   }
 }
 </script>
@@ -224,7 +226,7 @@ async function handleSubmit() {
       </h1>
       <p class="events__lede">
         Each arrangement is composed for the room it will occupy and the
-        evening it will mark. Charleston Bonsai works directly with
+        evening it will mark. {{ siteName }} works directly with
         planners, florists, and couples within the Lowcountry — every
         event is built from scratch, set on the day of, and tended
         through the night.
@@ -268,7 +270,7 @@ async function handleSubmit() {
           adjusted before anyone else sees it.
         </p>
         <p>
-          Charleston Bonsai works directly with couples planning their
+          {{ siteName }} works directly with couples planning their
           own table, with planners building the room around a theme,
           and with restaurants and hotels who want a living object on
           a counter for the season. The conversation always begins the

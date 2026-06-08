@@ -1,6 +1,8 @@
 <script setup lang="ts">
+const { siteName } = useSite()
+
 useHead({
-  title: 'Unsubscribed — Charleston Bonsai',
+  title: `Unsubscribed — ${siteName}`,
   meta: [{ name: 'robots', content: 'noindex' }],
 })
 </script>

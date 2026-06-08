@@ -5,6 +5,7 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { siteName } = useSite()
 
 const email = ref('')
 const password = ref('')
@@ -75,7 +76,7 @@ async function handleLogin() {
           </div>
           <div class="text-left">
             <div class="font-serif text-xl font-semibold text-charcoal">
-              Charleston Bonsai
+              {{ siteName }}
             </div>
             <div class="text-xs text-stone-500">
               Admin Portal

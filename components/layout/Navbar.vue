@@ -13,6 +13,7 @@
  * lockup that reads like a startup mark.
  */
 const route = useRoute()
+const { siteName } = useSite()
 
 const navLinks = [
   { to: '/', label: 'Index' },
@@ -80,7 +81,7 @@ function closeMenu() {
             <span class="cb-nav__bracket cb-nav__bracket--close">]</span>
           </span>
           <span class="cb-nav__rule" aria-hidden="true" />
-          <span class="cb-nav__name">Charleston Bonsai</span>
+          <span class="cb-nav__name">{{ siteName }}</span>
         </NuxtLink>
 
         <div class="cb-nav__links">

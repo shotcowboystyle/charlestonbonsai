@@ -22,6 +22,7 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits<{ close: [] }>()
 
+const { siteName } = useSite()
 const takeoverRef = ref<HTMLElement | null>(null)
 
 // Address line shown at the bottom of the takeover (mirrors footer imprint)
@@ -84,7 +85,7 @@ onBeforeUnmount(() => {
         <div class="takeover__inner">
           <div class="takeover__top" aria-hidden="true">
             <p class="takeover__eyebrow">
-              <span>Charleston Bonsai</span>
+              <span>{{ siteName }}</span>
               <span class="takeover__bullet">·</span>
               <span>Navigation</span>
             </p>

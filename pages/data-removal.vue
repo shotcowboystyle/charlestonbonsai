@@ -1,12 +1,14 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'legal' })
 
+const { siteName } = useSite()
+
 useHead({
-  title: 'Data Removal — Charleston Bonsai',
+  title: `Data Removal — ${siteName}`,
   meta: [
     {
       name: 'description',
-      content: 'Request removal of your personal information from Charleston Bonsai. We confirm within 5 business days and complete the removal within 30 days.',
+      content: `Request removal of your personal information from ${siteName}. We confirm within 5 business days and complete the removal within 30 days.`,
     },
   ],
 })
@@ -53,7 +55,7 @@ const mailto = computed(() => `mailto:${email.value}?subject=Data%20Removal%20Re
         <li>Your name, email address, and phone number if you provided them to us directly</li>
         <li>Any messages or correspondence you have sent us</li>
         <li>Records of any appointments or inquiries</li>
-        <li>Any other personal data we hold in connection with your interactions with Charleston Bonsai</li>
+        <li>Any other personal data we hold in connection with your interactions with {{ siteName }}</li>
       </ul>
       <p>
         Note that we cannot remove data held by Meta (Facebook or Instagram)

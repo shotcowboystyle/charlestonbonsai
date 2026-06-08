@@ -12,6 +12,7 @@
  * hairline rules.
  */
 const year = new Date().getFullYear()
+const { siteName, contactEmail, contactMailto } = useSite()
 </script>
 
 <template>
@@ -36,8 +37,8 @@ const year = new Date().getFullYear()
             By appointment, Tuesday through Saturday.
           </p>
           <p class="cb-footer__write">
-            <a href="mailto:hello@charlestonbonsai.com">
-              hello@charlestonbonsai.com
+            <a :href="contactMailto">
+              {{ contactEmail }}
             </a>
           </p>
         </section>
@@ -69,7 +70,7 @@ const year = new Date().getFullYear()
 
       <div class="cb-footer__legal">
         <p class="cb-footer__copy">
-          &copy; {{ year }} Charleston Bonsai
+          &copy; {{ year }} {{ siteName }}
         </p>
         <nav class="cb-footer__legal-nav" aria-label="Legal">
           <NuxtLink to="/privacy-policy">

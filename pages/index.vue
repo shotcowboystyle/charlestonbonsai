@@ -2,8 +2,10 @@
 import type { Tree } from '~/types'
 import { TREE_SIZE_LABELS } from '~/types'
 
+const { siteName, contactEmail, contactMailto } = useSite()
+
 useHead({
-  title: 'Charleston Bonsai — A working nursery',
+  title: `${siteName} — A working nursery`,
   meta: [
     {
       name: 'description',
@@ -80,7 +82,7 @@ onMounted(() => {
     <section class="plate" aria-labelledby="plate-eyebrow">
       <header class="plate__masthead">
         <p id="plate-eyebrow" class="plate__eyebrow">
-          <span>Charleston Bonsai</span>
+          <span>{{ siteName }}</span>
           <span class="plate__bullet" aria-hidden="true">·</span>
           <span>A working nursery</span>
         </p>
@@ -369,8 +371,8 @@ onMounted(() => {
         <div>
           <dt>Write</dt>
           <dd>
-            <a href="mailto:hello@charlestonbonsai.com">
-              hello@charlestonbonsai.com
+            <a :href="contactMailto">
+              {{ contactEmail }}
             </a>
           </dd>
         </div>

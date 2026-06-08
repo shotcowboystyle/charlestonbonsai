@@ -7,18 +7,20 @@ export function useSeo(options: {
 }) {
   const config = useRuntimeConfig()
   const route = useRoute()
+  const siteName = config.public.siteName
+  const defaultTitle = `${siteName} Gallery`
 
   const {
-    title = 'Charleston Bonsai Gallery',
-    description = 'Discover exceptional bonsai trees cultivated with care in Charleston.',
+    title = defaultTitle,
+    description = `Discover exceptional bonsai trees cultivated with care by ${siteName}.`,
     image = '/images/og-image.jpg',
     url = config.public.siteUrl + route.path,
     type = 'website',
   } = options
 
-  const fullTitle = title === 'Charleston Bonsai Gallery'
+  const fullTitle = title === defaultTitle
     ? title
-    : `${title} | Charleston Bonsai`
+    : `${title} | ${siteName}`
 
   useHead({
     title: fullTitle,
@@ -33,7 +35,7 @@ export function useSeo(options: {
       { property: 'og:description', content: description },
       { property: 'og:image', content: image },
       { property: 'og:url', content: url },
-      { property: 'og:site_name', content: 'Charleston Bonsai' },
+      { property: 'og:site_name', content: siteName },
     ],
     link: [
       { rel: 'canonical', href: url },

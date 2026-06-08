@@ -1,7 +1,9 @@
 <script setup lang="ts">
+const { siteName } = useSite()
+
 // Meta
 useHead({
-  title: 'Reset Password - Charleston Bonsai Admin',
+  title: `Reset Password - ${siteName} Admin`,
 })
 
 // Route
@@ -102,7 +104,7 @@ async function handleSubmit() {
       <!-- Logo -->
       <div class="text-center mb-8">
         <NuxtLink to="/" class="inline-block">
-          <span class="text-3xl font-serif font-bold text-forest">Charleston Bonsai</span>
+          <span class="text-3xl font-serif font-bold text-forest">{{ siteName }}</span>
         </NuxtLink>
       </div>
 

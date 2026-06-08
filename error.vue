@@ -6,11 +6,12 @@ const props = defineProps<{
 }>()
 
 const is404 = computed(() => props.error.statusCode === 404)
+const { siteName } = useSite()
 
 useHead({
   title: () => is404.value
-    ? 'Not in the catalog — Charleston Bonsai'
-    : 'Something went wrong — Charleston Bonsai',
+    ? `Not in the catalog — ${siteName}`
+    : `Something went wrong — ${siteName}`,
   meta: [
     { name: 'robots', content: 'noindex' },
   ],
