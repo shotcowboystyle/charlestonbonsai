@@ -17,7 +17,7 @@ export type CareLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert'
 export type TreeSize = 'mini' | 'small' | 'medium' | 'large' | 'extra-large'
 
 // Sort options for gallery
-export type SortOption = 'price-asc' | 'price-desc' | 'name' | 'newest' | 'oldest'
+export type SortOption = 'name' | 'newest' | 'oldest'
 
 // Main tree/listing interface
 export interface Tree {
@@ -44,12 +44,16 @@ export interface Tree {
   updatedAt: string
 }
 
+// Consumer-facing shape. Price is intentionally omitted on every public
+// surface (cards, detail, home, related rows). Admin paths use the full
+// `Tree` interface and continue to read/write price.
+export type PublicTree = Omit<Tree, 'price'>
+
 // Filter state for gallery
 export interface FilterState {
   sizes: TreeSize[]
   careLevels: CareLevel[]
   treeTypes: TreeType[]
-  priceRange: [number, number]
   search: string
   sortBy: SortOption
   inStockOnly: boolean
@@ -152,7 +156,5 @@ export const TREE_SIZE_SHORT_LABELS: Record<TreeSize, string> = {
 export const SORT_OPTIONS: { value: SortOption, label: string }[] = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'name', label: 'Name: A to Z' },
 ]

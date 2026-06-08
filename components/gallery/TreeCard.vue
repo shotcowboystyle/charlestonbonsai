@@ -1,23 +1,15 @@
 <script setup lang="ts">
-import type { Tree } from '~/types'
+import type { PublicTree } from '~/types'
 import { TREE_SIZE_SHORT_LABELS } from '~/types'
 
 interface Props {
-  tree: Tree
+  tree: PublicTree
 }
 
 const props = defineProps<Props>()
 
 const sizeShort = computed(() => TREE_SIZE_SHORT_LABELS[props.tree.size] || props.tree.size)
 const hasModel = computed(() => Boolean(props.tree.model3dUrl))
-
-const formattedPrice = computed(() =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(props.tree.price),
-)
 
 function handleImageError(e: Event) {
   const target = e.target as HTMLImageElement
@@ -29,7 +21,7 @@ function handleImageError(e: Event) {
   <NuxtLink
     :to="`/gallery/${tree.slug}`"
     class="specimen"
-    :aria-label="`${tree.name} — ${tree.species}, ${formattedPrice}`"
+    :aria-label="`${tree.name} — ${tree.species}, price on inquiry`"
   >
     <figure class="specimen__frame">
       <img
@@ -47,7 +39,7 @@ function handleImageError(e: Event) {
         <span class="specimen__name-text">{{ tree.name }}</span>
       </h3>
       <p class="specimen__price">
-        {{ formattedPrice }}
+        Price on inquiry
       </p>
       <p class="specimen__line">
         <span>Age {{ tree.age }} yrs</span>
@@ -182,16 +174,21 @@ function handleImageError(e: Event) {
   transform: scaleX(1);
 }
 
+/* "Price on inquiry" reads as a quiet status tag, not a numeric anchor —
+   small caps in body face so the tree name stays the typographic lead. */
 .specimen__price {
   grid-column: 2;
   grid-row: 1;
+  align-self: baseline;
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.0625rem;
-  font-weight: 400;
-  line-height: 1.25;
-  color: var(--text);
-  font-feature-settings: var(--feat-spec-data);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--text-faint);
+  font-feature-settings: var(--feat-small-caps);
   white-space: nowrap;
 }
 
@@ -215,10 +212,9 @@ function handleImageError(e: Event) {
 }
 
 /* Cardo's regular weight is delicate on dark surfaces — light strokes on
-   near-black read as washed-out. Bump the name and price to the bold cut
-   in dark mode so the typographic anchor of the specimen holds its presence. */
-[data-theme='dark'] .specimen__name,
-[data-theme='dark'] .specimen__price {
+   near-black read as washed-out. Bump the name to the bold cut in dark
+   mode so the typographic anchor of the specimen holds its presence. */
+[data-theme='dark'] .specimen__name {
   font-weight: 700;
 }
 </style>

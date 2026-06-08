@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FilterState, Tree } from '~/types'
+import type { FilterState, PublicTree } from '~/types'
 
 const { siteName } = useSite()
 
@@ -15,7 +15,7 @@ useHead({
 
 // ── state ───────────────────────────────────────────────────────────────
 
-const trees = ref<Tree[]>([])
+const trees = ref<PublicTree[]>([])
 const total = ref(0)
 const pending = ref(true)
 const loadingMore = ref(false)
@@ -28,7 +28,6 @@ const filters = ref<FilterState>({
   sizes: [],
   careLevels: [],
   treeTypes: [],
-  priceRange: [0, 10000],
   search: '',
   sortBy: 'newest',
   // This page is the in-stock catalog. Sold specimens live in /archive,
@@ -122,12 +121,6 @@ async function fetchTrees(append = false) {
     }
 
     switch (filters.value.sortBy) {
-      case 'price-asc':
-        query = query.order('price', { ascending: true })
-        break
-      case 'price-desc':
-        query = query.order('price', { ascending: false })
-        break
       case 'name':
         query = query.order('name', { ascending: true })
         break
@@ -150,7 +143,6 @@ async function fetchTrees(append = false) {
       slug: item.slug,
       species: item.species,
       treeType: item.tree_type,
-      price: item.price,
       description: item.description,
       shortDescription: item.short_description,
       careLevel: item.care_level,
@@ -166,7 +158,7 @@ async function fetchTrees(append = false) {
       featured: item.featured,
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-    })) as Tree[]
+    })) as PublicTree[]
 
     if (append)
       trees.value = [...trees.value, ...transformed]
@@ -223,7 +215,6 @@ function clearAll() {
     sizes: [],
     careLevels: [],
     treeTypes: [],
-    priceRange: [0, 10000],
     search: '',
     sortBy: 'newest',
     inStockOnly: true,

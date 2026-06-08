@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import type { Tree } from '~/types'
+import type { PublicTree } from '~/types'
 
 interface Props {
-  tree: Tree
+  tree: PublicTree
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 function handleImageError(e: Event) {
   const target = e.target as HTMLImageElement
   target.src = '/images/trees/placeholder-thumb.svg'
 }
-
-const priceFormatted = computed(() =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(props.tree.price),
-)
 </script>
 
 <template>
@@ -51,7 +43,7 @@ const priceFormatted = computed(() =>
       </p>
       <p class="specimen__price">
         <span class="specimen__rule" aria-hidden="true" />
-        {{ priceFormatted }}
+        Price on inquiry
         <svg
           class="specimen__arrow"
           viewBox="0 0 24 12"

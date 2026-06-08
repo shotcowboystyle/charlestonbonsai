@@ -1,4 +1,4 @@
-import type { Tree } from '~/types'
+import type { PublicTree } from '~/types'
 
 import { createClient } from '@supabase/supabase-js'
 
@@ -35,14 +35,14 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
-    // Transform snake_case to camelCase
-    const tree: Tree = {
+    // Transform snake_case to camelCase. Price is intentionally not
+    // returned to consumer surfaces — pricing is by inquiry only.
+    const tree: PublicTree = {
       id: data.id,
       name: data.name,
       slug: data.slug,
       species: data.species,
       treeType: data.tree_type,
-      price: data.price,
       description: data.description,
       shortDescription: data.short_description,
       careLevel: data.care_level,
