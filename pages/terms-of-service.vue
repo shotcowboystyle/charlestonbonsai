@@ -1,12 +1,14 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'legal' })
 
+const { siteName, siteDomain, contactEmail, contactMailto } = useSite()
+
 useHead({
-  title: 'Terms of Service — Charleston Bonsai',
+  title: `Terms of Service — ${siteName}`,
   meta: [
     {
       name: 'description',
-      content: 'The terms that govern use of the Charleston Bonsai website, the catalog, and any inquiries or purchases conducted through us.',
+      content: `The terms that govern use of the ${siteName} website, the catalog, and any inquiries or purchases conducted through us.`,
     },
   ],
 })
@@ -32,8 +34,8 @@ useHead({
         <span>Acceptance of terms</span>
       </h2>
       <p>
-        By accessing or using the Charleston Bonsai website at
-        charlestonbonsai.com (the “Site”), you agree to be bound by these
+        By accessing or using the {{ siteName }} website at
+        {{ siteDomain }} (the “Site”), you agree to be bound by these
         Terms of Service (“Terms”). If you do not agree to these Terms,
         please do not use the Site. These Terms apply to all visitors,
         users, and anyone who accesses or uses the Site.
@@ -46,7 +48,7 @@ useHead({
         <span>What we do</span>
       </h2>
       <p>
-        Charleston Bonsai is a working nursery specialising in the
+        {{ siteName }} is a working nursery specialising in the
         cultivation and sale of bonsai specimens. The Site presents our
         catalog, allows visitors to browse available trees, and offers ways
         to write to us to schedule an appointment or to inquire about a
@@ -69,7 +71,7 @@ useHead({
         <li>Transmit unsolicited or unauthorised advertising or promotional material</li>
         <li>Attempt to gain unauthorised access to any part of the Site or its related systems</li>
         <li>Use automated tools (bots, scrapers) to extract data from the Site without our prior written consent</li>
-        <li>Impersonate Charleston Bonsai or any of its staff</li>
+        <li>Impersonate {{ siteName }} or any of its staff</li>
       </ul>
     </section>
 
@@ -100,7 +102,7 @@ useHead({
       </h2>
       <p>
         All content on this Site — including text, photographs, graphics,
-        logos, and design — is the property of Charleston Bonsai or its
+        logos, and design — is the property of {{ siteName }} or its
         content suppliers and is protected by applicable copyright and
         intellectual-property laws. You may not reproduce, distribute,
         modify, or create derivative works from any content on this Site
@@ -115,7 +117,7 @@ useHead({
       </h2>
       <p>
         Content we post to our Facebook and Instagram business pages is
-        owned by Charleston Bonsai. By interacting with our social-media
+        owned by {{ siteName }}. By interacting with our social-media
         pages — commenting, sharing, or tagging us — you grant us a
         non-exclusive, royalty-free licence to use, display, and share that
         content in connection with our business. We will always credit you
@@ -145,7 +147,7 @@ useHead({
         <span>Limitation of liability</span>
       </h2>
       <p>
-        To the fullest extent permitted by law, Charleston Bonsai shall not
+        To the fullest extent permitted by law, {{ siteName }} shall not
         be liable for any indirect, incidental, special, consequential, or
         punitive damages arising from your use of the Site or our services,
         including but not limited to loss of profits, data, or goodwill,
@@ -173,7 +175,7 @@ useHead({
         <span>Indemnification</span>
       </h2>
       <p>
-        You agree to indemnify, defend, and hold harmless Charleston Bonsai
+        You agree to indemnify, defend, and hold harmless {{ siteName }}
         and its owners, employees, and agents from and against any claims,
         liabilities, damages, losses, and expenses (including reasonable
         attorneys’ fees) arising out of or in any way connected with your
@@ -220,7 +222,7 @@ useHead({
 
       <div class="legal-contact">
         <p class="legal-contact__name">
-          Charleston Bonsai
+          {{ siteName }}
         </p>
         <dl>
           <dt>By post</dt>
@@ -230,7 +232,7 @@ useHead({
           </dd>
           <dt>By email</dt>
           <dd>
-            <a href="mailto:hello@charlestonbonsai.com">hello@charlestonbonsai.com</a>
+            <a :href="contactMailto">{{ contactEmail }}</a>
           </dd>
         </dl>
       </div>

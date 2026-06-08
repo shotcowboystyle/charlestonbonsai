@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { FilterState, Tree } from '~/types'
 
+const { siteName } = useSite()
+
 useHead({
-  title: 'Catalog — Charleston Bonsai',
+  title: `Catalog — ${siteName}`,
   meta: [
     {
       name: 'description',

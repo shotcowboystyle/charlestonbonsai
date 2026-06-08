@@ -17,6 +17,11 @@
  *   - server/network errors restore the form with an italic note and
  *     a direct-mail escape hatch
  */
+import heroImage from '~/assets/images/retreat-photos/retreat-hero.jpeg'
+import treeImage1 from '~/assets/images/retreat-photos/retreat-individual-tree-1.jpeg'
+import treeImage2 from '~/assets/images/retreat-photos/retreat-individual-tree-2.jpeg'
+import treeImage3 from '~/assets/images/retreat-photos/retreat-individual-tree-3.jpeg'
+
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
 
 type FieldKey
@@ -34,8 +39,10 @@ interface InquiryResponse {
   field?: FieldKey
 }
 
+const { siteName, contactEmail } = useSite()
+
 useHead({
-  title: 'Retreats — Charleston Bonsai',
+  title: `Retreats — ${siteName}`,
   meta: [
     {
       name: 'description',
@@ -50,8 +57,6 @@ const currentYear = new Date().getFullYear()
 // One opening plate and three package plates. "Starting from" values are
 // placeholders pending Curt's confirmation; flagged with TODO so they
 // surface in code review before launch.
-// TODO(photo): replace .plate-placeholder with real photography of the
-// house, the bench, and a representative tree from each package tier.
 const openingPlate = {
   region: 'Blue Ridge · Late October',
   setting: 'Private house · six guest maximum',
@@ -67,6 +72,7 @@ const packagePlates = [
     // TODO(pricing): confirm anchor with Curt before launch.
     startingFrom: '$2,400 / guest',
     aspectRatio: '4 / 5',
+    image: treeImage1,
   },
   {
     title: 'The five-day immersion',
@@ -75,6 +81,7 @@ const packagePlates = [
     tree: 'Japanese white pine, statement class',
     startingFrom: '$4,800 / guest',
     aspectRatio: '4 / 5',
+    image: treeImage2,
   },
   {
     title: 'Private commission',
@@ -83,6 +90,7 @@ const packagePlates = [
     tree: 'Negotiated in advance',
     startingFrom: 'By inquiry',
     aspectRatio: '4 / 5',
+    image: treeImage3,
   },
 ] as const
 
@@ -212,14 +220,14 @@ async function handleSubmit() {
     }
 
     state.value = 'error'
-    submitError.value = 'Something didn’t get through. Please try again, or write directly to hello@charlestonbonsai.com.'
+    submitError.value = `Something didn’t get through. Please try again, or write directly to ${contactEmail}.`
   }
   catch (err) {
     // Defensive: $fetch errors should already be normalized above. Log
     // anything else loudly per the project's no-silent-swallow rule.
     console.error('[retreats/inquire] unexpected error:', err)
     state.value = 'error'
-    submitError.value = 'Something didn’t get through. Please try again, or write directly to hello@charlestonbonsai.com.'
+    submitError.value = `Something didn’t get through. Please try again, or write directly to ${contactEmail}.`
   }
 }
 </script>
@@ -258,8 +266,11 @@ async function handleSubmit() {
         <span class="strip__item">{{ openingPlate.bench }}</span>
       </div>
       <div class="opening__image">
-        <!-- TODO(photo): swap for real photography of the house at dawn. -->
-        <div class="plate-placeholder" aria-hidden="true" />
+        <img
+          :src="heroImage"
+          alt="The retreat house and covered porch in the Blue Ridge."
+          fetchpriority="high"
+        >
       </div>
     </section>
 
@@ -320,7 +331,11 @@ async function handleSubmit() {
             class="packages__image"
             :style="{ aspectRatio: plate.aspectRatio }"
           >
-            <div class="plate-placeholder" aria-hidden="true" />
+            <img
+              :src="plate.image"
+              alt="A specimen worked at the retreat bench."
+              loading="lazy"
+            >
           </div>
           <div class="packages__caption">
             <h3 class="packages__title">
@@ -818,6 +833,14 @@ async function handleSubmit() {
   }
 }
 
+.opening__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
 /* ============================================================
    III. THE PRACTICE
    ============================================================ */
@@ -881,6 +904,14 @@ async function handleSubmit() {
   width: 100%;
   background: var(--surface-raised);
   overflow: hidden;
+}
+
+.packages__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .packages__caption {

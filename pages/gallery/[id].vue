@@ -5,6 +5,7 @@ import { CARE_LEVEL_LABELS, TREE_SIZE_SHORT_LABELS, TREE_TYPE_LABELS } from '~/t
 
 const route = useRoute()
 const slug = route.params.id as string
+const { siteName, contactEmail } = useSite()
 
 const { data: fetched, error: fetchError } = await useFetch<Tree>(`/api/trees/${slug}`)
 
@@ -24,11 +25,11 @@ if (fetchError.value || !fetched.value) {
 const tree = fetched as Ref<Tree>
 
 useHead({
-  title: `${tree.value.name} — Charleston Bonsai`,
+  title: `${tree.value.name} — ${siteName}`,
   meta: [
     {
       name: 'description',
-      content: tree.value.shortDescription || `${tree.value.name} — a specimen from the Charleston Bonsai catalog.`,
+      content: tree.value.shortDescription || `${tree.value.name} — a specimen from the ${siteName} catalog.`,
     },
   ],
 })
@@ -104,7 +105,7 @@ const inquireLink = computed(() => {
     return '#'
   const subject = encodeURIComponent(`Inquiry — ${tree.value.name}`)
   const body = encodeURIComponent(`Hi, I'd like to know if ${tree.value.name} is still available.`)
-  return `mailto:hello@charlestonbonsai.com?subject=${subject}&body=${body}`
+  return `mailto:${contactEmail}?subject=${subject}&body=${body}`
 })
 
 const notifyLink = computed(() => {
@@ -112,7 +113,7 @@ const notifyLink = computed(() => {
     return '#'
   const subject = encodeURIComponent(`Notify me — similar to ${tree.value.name}`)
   const body = encodeURIComponent(`Hi, I was interested in ${tree.value.name} but see it has been sold. Please write when similar trees are ready.`)
-  return `mailto:hello@charlestonbonsai.com?subject=${subject}&body=${body}`
+  return `mailto:${contactEmail}?subject=${subject}&body=${body}`
 })
 
 const formattedPrice = computed(() => {
@@ -258,7 +259,7 @@ const { data: relatedTrees } = await useAsyncData<Tree[]>(
             <span aria-hidden="true">→</span>
           </a>
           <p class="monograph__inquire-helper">
-            Opens in your email · hello@charlestonbonsai.com
+            Opens in your email · {{ contactEmail }}
           </p>
         </template>
         <template v-else>

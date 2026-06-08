@@ -1,12 +1,14 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'legal' })
 
+const { siteName, siteDomain, contactEmail, contactMailto } = useSite()
+
 useHead({
-  title: 'Privacy Policy — Charleston Bonsai',
+  title: `Privacy Policy — ${siteName}`,
   meta: [
     {
       name: 'description',
-      content: 'How Charleston Bonsai collects, uses, and protects information from visitors to the catalog and from inquiries received by email or social media.',
+      content: `How ${siteName} collects, uses, and protects information from visitors to the catalog and from inquiries received by email or social media.`,
     },
   ],
 })
@@ -32,8 +34,8 @@ useHead({
         <span>Introduction</span>
       </h2>
       <p>
-        Charleston Bonsai (“we,” “us,” or “our”) operates the website at
-        charlestonbonsai.com (the “Site”). This Privacy Policy explains how
+        {{ siteName }} (“we,” “us,” or “our”) operates the website at
+        {{ siteDomain }} (the “Site”). This Privacy Policy explains how
         we collect, use, disclose, and safeguard information when you visit
         the Site or interact with our social-media pages on Facebook and
         Instagram. Please read it carefully. If you disagree with its terms,
@@ -229,7 +231,7 @@ useHead({
 
       <div class="legal-contact">
         <p class="legal-contact__name">
-          Charleston Bonsai
+          {{ siteName }}
         </p>
         <dl>
           <dt>By post</dt>
@@ -239,7 +241,7 @@ useHead({
           </dd>
           <dt>By email</dt>
           <dd>
-            <a href="mailto:hello@charlestonbonsai.com">hello@charlestonbonsai.com</a>
+            <a :href="contactMailto">{{ contactEmail }}</a>
           </dd>
         </dl>
       </div>

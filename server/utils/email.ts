@@ -1,3 +1,9 @@
+// Brand identity is configurable via env so the same code can ship under a
+// different name and domain. Email prefixes (hello/noreply) are derived from
+// SITE_DOMAIN; EMAIL_FROM and STUDIO_EMAIL still override when set.
+const siteName = () => process.env.SITE_NAME || 'Charleston Bonsai'
+const siteDomain = () => process.env.SITE_DOMAIN || 'charlestonbonsai.com'
+
 /**
  * Inquiry payload from the /events landing page.
  * Mirrors the shape persisted to event_inquiries.
@@ -40,10 +46,10 @@ export async function sendEventInquiryEmail(
   payload: EventInquiryPayload,
 ): Promise<{ success: boolean, error?: string }> {
   const resendApiKey = process.env.RESEND_API_KEY
-  const emailFrom = process.env.EMAIL_FROM || 'noreply@charlestonbonsai.com'
+  const emailFrom = process.env.EMAIL_FROM || `noreply@${siteDomain()}`
   const studioEmail = process.env.STUDIO_EMAIL
     || process.env.ADMIN_EMAIL
-    || 'hello@charlestonbonsai.com'
+    || `hello@${siteDomain()}`
 
   const eventTypeLabel = EVENT_TYPE_LABELS[payload.eventType] || payload.eventType
   const subject = `New event inquiry — ${eventTypeLabel}, ${payload.eventDate}`
@@ -122,7 +128,7 @@ export async function sendEventInquiryEmail(
           </head>
           <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; color: #222; background: #f7f5f0;">
             <div style="max-width: 640px; margin: 0 auto; padding: 32px 24px; background: #fdfcf8;">
-              <p style="font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: #888; margin: 0 0 8px;">Charleston Bonsai · Event inquiry</p>
+              <p style="font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: #888; margin: 0 0 8px;">${escapeHtml(siteName())} · Event inquiry</p>
               <h1 style="font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.2; color: #222; margin: 0 0 24px;">
                 ${escapeHtml(eventTypeLabel)} — ${escapeHtml(payload.eventDate)}
               </h1>
@@ -194,10 +200,10 @@ export async function sendRetreatInquiryEmail(
   payload: RetreatInquiryPayload,
 ): Promise<{ success: boolean, error?: string }> {
   const resendApiKey = process.env.RESEND_API_KEY
-  const emailFrom = process.env.EMAIL_FROM || 'noreply@charlestonbonsai.com'
+  const emailFrom = process.env.EMAIL_FROM || `noreply@${siteDomain()}`
   const studioEmail = process.env.STUDIO_EMAIL
     || process.env.ADMIN_EMAIL
-    || 'hello@charlestonbonsai.com'
+    || `hello@${siteDomain()}`
 
   const packageLabel = PACKAGE_LABELS[payload.packageType] || payload.packageType
   const skillLabel = SKILL_LABELS[payload.skillLevel] || payload.skillLevel
@@ -274,7 +280,7 @@ export async function sendRetreatInquiryEmail(
           </head>
           <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; color: #222; background: #f7f5f0;">
             <div style="max-width: 640px; margin: 0 auto; padding: 32px 24px; background: #fdfcf8;">
-              <p style="font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: #888; margin: 0 0 8px;">Charleston Bonsai · Retreat inquiry</p>
+              <p style="font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: #888; margin: 0 0 8px;">${escapeHtml(siteName())} · Retreat inquiry</p>
               <h1 style="font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.2; color: #222; margin: 0 0 24px;">
                 ${escapeHtml(packageLabel)} — ${escapeHtml(payload.preferredDates)}
               </h1>
@@ -319,7 +325,7 @@ export async function sendPasswordResetEmail(
   siteUrl: string,
 ): Promise<{ success: boolean, error?: string }> {
   const resendApiKey = process.env.RESEND_API_KEY
-  const emailFrom = process.env.EMAIL_FROM || 'noreply@charlestonbonsai.com'
+  const emailFrom = process.env.EMAIL_FROM || `noreply@${siteDomain()}`
 
   const resetUrl = `${siteUrl}/admin/reset-password?token=${resetToken}`
 
@@ -350,7 +356,7 @@ export async function sendPasswordResetEmail(
       body: JSON.stringify({
         from: emailFrom,
         to: email,
-        subject: 'Reset Your Charleston Bonsai Admin Password',
+        subject: `Reset Your ${siteName()} Admin Password`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -366,7 +372,7 @@ export async function sendPasswordResetEmail(
           <body>
             <div class="container">
               <h2>Reset Your Password</h2>
-              <p>You requested to reset your admin password for Charleston Bonsai Gallery.</p>
+              <p>You requested to reset your admin password for ${escapeHtml(siteName())} Gallery.</p>
               <p>Click the button below to set a new password:</p>
               <p><a href="${resetUrl}" class="button">Reset Password</a></p>
               <p>Or copy this link to your browser:</p>
@@ -374,7 +380,7 @@ export async function sendPasswordResetEmail(
               <p>This link will expire in <strong>1 hour</strong>.</p>
               <p>If you didn't request this password reset, you can safely ignore this email.</p>
               <div class="footer">
-                <p>Charleston Bonsai Gallery</p>
+                <p>${escapeHtml(siteName())} Gallery</p>
               </div>
             </div>
           </body>
@@ -408,7 +414,7 @@ export async function sendSubscribeConfirmationEmail(
   siteUrl: string,
 ): Promise<{ success: boolean, error?: string }> {
   const resendApiKey = process.env.RESEND_API_KEY
-  const emailFrom = process.env.EMAIL_FROM || 'noreply@charlestonbonsai.com'
+  const emailFrom = process.env.EMAIL_FROM || `noreply@${siteDomain()}`
 
   const confirmUrl = `${siteUrl}/api/subscribe/confirm?token=${confirmationToken}`
   const unsubscribeUrl = `${siteUrl}/api/subscribe/unsubscribe?token=${unsubscribeToken}`
@@ -441,7 +447,7 @@ export async function sendSubscribeConfirmationEmail(
       body: JSON.stringify({
         from: emailFrom,
         to: email,
-        subject: 'Confirm your Charleston Bonsai subscription',
+        subject: `Confirm your ${siteName()} subscription`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -457,13 +463,13 @@ export async function sendSubscribeConfirmationEmail(
           <body>
             <div class="container">
               <h2>One more step</h2>
-              <p>Please confirm you'd like to hear from Charleston Bonsai when a new tree is listed.</p>
+              <p>Please confirm you'd like to hear from ${escapeHtml(siteName())} when a new tree is listed.</p>
               <p><a href="${confirmUrl}" class="button">Confirm subscription</a></p>
               <p>Or copy this link to your browser:</p>
               <p style="word-break: break-all; color: #666;">${confirmUrl}</p>
               <p>This link will expire in <strong>24 hours</strong>. If you didn't request this, you can safely ignore this email.</p>
               <div class="footer">
-                <p>Charleston Bonsai Gallery</p>
+                <p>${escapeHtml(siteName())} Gallery</p>
                 <p>Not interested? <a href="${unsubscribeUrl}">Unsubscribe</a>.</p>
               </div>
             </div>

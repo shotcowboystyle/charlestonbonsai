@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import heroImage from '~/assets/images/visit-the-nursery.jpg'
+
+const { siteName, contactEmail, contactMailto } = useSite()
+
 useHead({
-  title: 'Visit — Charleston Bonsai',
+  title: `Visit — ${siteName}`,
   meta: [
     {
       name: 'description',
-      content: 'Visits to the Charleston Bonsai nursery are by appointment, Tuesday through Saturday. Specimens viewed by request.',
+      content: `Visits to the ${siteName} nursery are by appointment, Tuesday through Saturday. Specimens viewed by request.`,
     },
   ],
 })
@@ -29,6 +33,16 @@ const currentYear = new Date().getFullYear()
       </p>
     </header>
 
+    <section class="visit-page__opening" aria-label="The nursery">
+      <div class="visit-page__opening-image">
+        <img
+          :src="heroImage"
+          alt="The nursery bench at the Charleston workshop."
+          fetchpriority="high"
+        >
+      </div>
+    </section>
+
     <section class="visit-page__lines" aria-label="Visit details">
       <dl class="visit-page__dl">
         <div>
@@ -45,7 +59,7 @@ const currentYear = new Date().getFullYear()
         <div>
           <dt>Write</dt>
           <dd>
-            <a href="mailto:hello@charlestonbonsai.com">hello@charlestonbonsai.com</a>
+            <a :href="contactMailto">{{ contactEmail }}</a>
           </dd>
         </div>
       </dl>
@@ -70,21 +84,21 @@ const currentYear = new Date().getFullYear()
 
 <style scoped>
 .visit-page {
-  max-width: 64rem;
-  margin: 0 auto;
-  padding: clamp(5rem, 12vw, 9rem) clamp(1.5rem, 5vw, 3rem) clamp(4rem, 10vw, 7rem);
   display: flex;
   flex-direction: column;
   gap: var(--section-y);
   background: var(--surface);
   color: var(--text);
+  padding: clamp(5rem, 12vw, 9rem) clamp(1.5rem, 5vw, 3rem) clamp(4rem, 10vw, 7rem);
+  max-width: 64rem;
+  margin: 0 auto;
 }
 
 .visit-page__masthead {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  max-width: 50ch;
+  max-width: 56ch;
 }
 
 .visit-page__eyebrow {
@@ -126,6 +140,34 @@ const currentYear = new Date().getFullYear()
   color: var(--text-muted);
   max-width: var(--measure-reading);
   margin: 0;
+  font-feature-settings: var(--feat-running-text);
+}
+
+.visit-page__opening {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.visit-page__opening-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface-raised);
+}
+
+@media (min-width: 720px) {
+  .visit-page__opening-image {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.visit-page__opening-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .visit-page__lines {

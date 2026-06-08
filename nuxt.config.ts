@@ -22,14 +22,16 @@ export default defineNuxtConfig({
       supabaseUrl: process.env.SUPABASE_URL || 'https://xhderhlscsreyylyucvb.supabase.co',
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY || 'sb_publishable_ERYNxpVpCDlF17CT_VwCgg_ogPIzCg7',
       siteUrl: process.env.SITE_URL || 'http://localhost:3000',
+      siteName: process.env.SITE_NAME || 'Charleston Bonsai',
+      siteDomain: process.env.SITE_DOMAIN || 'charlestonbonsai.com',
     },
   },
 
   app: {
     head: {
-      title: 'Charleston Bonsai Gallery',
+      title: `${process.env.SITE_NAME || 'Charleston Bonsai'} Gallery`,
       meta: [
-        { name: 'description', content: 'Premium bonsai trees cultivated with care in Charleston. Explore our curated collection of living art.' },
+        { name: 'description', content: `Premium bonsai trees cultivated with care. Explore the ${process.env.SITE_NAME || 'Charleston Bonsai'} collection of living art.` },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { charset: 'utf-8' },
       ],

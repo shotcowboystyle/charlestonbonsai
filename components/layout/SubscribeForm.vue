@@ -10,6 +10,8 @@
  */
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
 
+const { contactEmail } = useSite()
+
 const email = ref('')
 const state = ref<FormState>('idle')
 const errorMessage = ref('')
@@ -51,7 +53,7 @@ async function handleSubmit() {
       state.value = 'error'
       errorMessage.value = response.error === 'invalid_email'
         ? 'That email address doesn’t look right.'
-        : 'That didn’t go through. Try again, or write hello@charlestonbonsai.com.'
+        : `That didn’t go through. Try again, or write ${contactEmail}.`
     }
   }
   catch (err) {
@@ -59,7 +61,7 @@ async function handleSubmit() {
     // unexpected failures rather than silently swallowing.
     console.error('[subscribe] unexpected error:', err)
     state.value = 'error'
-    errorMessage.value = 'That didn’t go through. Try again, or write hello@charlestonbonsai.com.'
+    errorMessage.value = `That didn’t go through. Try again, or write ${contactEmail}.`
   }
 }
 </script>
