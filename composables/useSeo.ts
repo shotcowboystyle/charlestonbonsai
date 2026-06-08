@@ -46,7 +46,6 @@ export function useSeo(options: {
 export function useProductSeo(tree: {
   name: string
   description: string
-  price: number
   images: string[]
   slug: string
 }) {
@@ -60,7 +59,9 @@ export function useProductSeo(tree: {
     type: 'product',
   })
 
-  // Product-specific structured data
+  // Product-specific structured data. Offers/price are intentionally
+  // omitted — pricing is by inquiry. A Product without an Offer is valid
+  // schema.org and the correct signal when price is not published.
   useHead({
     script: [
       {
@@ -71,12 +72,6 @@ export function useProductSeo(tree: {
           'name': tree.name,
           'description': tree.description,
           'image': tree.images,
-          'offers': {
-            '@type': 'Offer',
-            'price': tree.price,
-            'priceCurrency': 'USD',
-            'availability': 'https://schema.org/InStock',
-          },
         }),
       },
     ],

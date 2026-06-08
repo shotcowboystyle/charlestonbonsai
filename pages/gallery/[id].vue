@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
-import type { Tree } from '~/types'
+import type { PublicTree } from '~/types'
 import { CARE_LEVEL_LABELS, TREE_SIZE_SHORT_LABELS, TREE_TYPE_LABELS } from '~/types'
 
 const route = useRoute()
 const slug = route.params.id as string
 const { siteName, contactEmail } = useSite()
 
-const { data: fetched, error: fetchError } = await useFetch<Tree>(`/api/trees/${slug}`)
+const { data: fetched, error: fetchError } = await useFetch<PublicTree>(`/api/trees/${slug}`)
 
 // Surface real HTTP status. A missing specimen is a true 404 so search
 // engines drop the URL; an unreachable API is whatever status the fetch
@@ -20,9 +20,9 @@ if (fetchError.value || !fetched.value) {
   })
 }
 
-// Narrowed ref — the createError above guarantees fetched.value is a Tree
-// from this point on. The cast lets the template skip null checks.
-const tree = fetched as Ref<Tree>
+// Narrowed ref — the createError above guarantees fetched.value is a
+// PublicTree from this point on. The cast lets the template skip null checks.
+const tree = fetched as Ref<PublicTree>
 
 useHead({
   title: `${tree.value.name} — ${siteName}`,
@@ -116,16 +116,6 @@ const notifyLink = computed(() => {
   return `mailto:${contactEmail}?subject=${subject}&body=${body}`
 })
 
-const formattedPrice = computed(() => {
-  if (!tree.value)
-    return ''
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(tree.value.price)
-})
-
 // ── related ─────────────────────────────────────────────────────────────
 
 // useAsyncData runs during SSR so the related row is rendered in the
@@ -133,7 +123,7 @@ const formattedPrice = computed(() => {
 // not shift on hydration.
 const treeId = tree.value.id
 const treeType = tree.value.treeType
-const { data: relatedTrees } = await useAsyncData<Tree[]>(
+const { data: relatedTrees } = await useAsyncData<PublicTree[]>(
   `related-${slug}`,
   async () => {
     const supabase = useSupabaseClient()
@@ -150,7 +140,6 @@ const { data: relatedTrees } = await useAsyncData<Tree[]>(
       slug: item.slug,
       species: item.species,
       treeType: item.tree_type,
-      price: item.price,
       description: item.description,
       shortDescription: item.short_description,
       careLevel: item.care_level,
@@ -166,7 +155,7 @@ const { data: relatedTrees } = await useAsyncData<Tree[]>(
       featured: item.featured,
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-    })) as Tree[]
+    })) as PublicTree[]
   },
   { default: () => [] },
 )
@@ -189,7 +178,7 @@ const { data: relatedTrees } = await useAsyncData<Tree[]>(
             {{ tree.name }}
           </h1>
           <p class="monograph__price">
-            {{ formattedPrice }}
+            Price on inquiry
           </p>
         </div>
         <p v-if="!tree.inStock" class="monograph__status">
@@ -408,14 +397,19 @@ const { data: relatedTrees } = await useAsyncData<Tree[]>(
   color: var(--text);
 }
 
+/* "Price on inquiry" reads as a status tag in the masthead — small caps
+   in body face so the tree name remains the sole typographic anchor. */
 .monograph__price {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.375rem, 2.6vw, 1.75rem);
-  line-height: 1.1;
-  color: var(--text);
-  font-feature-settings: var(--feat-spec-data);
+  align-self: baseline;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--text-faint);
+  font-feature-settings: var(--feat-small-caps);
   white-space: nowrap;
 }
 
@@ -710,8 +704,7 @@ const { data: relatedTrees } = await useAsyncData<Tree[]>(
 
 /* ──────── dark-mode display weight bump ──────── */
 
-[data-theme='dark'] .monograph__name,
-[data-theme='dark'] .monograph__price {
+[data-theme='dark'] .monograph__name {
   font-weight: 700;
 }
 

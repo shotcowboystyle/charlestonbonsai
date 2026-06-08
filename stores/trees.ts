@@ -18,7 +18,6 @@ export const useTreesStore = defineStore('trees', () => {
     sizes: [],
     careLevels: [],
     treeTypes: [],
-    priceRange: [0, 10000],
     search: '',
     sortBy: 'newest',
     inStockOnly: false,
@@ -43,11 +42,6 @@ export const useTreesStore = defineStore('trees', () => {
       result = result.filter(tree => filters.value.treeTypes.includes(tree.treeType))
     }
 
-    // Filter by price range
-    result = result.filter(
-      tree => tree.price >= filters.value.priceRange[0] && tree.price <= filters.value.priceRange[1],
-    )
-
     // Filter by search
     if (filters.value.search) {
       const searchLower = filters.value.search.toLowerCase()
@@ -66,12 +60,6 @@ export const useTreesStore = defineStore('trees', () => {
 
     // Sort
     switch (filters.value.sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price)
-        break
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price)
-        break
       case 'name':
         result.sort((a, b) => a.name.localeCompare(b.name))
         break
@@ -91,8 +79,6 @@ export const useTreesStore = defineStore('trees', () => {
       filters.value.sizes.length > 0
       || filters.value.careLevels.length > 0
       || filters.value.treeTypes.length > 0
-      || filters.value.priceRange[0] > 0
-      || filters.value.priceRange[1] < 10000
       || filters.value.search !== ''
       || filters.value.inStockOnly
     )
@@ -219,7 +205,6 @@ export const useTreesStore = defineStore('trees', () => {
       sizes: [],
       careLevels: [],
       treeTypes: [],
-      priceRange: [0, 10000],
       search: '',
       sortBy: 'newest',
       inStockOnly: false,

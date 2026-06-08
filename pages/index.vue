@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tree } from '~/types'
+import type { PublicTree } from '~/types'
 import { TREE_SIZE_LABELS } from '~/types'
 
 const { siteName, contactEmail, contactMailto } = useSite()
@@ -14,25 +14,17 @@ useHead({
   ],
 })
 
-const { data: featuredTrees, pending } = await useFetch<Tree[]>('/api/trees/featured', {
+const { data: featuredTrees, pending } = await useFetch<PublicTree[]>('/api/trees/featured', {
   default: () => [],
 })
 
 const hasFeatured = computed(() => Boolean(featuredTrees.value && featuredTrees.value.length > 0))
 
-const heroSpecimen = computed<Tree | null>(() => featuredTrees.value?.[0] ?? null)
-const editorialSpecimen = computed<Tree | null>(() => featuredTrees.value?.[1] ?? null)
-const gridSpecimens = computed<Tree[]>(() => featuredTrees.value?.slice(2) ?? [])
+const heroSpecimen = computed<PublicTree | null>(() => featuredTrees.value?.[0] ?? null)
+const editorialSpecimen = computed<PublicTree | null>(() => featuredTrees.value?.[1] ?? null)
+const gridSpecimens = computed<PublicTree[]>(() => featuredTrees.value?.slice(2) ?? [])
 
 const currentYear = new Date().getFullYear()
-
-function formatPrice(value: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value)
-}
 
 function handleImageError(e: Event) {
   const target = e.target as HTMLImageElement
@@ -270,7 +262,7 @@ onMounted(() => {
           </div>
           <div>
             <dt>Price</dt>
-            <dd>{{ formatPrice(editorialSpecimen.price) }}</dd>
+            <dd>On inquiry</dd>
           </div>
         </dl>
 
