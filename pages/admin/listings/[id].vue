@@ -32,41 +32,14 @@ const careLevelOptions = Object.entries(CARE_LEVEL_LABELS).map(([value, label]) 
 const sizeOptions = Object.entries(TREE_SIZE_LABELS).map(([value, label]) => ({ value, label }))
 
 onMounted(async () => {
-  const supabase = useSupabaseClient()
+  const tokenCookie = useCookie('admin_token')
 
   try {
-    const { data, error } = await supabase
-      .from('trees')
-      .select('*')
-      .eq('id', treeId)
-      .single()
-
-    if (error)
-      throw error
-
-    tree.value = {
-      id: data.id,
-      name: data.name,
-      slug: data.slug,
-      species: data.species,
-      treeType: data.tree_type,
-      price: data.price,
-      description: data.description,
-      shortDescription: data.short_description,
-      careLevel: data.care_level,
-      size: data.size,
-      age: data.age,
-      height: data.height,
-      potType: data.pot_type,
-      images: data.images,
-      thumbnail: data.thumbnail,
-      model3dUrl: data.model_3d_url,
-      features: data.features,
-      inStock: data.in_stock,
-      featured: data.featured,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-    }
+    tree.value = await $fetch<Tree>(`/api/admin/listings/${treeId}`, {
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+    })
 
     form.value = {
       name: tree.value.name,

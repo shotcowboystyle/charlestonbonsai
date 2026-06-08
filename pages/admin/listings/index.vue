@@ -54,40 +54,14 @@ onMounted(async () => {
 
 async function fetchTrees() {
   loading.value = true
-  const supabase = useSupabaseClient()
+  const tokenCookie = useCookie('admin_token')
 
   try {
-    const { data, error } = await supabase
-      .from('trees')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error)
-      throw error
-
-    trees.value = (data || []).map(item => ({
-      id: item.id,
-      name: item.name,
-      slug: item.slug,
-      species: item.species,
-      treeType: item.tree_type,
-      price: item.price,
-      description: item.description,
-      shortDescription: item.short_description,
-      careLevel: item.care_level,
-      size: item.size,
-      age: item.age,
-      height: item.height,
-      potType: item.pot_type,
-      images: item.images,
-      thumbnail: item.thumbnail,
-      model3dUrl: item.model_3d_url,
-      features: item.features,
-      inStock: item.inStock,
-      featured: item.featured,
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    })) as Tree[]
+    trees.value = await $fetch<Tree[]>('/api/admin/listings', {
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+    })
   }
   catch {
     toast.error('Failed to load listings', 'Could not fetch tree data. Please refresh the page to try again.')

@@ -17,45 +17,17 @@ const stats = ref({
 })
 
 onMounted(async () => {
-  const supabase = useSupabaseClient()
+  const tokenCookie = useCookie('admin_token')
 
   try {
-    // Fetch all trees for stats
-    const { data, error } = await supabase
-      .from('trees')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error)
-      throw error
-
-    const trees = (data || []).map(item => ({
-      id: item.id,
-      name: item.name,
-      slug: item.slug,
-      species: item.species,
-      treeType: item.tree_type,
-      price: item.price,
-      description: item.description,
-      shortDescription: item.short_description,
-      careLevel: item.care_level,
-      size: item.size,
-      age: item.age,
-      height: item.height,
-      potType: item.pot_type,
-      images: item.images,
-      thumbnail: item.thumbnail,
-      model3dUrl: item.model_3d_url,
-      features: item.features,
-      inStock: item.in_stock,
-      featured: item.featured,
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    })) as Tree[]
+    const trees = await $fetch<Tree[]>('/api/admin/listings', {
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+    })
 
     recentTrees.value = trees.slice(0, 5)
 
-    // Calculate stats
     stats.value = {
       total: trees.length,
       inStock: trees.filter(t => t.inStock).length,
