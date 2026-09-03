@@ -15,10 +15,9 @@
  * (`{ ok: false, field: 'email', error: 'invalid' }`) so the
  * form can target the right input. Mirrors /api/events/inquire.
  */
-import { createClient } from '@supabase/supabase-js'
 import { sendRetreatInquiryEmail } from '~/server/utils/email'
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
+import { createServiceClient } from '~/server/utils/supabase'
+import { asPartySize, asString, isValidEmail } from '~/server/utils/validators'
 
 const ALLOWED_PACKAGE_TYPES = new Set([
   'weekend',
@@ -52,27 +51,6 @@ type FieldKey
     | 'skillLevel'
     | 'notes'
 
-function asString(value: unknown, max: number): string | null {
-  if (typeof value !== 'string')
-    return null
-  const trimmed = value.trim()
-  if (trimmed.length === 0 || trimmed.length > max)
-    return null
-  return trimmed
-}
-
-function asPartySize(value: unknown): number | null {
-  if (value === null || value === undefined || value === '')
-    return null
-  const n = typeof value === 'number' ? value : Number(value)
-  if (!Number.isFinite(n) || !Number.isInteger(n))
-    return null
-  // Mountain house tops out at 6 guests — matches the table check constraint.
-  if (n < 1 || n > 6)
-    return null
-  return n
-}
-
 export default defineEventHandler(async (event) => {
   const body = await readBody<InquiryBody>(event).catch(() => null)
   if (!body) {
@@ -88,7 +66,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const rawEmail = typeof body.email === 'string' ? body.email.trim() : ''
-  if (!rawEmail || !EMAIL_PATTERN.test(rawEmail) || rawEmail.length > 254) {
+  if (!isValidEmail(rawEmail)) {
     setResponseStatus(event, 400)
     return { ok: false, error: 'invalid', field: 'email' as FieldKey }
   }
@@ -126,11 +104,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // ---- Persist -----------------------------------------------------
-  const config = useRuntimeConfig()
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   const { error: writeError } = await supabase
     .from('retreat_inquiries')

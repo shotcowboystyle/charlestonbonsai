@@ -9,82 +9,7 @@ const emit = defineEmits<{
   'apply': [price: number]
 }>()
 
-// --- Species Data ---
-const SPECIES: Record<string, { name: string, multiplier: number, rarity: string, note: string }> = {
-  'juniper-shimpaku': {
-    name: 'Shimpaku Juniper',
-    multiplier: 1.6,
-    rarity: 'premium',
-    note: 'Highly prized for fine foliage and natural jin/shari. Itoigawa variety commands top prices.',
-  },
-  'juniper-procumbens': {
-    name: 'Juniper Procumbens Nana',
-    multiplier: 1.0,
-    rarity: 'common',
-    note: 'Most popular beginner species. Widely available and forgiving. Good starter stock.',
-  },
-  'juniper-rocky-mountain': {
-    name: 'Rocky Mountain Juniper',
-    multiplier: 1.3,
-    rarity: 'moderate',
-    note: 'Excellent collected (yamadori) material with dramatic deadwood and trunk character.',
-  },
-  'japanese-maple': {
-    name: 'Japanese Maple',
-    multiplier: 1.5,
-    rarity: 'premium',
-    note: 'Prized for seasonal color changes. Delicate ramification adds significant value.',
-  },
-  'black-pine': {
-    name: 'Japanese Black Pine',
-    multiplier: 1.7,
-    rarity: 'premium',
-    note: 'Classic bonsai species. Thick bark and powerful character. Slow development adds value.',
-  },
-  'chinese-elm': {
-    name: 'Chinese Elm',
-    multiplier: 0.9,
-    rarity: 'common',
-    note: 'Hardy and forgiving. Excellent ramification potential. Abundant availability keeps prices accessible.',
-  },
-  'ficus': {
-    name: 'Ficus (Tropical)',
-    multiplier: 0.8,
-    rarity: 'common',
-    note: 'Popular indoor species. Easy to grow and style. Mass production reduces premium potential.',
-  },
-  'azalea-satsuki': {
-    name: 'Satsuki Azalea',
-    multiplier: 1.4,
-    rarity: 'moderate',
-    note: 'Spectacular flowering adds value. Japanese cultivars command premium prices.',
-  },
-  'trident-maple': {
-    name: 'Trident Maple',
-    multiplier: 1.3,
-    rarity: 'moderate',
-    note: 'Excellent nebari development and fall color. Fusion plantings popular.',
-  },
-  'white-pine': {
-    name: 'Japanese White Pine',
-    multiplier: 1.8,
-    rarity: 'premium',
-    note: 'The aristocrat of bonsai. Slow growth, blue-green needles. Grafted varieties especially valued.',
-  },
-  'bald-cypress': {
-    name: 'Bald Cypress',
-    multiplier: 1.1,
-    rarity: 'moderate',
-    note: 'Unique deciduous conifer. Buttressed trunk and fine ramification. Growing in popularity.',
-  },
-  'other': {
-    name: 'Other / Mixed Species',
-    multiplier: 1.0,
-    rarity: 'varies',
-    note: 'Pricing varies widely by species rarity and regional demand.',
-  },
-}
-
+// The valuation model lives in ~/utils/pricing so it can be unit-tested.
 const POT_OPTIONS = [
   { value: 'basic', label: 'Basic' },
   { value: 'mid', label: 'Mid-range' },
@@ -114,110 +39,19 @@ const STYLING_HELPERS: Record<string, string> = {
 }
 
 // Calculator state
-const species = ref('juniper-shimpaku')
+const species = ref(DEFAULT_SPECIES_KEY)
 const age = ref(5)
 const height = ref(18)
 const potQuality = ref('mid')
 const stylingLevel = ref('refined')
 
-// Defaults used as fallback (values are always in the maps, but TS can't prove it)
-const DEFAULT_SPECIES = SPECIES['juniper-shimpaku']!
-const DEFAULT_POT = { low: 20, high: 60, label: 'Mid-range ceramic' }
-const DEFAULT_STYLING = { factor: 1.15, label: 'Refined' }
-
-// Computed pricing
-const result = computed(() => {
-  const sp = SPECIES[species.value] ?? DEFAULT_SPECIES
-
-  let basePerYear: { low: number, high: number }
-  switch (sp.rarity) {
-    case 'premium':
-      basePerYear = { low: 25, high: 50 }
-      break
-    case 'moderate':
-      basePerYear = { low: 20, high: 35 }
-      break
-    default:
-      basePerYear = { low: 15, high: 25 }
-      break
-  }
-
-  const baseValueLow = age.value * basePerYear.low
-  const baseValueHigh = age.value * basePerYear.high
-
-  let sizeFactor: number
-  if (height.value <= 6)
-    sizeFactor = 0.7
-  else if (height.value <= 12)
-    sizeFactor = 0.9
-  else if (height.value <= 24)
-    sizeFactor = 1.0
-  else if (height.value <= 36)
-    sizeFactor = 1.2
-  else
-    sizeFactor = 1.5
-
-  const potFactors = {
-    basic: { low: 5, high: 20, label: 'Basic plastic/mica' },
-    mid: { low: 20, high: 60, label: 'Mid-range ceramic' },
-    handmade: { low: 60, high: 150, label: 'Handmade artisan' },
-    signed: { low: 150, high: 500, label: 'Signed/collectible' },
-  } as const
-  const pot = potFactors[potQuality.value as keyof typeof potFactors] ?? DEFAULT_POT
-
-  const stylingMultipliers = {
-    raw: { factor: 0.6, label: 'Raw / unstyled' },
-    developing: { factor: 0.85, label: 'Developing' },
-    refined: { factor: 1.15, label: 'Refined' },
-    exhibition: { factor: 1.5, label: 'Exhibition-ready' },
-  } as const
-  const styling = stylingMultipliers[stylingLevel.value as keyof typeof stylingMultipliers] ?? DEFAULT_STYLING
-
-  const treeLow = baseValueLow * sizeFactor * sp.multiplier * styling.factor
-  const treeHigh = baseValueHigh * sizeFactor * sp.multiplier * styling.factor
-
-  const totalLow = Math.max(Math.round(treeLow + pot.low), 5)
-  const totalHigh = Math.max(Math.round(treeHigh + pot.high), 10)
-
-  const midPrice = (totalLow + totalHigh) / 2
-  let tier: string
-  if (midPrice < 60)
-    tier = 'starter'
-  else if (midPrice < 250)
-    tier = 'enthusiast'
-  else if (midPrice < 800)
-    tier = 'advanced'
-  else
-    tier = 'showcase'
-
-  const tierLabels: Record<string, string> = {
-    starter: 'Starter / Gift',
-    enthusiast: 'Enthusiast',
-    advanced: 'Advanced',
-    showcase: 'Showcase',
-  }
-
-  const ageContribution = (baseValueLow + baseValueHigh) / 2
-  const speciesContribution = ageContribution * (sp.multiplier - 1)
-  const sizeContribution = ageContribution * (sizeFactor - 1)
-  const stylingContribution = ageContribution * (styling.factor - 1)
-  const potContribution = (pot.low + pot.high) / 2
-
-  return {
-    low: totalLow,
-    high: totalHigh,
-    tier,
-    tierLabel: tierLabels[tier] ?? 'Enthusiast',
-    breakdown: [
-      { label: `Age (${age.value} yrs)`, value: ageContribution, color: 'bg-forest' },
-      { label: `Species (${sp.name})`, value: speciesContribution, color: 'bg-bark' },
-      { label: `Size (${height.value}")`, value: sizeContribution, color: 'bg-sage' },
-      { label: `Styling (${styling.label})`, value: stylingContribution, color: 'bg-moss' },
-      { label: `Pot (${pot.label})`, value: potContribution, color: 'bg-stone' },
-    ],
-    speciesNote: sp.note,
-  }
-})
+const result = computed(() => calculatePricing({
+  species: species.value,
+  age: age.value,
+  height: height.value,
+  potQuality: potQuality.value,
+  stylingLevel: stylingLevel.value,
+}))
 
 const maxBreakdownValue = computed(() =>
   Math.max(...result.value.breakdown.map(e => Math.abs(e.value)), 1),
@@ -242,8 +76,7 @@ function close() {
 }
 
 function applyMidpoint() {
-  const mid = Math.round((result.value.low + result.value.high) / 2)
-  emit('apply', mid)
+  emit('apply', midpointPrice(result.value))
   close()
 }
 
@@ -350,7 +183,7 @@ watch(() => props.modelValue, (value) => {
               class="btn btn-primary text-xs py-2"
               @click="applyMidpoint"
             >
-              Use ${{ Math.round((result.low + result.high) / 2).toLocaleString() }}
+              Use ${{ midpointPrice(result).toLocaleString() }}
             </button>
             <button
               type="button"

@@ -2,5 +2,12 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>shotcowboystyle/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "@nuxt/test-utils peer-requires vitest ^4. Release the ceiling once it supports vitest 5.",
+      "matchPackageNames": ["vitest", "@vitest/coverage-v8"],
+      "allowedVersions": "<5"
+    }
   ]
 }

@@ -15,6 +15,9 @@ export default antfu({
     '**/.nuxt/**',
     '**/.git/**',
     '**/*.md',
+    '**/coverage/**',
+    '**/playwright-report/**',
+    '**/test-results/**',
     '**/.agent/**',
     '**/.agents/**',
     '**/.claude/**',
@@ -29,5 +32,7 @@ export default antfu({
     'unused-imports/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     // Vue refs are often used in onMounted before declaration
     'ts/no-use-before-define': 'off',
+    // Let a top-level describe() name the unit under test, e.g. describe('FilterPills')
+    'test/prefer-lowercase-title': ['error', { ignoreTopLevelDescribe: true }],
   },
 })

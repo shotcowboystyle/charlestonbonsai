@@ -15,10 +15,9 @@
  * (`{ ok: false, field: 'email', error: 'invalid_email' }`) so the
  * form can target the right input.
  */
-import { createClient } from '@supabase/supabase-js'
 import { sendEventInquiryEmail } from '~/server/utils/email'
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
+import { createServiceClient } from '~/server/utils/supabase'
+import { asOptionalSmallInt, asString, isValidDateString, isValidEmail } from '~/server/utils/validators'
 
 const ALLOWED_EVENT_TYPES = new Set([
   'wedding',
@@ -41,37 +40,6 @@ interface InquiryBody {
 
 type FieldKey = 'name' | 'email' | 'eventDate' | 'location' | 'eventType' | 'notes'
 
-function asString(value: unknown, max: number): string | null {
-  if (typeof value !== 'string')
-    return null
-  const trimmed = value.trim()
-  if (trimmed.length === 0 || trimmed.length > max)
-    return null
-  return trimmed
-}
-
-function asOptionalSmallInt(value: unknown): number | null {
-  if (value === null || value === undefined || value === '')
-    return null
-  const n = typeof value === 'number' ? value : Number(value)
-  if (!Number.isFinite(n) || !Number.isInteger(n))
-    return null
-  // smallint range, but realistically capped much lower
-  if (n < 1 || n > 5000)
-    return null
-  return n
-}
-
-function isValidEventDate(value: unknown): value is string {
-  if (typeof value !== 'string')
-    return false
-  // YYYY-MM-DD only — matches what <input type="date"> emits.
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
-    return false
-  const parsed = new Date(`${value}T00:00:00Z`)
-  return !Number.isNaN(parsed.getTime())
-}
-
 export default defineEventHandler(async (event) => {
   const body = await readBody<InquiryBody>(event).catch(() => null)
   if (!body) {
@@ -87,13 +55,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const rawEmail = typeof body.email === 'string' ? body.email.trim() : ''
-  if (!rawEmail || !EMAIL_PATTERN.test(rawEmail) || rawEmail.length > 254) {
+  if (!isValidEmail(rawEmail)) {
     setResponseStatus(event, 400)
     return { ok: false, error: 'invalid', field: 'email' as FieldKey }
   }
   const email = rawEmail.toLowerCase()
 
-  if (!isValidEventDate(body.eventDate)) {
+  if (!isValidDateString(body.eventDate)) {
     setResponseStatus(event, 400)
     return { ok: false, error: 'invalid', field: 'eventDate' as FieldKey }
   }
@@ -122,11 +90,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // ---- Persist -----------------------------------------------------
-  const config = useRuntimeConfig()
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   const { error: writeError } = await supabase
     .from('event_inquiries')

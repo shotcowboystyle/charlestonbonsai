@@ -5,7 +5,7 @@
  * the unsubscribed page. We treat an unknown token as a soft success to
  * avoid leaking which addresses are on the list.
  */
-import { createClient } from '@supabase/supabase-js'
+import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -15,10 +15,7 @@ export default defineEventHandler(async (event) => {
   if (typeof token !== 'string' || token.length < 32)
     return sendRedirect(event, `${siteUrl}/subscribe/unsubscribed`, 302)
 
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   const { error } = await supabase
     .from('subscribers')

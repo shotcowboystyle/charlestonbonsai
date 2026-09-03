@@ -17,32 +17,16 @@ const sizeOptions = TREE_SIZE_LABELS
 const careLevelOptions = CARE_LEVEL_LABELS
 const treeTypeOptions = TREE_TYPE_LABELS
 
-const hasActiveFilters = computed(() => {
-  return (
-    props.modelValue.sizes.length > 0
-    || props.modelValue.careLevels.length > 0
-    || props.modelValue.treeTypes.length > 0
-  )
-})
+const hasActiveFilters = computed(() => hasActiveFacets(props.modelValue))
 
-function isSelected(type: keyof Pick<FilterState, 'sizes' | 'careLevels' | 'treeTypes'>, value: string): boolean {
+function isSelected(type: FacetKey, value: string): boolean {
   return (props.modelValue[type] as string[]).includes(value)
 }
 
-function toggleFilter(type: keyof Pick<FilterState, 'sizes' | 'careLevels' | 'treeTypes'>, value: string) {
-  const newValue = [...props.modelValue[type]] as string[]
-  const index = newValue.indexOf(value)
-
-  if (index === -1) {
-    newValue.push(value)
-  }
-  else {
-    newValue.splice(index, 1)
-  }
-
+function toggleFilter(type: FacetKey, value: string) {
   emit('update:modelValue', {
     ...props.modelValue,
-    [type]: newValue,
+    [type]: toggleIn(props.modelValue[type] as string[], value),
   })
 }
 

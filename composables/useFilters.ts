@@ -152,9 +152,11 @@ function debounce<T extends (...args: any[]) => any>(
   fn: T,
   delay: number,
 ): (...args: Parameters<T>) => void {
-  let timeoutId: ReturnType<typeof setTimeout>
+  // The 3-argument setTimeout resolves to the DOM overload (returns number)
+  // while ReturnType<typeof setTimeout> is Node's Timeout, so accept either.
+  let timeoutId: ReturnType<typeof setTimeout> | number
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => fn(...args), delay)
+    timeoutId = setTimeout(fn, delay, ...args)
   }
 }

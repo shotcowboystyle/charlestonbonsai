@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import jwt from 'jsonwebtoken'
+import { createServiceClient } from '~/server/utils/supabase'
 import { hashPassword, verifyPassword } from '~/server/utils/tokens'
 
 export default defineEventHandler(async (event) => {
@@ -61,10 +61,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Create Supabase client with service key
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   try {
     // Get current user

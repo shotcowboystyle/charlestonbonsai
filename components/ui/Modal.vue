@@ -29,13 +29,17 @@ const modalClasses = computed(() => {
 })
 
 // Lock body scroll when modal is open
-watch(() => props.modelValue, (value) => {
-  if (value) {
-    document.body.style.overflow = 'hidden'
-  }
-  else {
-    document.body.style.overflow = ''
-  }
+function setBodyScrollLock(locked: boolean) {
+  document.body.style.overflow = locked ? 'hidden' : ''
+}
+
+watch(() => props.modelValue, setBodyScrollLock)
+
+// Without this, a modal destroyed while still open (route change, v-if on a
+// parent) leaves the lock in place and the page permanently unscrollable.
+onUnmounted(() => {
+  if (props.modelValue)
+    setBodyScrollLock(false)
 })
 </script>
 
