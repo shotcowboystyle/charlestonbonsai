@@ -23,7 +23,7 @@
     "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "dependencies": {
-    "@pinia/nuxt": "^0.11.3",
+    "@pinia/nuxt": "^1.0.2",
     "@supabase/supabase-js": "^2.112.4",
     "@tiptap/extension-link": "^3.30.5",
     "@tiptap/extension-placeholder": "^3.30.5",
