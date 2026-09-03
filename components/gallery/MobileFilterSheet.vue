@@ -20,20 +20,11 @@ const emit = defineEmits<{
 
 // Draft is initialised every time the sheet opens. Closing without
 // pressing Apply discards the draft.
-const draft = ref<FilterState>(snapshot(props.modelValue))
-
-function snapshot(s: FilterState): FilterState {
-  return {
-    ...s,
-    sizes: [...s.sizes],
-    careLevels: [...s.careLevels],
-    treeTypes: [...s.treeTypes],
-  }
-}
+const draft = ref<FilterState>(snapshotFilters(props.modelValue))
 
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
-    draft.value = snapshot(props.modelValue)
+    draft.value = snapshotFilters(props.modelValue)
     document.body.style.overflow = 'hidden'
   }
   else {
@@ -76,15 +67,6 @@ function toggleSpecies(v: TreeType) {
 function pickSort(v: SortOption) {
   draft.value.sortBy = v
 }
-function toggleIn<T>(arr: T[], v: T): T[] {
-  const i = arr.indexOf(v)
-  if (i === -1)
-    return [...arr, v]
-  const next = [...arr]
-  next.splice(i, 1)
-  return next
-}
-
 function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape')
     close()

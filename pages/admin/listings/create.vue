@@ -159,13 +159,6 @@ function removeFeature(index: number) {
   form.value.features.splice(index, 1)
 }
 
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
 async function handleSubmit() {
   errors.value = {}
 

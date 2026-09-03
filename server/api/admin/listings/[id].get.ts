@@ -1,5 +1,7 @@
+import type { TreeRow } from '~/server/utils/mappers'
 import type { Tree } from '~/types'
-import { createClient } from '@supabase/supabase-js'
+import { mapAdminTreeRow } from '~/server/utils/mappers'
+import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event): Promise<Tree> => {
   requireAdmin(event)
@@ -13,11 +15,7 @@ export default defineEventHandler(async (event): Promise<Tree> => {
     })
   }
 
-  const config = useRuntimeConfig()
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   const { data, error } = await supabase
     .from('trees')
@@ -39,27 +37,5 @@ export default defineEventHandler(async (event): Promise<Tree> => {
     })
   }
 
-  return {
-    id: data.id,
-    name: data.name,
-    slug: data.slug,
-    species: data.species,
-    treeType: data.tree_type,
-    price: data.price,
-    description: data.description,
-    shortDescription: data.short_description,
-    careLevel: data.care_level,
-    size: data.size,
-    age: data.age,
-    height: data.height,
-    potType: data.pot_type,
-    images: data.images,
-    thumbnail: data.thumbnail,
-    model3dUrl: data.model_3d_url,
-    features: data.features,
-    inStock: data.in_stock,
-    featured: data.featured,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-  }
+  return mapAdminTreeRow(data as TreeRow)
 })

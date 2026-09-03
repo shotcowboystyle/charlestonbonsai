@@ -10,10 +10,33 @@ npm run build        # Production build (SSR)
 npm run generate     # Static site generation (used by Netlify)
 npm run preview      # Preview production build locally
 npm run lint         # ESLint with auto-fix
+npm run lint:ci      # ESLint without --fix (the CI gate)
 npm run typecheck    # TypeScript type checking
+npm run test         # All three Vitest projects (unit + server + nuxt)
+npm run test:unit    # Node-env projects only — fast inner loop
+npm run test:watch   # Vitest watch mode
+npm run test:e2e     # Playwright (builds + previews the app first)
+npm run verify       # lint:ci + typecheck + test + build (the full local gate)
 ```
 
-No test runner is configured. `test.mjs` is a manual Supabase connectivity verification script, not a test suite.
+### Testing
+
+| Layer | Location | Environment |
+|-------|----------|-------------|
+| Pure unit | `test/unit/` | node, no mocks |
+| API handlers | `test/server/` | node + stubbed Nitro globals + fake Supabase |
+| Components | `test/nuxt/` | `environment: 'nuxt'` + happy-dom |
+| End-to-end | `test/e2e/` | Playwright against `build` + `preview` |
+
+**Convention: `*.test.ts` is Vitest, `*.spec.ts` is Playwright.** The globs never overlap.
+
+Tests live in a top-level `test/` directory, never colocated — Nitro scans `server/api/**/*.ts` as routes, so a colocated `server/api/trees/list.test.ts` would ship as the live endpoint `/api/trees/list.test`.
+
+Handler tests stub the Nitro auto-imports in `test/setup/nitro-globals.ts` (real h3 implementations; only `defineEventHandler` and `useRuntimeConfig` are faked) and mock `~/server/utils/supabase` — that module is the single injection seam for the database. `test/utils/supabase-mock.ts` models the chainable query builder, including the `.single()` (PGRST116 on empty) vs `.maybeSingle()` (null on empty) difference.
+
+E2E runs against a build whose Supabase URL points at a dead port, so it never touches live data; all API responses come from `page.route` fixtures.
+
+Pin `vitest` to `^4` — `@nuxt/test-utils` does not yet support Vitest 5 (enforced by a `packageRules` entry in `renovate.json`).
 
 ## Architecture
 
@@ -53,7 +76,9 @@ No test runner is configured. `test.mjs` is a manual Supabase connectivity verif
 - `POST /api/admin/upload`
 
 ### Data Flow
-Supabase responses return snake_case; API endpoints manually convert to camelCase before sending to the client. The `trees` store handles pagination and client-side filtering (size, care level, type, price range, search, sort, inStockOnly).
+Supabase responses return snake_case; `server/utils/mappers.ts` converts to camelCase. `mapPublicTreeRow` omits `price` — that function is the runtime enforcement of the price-omission invariant (`PublicTree = Omit<Tree, 'price'>` compiles away), so public handlers must map through it rather than spreading rows. `mapAdminTreeRow` adds `price` back for admin surfaces.
+
+Supabase clients come from `server/utils/supabase.ts` (`createAnonClient` for public reads, `createServiceClient` for admin/write paths) — never construct one inline, or handler tests lose their injection seam. The `trees` store handles pagination and client-side filtering (size, care level, type, price range, search, sort, inStockOnly).
 
 ## Environment Variables
 

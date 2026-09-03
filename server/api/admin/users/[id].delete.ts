@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {
   // 1. Verify admin
@@ -21,13 +21,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const config = useRuntimeConfig()
-
   // 3. Create service client to bypass RLS
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   // 4. Delete user
   const { error } = await supabase

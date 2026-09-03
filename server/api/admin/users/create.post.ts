@@ -1,11 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
+import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {
   // 1. Verify admin (only admins can create admins)
   requireAdmin(event)
 
-  const config = useRuntimeConfig()
   const body = await readBody(event)
 
   const { email, password } = body
@@ -22,10 +21,7 @@ export default defineEventHandler(async (event) => {
   const password_hash = await bcrypt.hash(password, salt)
 
   // 3. Create service client to bypass RLS
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   // 4. Check if user already exists
   const { data: existingUser } = await supabase

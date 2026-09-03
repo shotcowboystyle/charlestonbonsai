@@ -1,8 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServiceClient } from '~/server/utils/supabase'
 import { hashToken, isTokenExpired } from '~/server/utils/tokens'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
   const query = getQuery(event)
 
   const { token } = query
@@ -15,10 +14,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Create Supabase client with service key
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   try {
     // Hash the token to find it in the database

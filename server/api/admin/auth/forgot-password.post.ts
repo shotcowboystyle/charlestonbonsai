@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createServiceClient } from '~/server/utils/supabase'
 import { generateResetToken, hashToken } from '~/server/utils/tokens'
 
 export default defineEventHandler(async (event) => {
@@ -15,10 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Create Supabase client with service key for admin operations
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   try {
     // Check if user exists (but don't reveal this to the client)

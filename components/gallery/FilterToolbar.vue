@@ -87,13 +87,6 @@ function closeMenu() {
   }
 }
 
-function sameSet<T>(a: T[], b: T[]): boolean {
-  if (a.length !== b.length)
-    return false
-  const bs = new Set(b)
-  return a.every(x => bs.has(x))
-}
-
 function toggleSize(value: TreeSize) {
   draft.value.sizes = toggleIn(draft.value.sizes, value)
 }
@@ -106,15 +99,6 @@ function toggleSpecies(value: TreeType) {
 function pickSort(value: SortOption) {
   draft.value.sortBy = value
   closeMenu()
-}
-
-function toggleIn<T>(arr: T[], v: T): T[] {
-  const i = arr.indexOf(v)
-  if (i === -1)
-    return [...arr, v]
-  const next = [...arr]
-  next.splice(i, 1)
-  return next
 }
 
 // Close on outside click / Esc.

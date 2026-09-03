@@ -6,7 +6,7 @@
  * confirmation page. Outcomes are surfaced via `?status=` query so the
  * page can render the right copy without exposing internals.
  */
-import { createClient } from '@supabase/supabase-js'
+import { createServiceClient } from '~/server/utils/supabase'
 import { hashToken, isTokenExpired } from '~/server/utils/tokens'
 
 export default defineEventHandler(async (event) => {
@@ -17,10 +17,7 @@ export default defineEventHandler(async (event) => {
   if (typeof token !== 'string' || token.length < 32)
     return sendRedirect(event, `${siteUrl}/subscribe/confirmed?status=invalid`, 302)
 
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   const tokenHash = hashToken(token)
   const { data: subscriber, error } = await supabase

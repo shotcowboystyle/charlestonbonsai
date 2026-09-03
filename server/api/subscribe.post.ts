@@ -13,11 +13,11 @@
  * an email is already known.
  */
 import crypto from 'node:crypto'
-import { createClient } from '@supabase/supabase-js'
 import { sendSubscribeConfirmationEmail } from '~/server/utils/email'
+import { createServiceClient } from '~/server/utils/supabase'
 import { hashToken } from '~/server/utils/tokens'
+import { EMAIL_PATTERN, MAX_EMAIL_LENGTH } from '~/server/utils/validators'
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
 const CONFIRMATION_TTL_MS = 24 * 60 * 60 * 1000
 
 function generateToken(): string {
@@ -28,17 +28,14 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<{ email?: unknown }>(event).catch(() => null)
   const rawEmail = typeof body?.email === 'string' ? body.email.trim() : ''
 
-  if (!rawEmail || !EMAIL_PATTERN.test(rawEmail) || rawEmail.length > 254) {
+  if (!rawEmail || !EMAIL_PATTERN.test(rawEmail) || rawEmail.length > MAX_EMAIL_LENGTH) {
     setResponseStatus(event, 400)
     return { ok: false, error: 'invalid_email' as const }
   }
 
   const email = rawEmail.toLowerCase()
   const config = useRuntimeConfig()
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   const { data: existing, error: lookupError } = await supabase
     .from('subscribers')

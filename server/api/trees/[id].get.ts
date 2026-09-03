@@ -1,14 +1,12 @@
+import type { TreeRow } from '~/server/utils/mappers'
 import type { PublicTree } from '~/types'
+import { mapPublicTreeRow } from '~/server/utils/mappers'
+import { createAnonClient } from '~/server/utils/supabase'
 
-import { createClient } from '@supabase/supabase-js'
+export default defineEventHandler(async (event): Promise<PublicTree> => {
+  const supabase = createAnonClient()
 
-export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.public.supabaseAnonKey,
-  )
-
+  // The route param is named `id`, but specimens are addressed by slug.
   const slug = getRouterParam(event, 'id')
 
   if (!slug) {
@@ -35,32 +33,7 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
-    // Transform snake_case to camelCase. Price is intentionally not
-    // returned to consumer surfaces — pricing is by inquiry only.
-    const tree: PublicTree = {
-      id: data.id,
-      name: data.name,
-      slug: data.slug,
-      species: data.species,
-      treeType: data.tree_type,
-      description: data.description,
-      shortDescription: data.short_description,
-      careLevel: data.care_level,
-      size: data.size,
-      age: data.age,
-      height: data.height,
-      potType: data.pot_type,
-      images: data.images,
-      thumbnail: data.thumbnail,
-      model3dUrl: data.model_3d_url,
-      features: data.features,
-      inStock: data.in_stock,
-      featured: data.featured,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-    }
-
-    return tree
+    return mapPublicTreeRow(data as TreeRow)
   }
   catch (error) {
     console.error('Error fetching tree:', error)

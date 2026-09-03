@@ -3,6 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@11.24.0",
   "description": "Charleston Bonsai Gallery - Premium bonsai tree showcase",
   "scripts": {
     "dev": "nuxt dev",
@@ -11,7 +12,15 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint . --fix",
-    "typecheck": "nuxt typecheck"
+    "lint:ci": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit --project server",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.11.3",
@@ -29,7 +38,7 @@
     "bcryptjs": "^3.0.3",
     "gsap": "^3.15.0",
     "jsonwebtoken": "^9.0.3",
-    "pinia": "^2.3.1",
+    "pinia": "^3.0.4",
     "qrcode": "^1.5.4",
     "three": "^0.185.1",
     "vue": "^3.5.42",
@@ -39,16 +48,23 @@
     "@antfu/eslint-config": "^9.3.0",
     "@nuxt/devtools": "^3.4.2",
     "@nuxt/eslint": "^1.17.0",
+    "@nuxt/test-utils": "^4.2.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
+    "@playwright/test": "^1.62.1",
     "@types/bcryptjs": "^3.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/three": "^0.185.4",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vue/test-utils": "^2.5.0",
     "autoprefixer": "^10.5.4",
     "eslint": "^9.39.5",
+    "h3": "^1.15.11",
+    "happy-dom": "^20.13.2",
     "nuxt": "^3.21.11",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
+    "vitest": "^4.1.11",
     "vue-tsc": "^2.2.12"
   }
 }

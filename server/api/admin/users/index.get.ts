@@ -1,18 +1,13 @@
 // import { serverSupabaseServiceRole } from 'supabase/server'
 // We are not using @nuxtjs/supabase, we use custom
-import { createClient } from '@supabase/supabase-js'
+import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {
   // 1. Verify admin
   requireAdmin(event)
 
-  const config = useRuntimeConfig()
-
   // 2. Create service client to bypass RLS
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   // 3. Fetch all admins safely
   const { data: users, error } = await supabase

@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -16,10 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Create Supabase client with service key for admin operations
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
-  )
+  const supabase = createServiceClient()
 
   try {
     // Fetch admin user
