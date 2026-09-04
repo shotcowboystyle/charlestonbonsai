@@ -23,7 +23,7 @@
     "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "dependencies": {
-    "@pinia/nuxt": "^0.11.3",
+    "@pinia/nuxt": "^1.0.2",
     "@supabase/supabase-js": "^2.112.4",
     "@tiptap/extension-link": "^3.30.5",
     "@tiptap/extension-placeholder": "^3.30.5",
@@ -38,11 +38,11 @@
     "bcryptjs": "^3.0.3",
     "gsap": "^3.15.0",
     "jsonwebtoken": "^9.0.3",
-    "pinia": "^3.0.4",
+    "pinia": "^4.0.3",
     "qrcode": "^1.5.4",
     "three": "^0.185.1",
     "vue": "^3.5.42",
-    "vue-router": "^4.6.4"
+    "vue-router": "^5.3.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
@@ -60,11 +60,11 @@
     "eslint": "^9.39.5",
     "h3": "^1.15.11",
     "happy-dom": "^20.13.2",
-    "nuxt": "^3.21.11",
+    "nuxt": "^4.5.2",
     "postcss": "^8.5.26",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.3.11"
   }
 }
