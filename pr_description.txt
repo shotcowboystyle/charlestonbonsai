@@ -1,5 +1,0 @@
-💡 **What:** Cached the Supabase clients in `server/utils/supabase.ts` by caching and reusing the client instance if it already exists, instead of calling `createClient` every time a request is made.
-
-🎯 **Why:** Recreating Supabase clients on every request puts unnecessary memory pressure on the server and slows down response times due to repeated object allocations and config lookups. Given they are designed to be long-lived or scoped properly, a cached singleton makes sense here for the shared instances.
-
-📊 **Measured Improvement:** We ran a benchmark testing 500 requests at a time, and 200 concurrently, simulating load against `/api/trees/list`. Under a concurrent load of 200 requests, response times dropped from ~5535ms to ~3897ms, which is roughly a 30% reduction in response time under load.
