@@ -1,15 +1,22 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@supabase/supabase-js'
 
+let cachedAnonClient: SupabaseClient | null = null
+let cachedServiceClient: SupabaseClient | null = null
+
 /**
  * Anonymous, RLS-scoped client. Public read paths only.
  */
 export function createAnonClient(): SupabaseClient {
+  if (cachedAnonClient)
+    return cachedAnonClient
+
   const config = useRuntimeConfig()
-  return createClient(
+  cachedAnonClient = createClient(
     config.public.supabaseUrl,
     config.public.supabaseAnonKey,
   )
+  return cachedAnonClient
 }
 
 /**
@@ -20,9 +27,13 @@ export function createAnonClient(): SupabaseClient {
  * smell — writes will silently fail under RLS rather than erroring loudly.
  */
 export function createServiceClient(): SupabaseClient {
+  if (cachedServiceClient)
+    return cachedServiceClient
+
   const config = useRuntimeConfig()
-  return createClient(
+  cachedServiceClient = createClient(
     config.public.supabaseUrl,
     config.supabaseServiceKey || config.public.supabaseAnonKey,
   )
+  return cachedServiceClient
 }
