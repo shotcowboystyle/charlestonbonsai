@@ -1,4 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+const fs = require('fs')
+const path = './server/utils/supabase.ts'
+const content = `import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@supabase/supabase-js'
 
 let anonClient: SupabaseClient | null = null
@@ -35,3 +37,5 @@ export function createServiceClient(): SupabaseClient {
   }
   return serviceClient
 }
+`
+fs.writeFileSync(path, content)
