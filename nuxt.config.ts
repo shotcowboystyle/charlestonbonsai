@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
     adminEmail: process.env.ADMIN_EMAIL || 'curt.blanton@gmail.com',
     adminPasswordHash: process.env.ADMIN_PASSWORD_HASH || '',
-    jwtSecret: process.env.JWT_SECRET || 'change-me-in-production',
+    jwtSecret: process.env.JWT_SECRET || '',
 
     // Public (exposed to client)
     public: {
