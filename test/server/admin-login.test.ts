@@ -1,7 +1,4 @@
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { testRuntimeConfig } from '../setup/nitro-globals'
 import { createTestEvent } from '../utils/event'
 import { expectDefined } from '../utils/expect-defined'
 import { createSupabaseMock } from '../utils/supabase-mock'
