@@ -314,7 +314,7 @@ watch(() => props.modelValue, (value) => {
                 type="button"
                 class="flex-1 px-2 py-1.5 rounded-md text-xs font-medium text-center transition-all" :class="[
                   potQuality === opt.value
-                    ? 'bg-white text-charcoal shadow-sm'
+                    ? 'bg-white text-charcoal shadow-xs'
                     : 'text-stone-400 hover:text-charcoal',
                 ]"
                 @click="potQuality = opt.value"
@@ -337,7 +337,7 @@ watch(() => props.modelValue, (value) => {
                 type="button"
                 class="flex-1 px-2 py-1.5 rounded-md text-xs font-medium text-center transition-all" :class="[
                   stylingLevel === opt.value
-                    ? 'bg-white text-charcoal shadow-sm'
+                    ? 'bg-white text-charcoal shadow-xs'
                     : 'text-stone-400 hover:text-charcoal',
                 ]"
                 @click="stylingLevel = opt.value"
