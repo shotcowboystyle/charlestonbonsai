@@ -1,14 +1,24 @@
+import { isBuiltin } from 'node:module'
+import tailwindcss from '@tailwindcss/vite'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-08-05',
   devtools: { enabled: true },
 
   modules: [
-    '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@nuxt/eslint',
   ],
+
+  // Tailwind v4 ships as a Vite plugin; the theme lives in the CSS entry
+  // (assets/css/main.css), not in a tailwind.config.ts.
+  css: ['~/assets/css/main.css'],
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
 
   runtimeConfig: {
     // Server-side only
@@ -59,22 +69,36 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
   },
 
-  tailwindcss: {
-    cssPath: '~/assets/css/main.css',
-    configPath: 'tailwind.config.ts',
-  },
-
   pinia: {
     storesDirs: ['./stores/**'],
   },
 
   typescript: {
     strict: true,
-    typeCheck: true,
+    // vite-plugin-checker's vue-tsc checker patches `typescript/lib/typescript.js`,
+    // which TypeScript 7 no longer ships — it throws on every dev boot. Type
+    // checking still runs out-of-band via `pnpm run typecheck`.
+    typeCheck: false,
   },
 
   // Configure Nitro for server API routes
   nitro: {
+    // Nitro treats node builtins as ESM externals, and its default
+    // `requireReturnsDefault: 'auto'` then resolves `require('stream')` to the
+    // module *namespace* rather than the CJS module object. Bundled CJS
+    // dependencies that subclass a builtin break on boot:
+    //   jws:     util.inherits(DataStream, Stream)
+    //            -> 'The "superCtor.prototype" property must be of type object'
+    //   undici:  class Dispatcher extends EventEmitter
+    //            -> 'Class extends value [object Module] is not a constructor'
+    //
+    // 'preferred' hands back the default export, which for a builtin is what
+    // `require()` returns. Scoped to builtins on purpose — applying it globally
+    // breaks packages that do want the namespace (e.g. `require('zod').z`).
+    commonJS: {
+      requireReturnsDefault: (id: string) => (isBuiltin(id) ? 'preferred' : 'auto'),
+    },
+
     // Don't prerender API routes
     prerender: {
       crawlLinks: true,
