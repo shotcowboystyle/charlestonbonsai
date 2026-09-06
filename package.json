@@ -57,7 +57,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "@vue/test-utils": "^2.5.0",
     "autoprefixer": "^10.5.4",
-    "eslint": "^9.39.5",
+    "eslint": "^10.10.0",
     "h3": "^1.15.11",
     "happy-dom": "^20.13.2",
     "nuxt": "^4.5.2",
