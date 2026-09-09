@@ -120,7 +120,13 @@ function onFocusIn(event: FocusEvent) {
   <div ref="root" class="collection" @focusin="onFocusIn">
     <a href="#main-content" class="sr-only">Skip to the collection</a>
 
-    <HomeSpecimenIndex :specimens="specimens" rail-act="#the-room" />
+    <!-- The banner landmark. This page carries no shared layout — its chrome
+         is the specimen index and its footer is the inquiry plate — so the
+         landmarks have to be declared here rather than inherited. The element
+         contributes no layout: everything inside it is fixed. -->
+    <header class="chrome">
+      <HomeSpecimenIndex :specimens="specimens" rail-act="#the-room" />
+    </header>
 
     <div class="sc-grain" aria-hidden="true" />
 
@@ -521,69 +527,74 @@ function onFocusIn(event: FocusEvent) {
           </div>
         </div>
       </section>
-
-      <!-- ═══════════════════════════════════════════════════════════
-           VI · THE INQUIRY PLATE — the ask, typeset exactly like a
-           specimen label, so it reads as part of the collection rather
-           than as a call to action bolted onto the end of one. Static
-           content and the last element on the page: nothing here can
-           fade out before the page does.
-           ═══════════════════════════════════════════════════════════ -->
-      <footer class="plate" aria-labelledby="plate-heading">
-        <div class="plate__inner">
-          <h2 id="plate-heading" class="plate__heading">
-            Visits to the nursery are by appointment.
-          </h2>
-
-          <dl class="label-list plate__lines">
-            <div>
-              <dt>Where</dt>
-              <dd>Charleston, South Carolina. 32&deg;47&prime;N 79&deg;55&prime;W</dd>
-            </div>
-            <div>
-              <dt>When</dt>
-              <dd>By appointment, year-round</dd>
-            </div>
-            <div>
-              <dt>Price</dt>
-              <dd>On inquiry, per specimen</dd>
-            </div>
-            <div>
-              <dt>Write</dt>
-              <dd><a :href="contactMailto">{{ contactEmail }}</a></dd>
-            </div>
-          </dl>
-
-          <p class="plate__close">
-            Inquiries about a specific specimen, its lineage, or its training
-            history are welcome. Please name the tree.
-          </p>
-
-          <nav class="plate__nav" aria-label="Elsewhere on this site">
-            <NuxtLink to="/gallery">
-              The catalog
-            </NuxtLink>
-            <NuxtLink to="/visit">
-              Visit
-            </NuxtLink>
-            <NuxtLink to="/events">
-              Events
-            </NuxtLink>
-            <NuxtLink to="/retreats">
-              Retreats
-            </NuxtLink>
-          </nav>
-
-          <p class="plate__colophon">
-            <span>{{ siteName }} Co.</span>
-            <span>
-              <NuxtLink to="/privacy-policy">Privacy</NuxtLink>
-              <NuxtLink to="/terms-of-service">Terms</NuxtLink>
-            </span>
-          </p>
-        </div>
-      </footer>
     </main>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         VI · THE INQUIRY PLATE — the ask, typeset exactly like a
+         specimen label, so it reads as part of the collection rather
+         than as a call to action bolted onto the end of one. Static
+         content and the last element on the page: nothing here can
+         fade out before the page does.
+
+         Outside <main> on purpose. A <footer> nested inside <main> is
+         scoped to it and gets no role at all; only a direct child of
+         <body>'s flow is the document's contentinfo landmark, and this
+         page has no shared layout to inherit one from.
+         ═══════════════════════════════════════════════════════════ -->
+    <footer class="plate" aria-labelledby="plate-heading">
+      <div class="plate__inner">
+        <h2 id="plate-heading" class="plate__heading">
+          Visits to the nursery are by appointment.
+        </h2>
+
+        <dl class="label-list plate__lines">
+          <div>
+            <dt>Where</dt>
+            <dd>Charleston, South Carolina. 32&deg;47&prime;N 79&deg;55&prime;W</dd>
+          </div>
+          <div>
+            <dt>When</dt>
+            <dd>By appointment, year-round</dd>
+          </div>
+          <div>
+            <dt>Price</dt>
+            <dd>On inquiry, per specimen</dd>
+          </div>
+          <div>
+            <dt>Write</dt>
+            <dd><a :href="contactMailto">{{ contactEmail }}</a></dd>
+          </div>
+        </dl>
+
+        <p class="plate__close">
+          Inquiries about a specific specimen, its lineage, or its training
+          history are welcome. Please name the tree.
+        </p>
+
+        <nav class="plate__nav" aria-label="Elsewhere on this site">
+          <NuxtLink to="/gallery">
+            The catalog
+          </NuxtLink>
+          <NuxtLink to="/visit">
+            Visit
+          </NuxtLink>
+          <NuxtLink to="/events">
+            Events
+          </NuxtLink>
+          <NuxtLink to="/retreats">
+            Retreats
+          </NuxtLink>
+        </nav>
+
+        <p class="plate__colophon">
+          <span>{{ siteName }} Co.</span>
+          <span>
+            <NuxtLink to="/privacy-policy">Privacy</NuxtLink>
+            <NuxtLink to="/terms-of-service">Terms</NuxtLink>
+          </span>
+        </p>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -630,6 +641,31 @@ function onFocusIn(event: FocusEvent) {
 
 .sc-grain {
   z-index: var(--z-raised);
+}
+
+/*
+  The banner region.
+
+  Both of its children position themselves, so left in normal flow this
+  collapses to a zero-by-zero box — a landmark that exists in the tree and has
+  no presence on the page. Giving it the viewport makes the region real without
+  changing where anything inside it sits: `position: fixed` alone does not
+  establish a containing block for fixed descendants, so the index and the bar
+  still resolve against the viewport exactly as before.
+
+  It must not intercept the pointer. The region covers the whole screen and
+  almost all of it is empty, so events pass through and only its actual chrome
+  takes them back.
+*/
+.chrome {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sticky);
+  pointer-events: none;
+}
+
+.chrome > * {
+  pointer-events: auto;
 }
 
 /* ============================================================
