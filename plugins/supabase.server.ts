@@ -5,7 +5,7 @@ export default defineNuxtPlugin(() => {
 
   const supabase = createClient(
     config.public.supabaseUrl,
-    config.supabaseServiceKey || config.public.supabaseAnonKey,
+    config.public.supabaseAnonKey,
   )
 
   return {

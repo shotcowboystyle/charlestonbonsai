@@ -1,5 +1,3 @@
-// import { serverSupabaseServiceRole } from 'supabase/server'
-// We are not using @nuxtjs/supabase, we use custom
 import { createServiceClient } from '~/server/utils/supabase'
 
 export default defineEventHandler(async (event) => {

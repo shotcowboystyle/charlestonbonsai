@@ -180,7 +180,7 @@ const tools = [
             class="rich-editor-btn w-7 h-7 rounded flex items-center justify-center transition-colors duration-150"
             :class="[
               ('activeCheck' in tool ? tool.activeCheck?.() : isActive(tool.id))
-                ? 'bg-sage text-white shadow-sm'
+                ? 'bg-sage text-white shadow-xs'
                 : 'text-stone-500 hover:bg-stone-200 hover:text-charcoal',
             ]"
             @click="tool.action?.()"

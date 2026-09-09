@@ -382,15 +382,15 @@ async function handleSubmit() {
                         type="text"
                         class="input flex-1"
                       >
-                      <label class="btn btn-outline cursor-pointer whitespace-nowrap" :class="{ 'opacity-50 pointer-events-none': uploadingImages[index] }">
-                        <span v-if="uploadingImages[index]">Uploading...</span>
+                      <label class="btn btn-outline cursor-pointer whitespace-nowrap" :class="{ 'opacity-50 pointer-events-none': uploadingImages[Number(index)] }">
+                        <span v-if="uploadingImages[Number(index)]">Uploading...</span>
                         <span v-else>Browse...</span>
-                        <input type="file" class="hidden" accept="image/*" @change="e => handleImageUpload(e, index)">
+                        <input type="file" class="hidden" accept="image/*" @change="e => handleImageUpload(e, Number(index))">
                       </label>
                       <button
                         type="button"
                         class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
-                        @click="removeImage(index)"
+                        @click="removeImage(Number(index))"
                       >
                         Remove
                       </button>
@@ -465,7 +465,7 @@ async function handleSubmit() {
                   <button
                     type="button"
                     class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    @click="removeFeature(index)"
+                    @click="removeFeature(Number(index))"
                   >
                     ×
                   </button>

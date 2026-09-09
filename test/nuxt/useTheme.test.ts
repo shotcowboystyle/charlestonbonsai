@@ -112,15 +112,40 @@ const ThemeTestComponent = defineComponent({
 })
 
 describe('useTheme', () => {
+  let store: Record<string, string>
+  let mockGetItem: any
+  let mockSetItem: any
+
+  beforeEach(() => {
+    store = {}
+    mockGetItem = vi.fn((key: string) => (key in store ? store[key] : null))
+    mockSetItem = vi.fn((key: string, value: string) => {
+      store[key] = value
+    })
+
+    // happy-dom's Storage in the nuxt test environment isn't reachable via
+    // `window.localStorage` — stub it on the global directly, same as the
+    // `initFromClient` suite above.
+    vi.stubGlobal('localStorage', {
+      getItem: mockGetItem,
+      setItem: mockSetItem,
+      removeItem: vi.fn(),
+      clear: vi.fn(() => {
+        store = {}
+      }),
+      length: 0,
+      key: vi.fn(),
+    })
+  })
+
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
     document.documentElement.removeAttribute('data-theme')
-    window.localStorage.clear()
     clearNuxtState() // clear useState
   })
 
   it('setTheme ignores disabled localStorage and still applies theme', async () => {
-    const setItemSpy = vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+    mockSetItem.mockImplementation(() => {
       throw new Error('localStorage is disabled')
     })
 
@@ -132,12 +157,10 @@ describe('useTheme', () => {
     // The main functionality we want to test for this issue
     expect(wrapper.vm.theme).toBe('dark')
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
-    expect(setItemSpy).toHaveBeenCalled()
+    expect(mockSetItem).toHaveBeenCalled()
   })
 
   it('setTheme updates theme, applies it to DOM, and saves to localStorage', async () => {
-    const setItemSpy = vi.spyOn(window.localStorage, 'setItem')
-
     const wrapper = await mountSuspended(ThemeTestComponent)
     expect(wrapper.vm.theme).toBe('light')
 
@@ -145,7 +168,7 @@ describe('useTheme', () => {
 
     expect(wrapper.vm.theme).toBe('dark')
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
-    expect(setItemSpy).toHaveBeenCalledWith('cb-theme', 'dark')
-    expect(window.localStorage.getItem('cb-theme')).toBe('dark')
+    expect(mockSetItem).toHaveBeenCalledWith('cb-theme', 'dark')
+    expect(mockGetItem('cb-theme')).toBe('dark')
   })
 })

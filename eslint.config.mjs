@@ -22,6 +22,7 @@ export default antfu({
     '**/.agents/**',
     '**/.claude/**',
     '**/.cursor/**',
+    'pnpm-workspace.yaml',
   ],
   rules: {
     // Nuxt uses process.env convention

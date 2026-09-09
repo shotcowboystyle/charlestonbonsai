@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
 
-  const { email, password } = body
+  const { email, password } = body || {}
 
   if (!email || !password) {
     throw createError({
@@ -15,7 +15,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Create Supabase client with service key for admin operations
+  // Create Supabase client with service key for admin operations.
+  // Security Note: createServiceClient() has been updated to strictly require
+  // the SUPABASE_SERVICE_KEY and will no longer dangerously fall back to the
+  // anon key, preventing privilege escalation vulnerabilities.
   const supabase = createServiceClient()
 
   try {
