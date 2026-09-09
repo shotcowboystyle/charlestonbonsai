@@ -1,20 +1,23 @@
-shellEmulator: true
+minimumReleaseAgeExcludePrune: true
 
-# trustPolicy: no-downgrade
-trustPolicy: "off"
-
+trustPolicy: no-downgrade
 trustPolicyExclude:
   - chokidar@4.0.3
   - semver
+  - "@vercel/cli-config@0.2.4"
+  - "@vercel/oidc@3.8.5"
+  - "@vercel/cli-exec@1.0.1"
 
-onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - esbuild
-  - unrs-resolver
-  - vue-demi
+shellEmulator: true
 
 allowBuilds:
   "@parcel/watcher": true
   esbuild: true
   unrs-resolver: true
   vue-demi: true
+
+onlyBuiltDependencies:
+  - "@parcel/watcher"
+  - esbuild
+  - unrs-resolver
+  - vue-demi

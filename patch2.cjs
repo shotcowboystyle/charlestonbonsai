@@ -1,4 +1,5 @@
-const fs = require('fs')
+const fs = require('node:fs')
+
 const path = './server/utils/supabase.ts'
 const content = `import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@supabase/supabase-js'
