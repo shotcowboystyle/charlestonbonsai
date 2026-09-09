@@ -67,7 +67,7 @@ async function handleLogin() {
 
 <template>
   <div class="min-h-screen bg-cream flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-[28rem]">
       <!-- Logo -->
       <div class="text-center mb-8">
         <NuxtLink to="/" class="inline-flex items-center gap-3">

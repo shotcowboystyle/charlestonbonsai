@@ -100,7 +100,7 @@ async function handleSubmit() {
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-forest-50 px-4">
-    <div class="max-w-md w-full">
+    <div class="max-w-[28rem] w-full">
       <!-- Logo -->
       <div class="text-center mb-8">
         <NuxtLink to="/" class="inline-block">

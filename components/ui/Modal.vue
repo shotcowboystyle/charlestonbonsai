@@ -19,10 +19,10 @@ const modalClasses = computed(() => {
   const base = 'relative bg-white rounded-2xl shadow-soft-lg max-h-[90vh] overflow-auto'
 
   const sizes = {
-    sm: 'w-full max-w-sm',
-    md: 'w-full max-w-md',
-    lg: 'w-full max-w-lg',
-    xl: 'w-full max-w-xl',
+    sm: 'w-full max-w-[24rem]',
+    md: 'w-full max-w-[28rem]',
+    lg: 'w-full max-w-[32rem]',
+    xl: 'w-full max-w-[36rem]',
   }
 
   return [base, sizes[props.size]]

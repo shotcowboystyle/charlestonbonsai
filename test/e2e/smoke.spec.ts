@@ -31,13 +31,25 @@ test.describe('public routes', () => {
   }
 })
 
-test('the home page renders its shell and navigation', async ({ page }) => {
+// Landmarks, not markup. The home page carries its own chrome rather than the
+// shared layout — its banner is the specimen index and its contentinfo is the
+// inquiry plate — so asserting a specific nav's aria-label would pin this test
+// to one page's implementation. What has to hold on every public page is that
+// a screen-reader user can reach the banner, the main region and the footer.
+test('the home page exposes its landmarks', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page.locator('header[role="banner"]')).toBeVisible()
-  await expect(page.locator('footer[role="contentinfo"]')).toBeVisible()
-  await expect(page.locator('nav[aria-label="Primary"]')).toBeVisible()
-  await expect(page.locator('nav[aria-label="Primary"] a[href="/gallery"]')).toBeVisible()
+  await expect(page.getByRole('banner')).toBeVisible()
+  await expect(page.getByRole('main')).toBeVisible()
+  await expect(page.getByRole('contentinfo')).toBeVisible()
+})
+
+// A page with no route out of it is a dead end. Which element carries the link
+// is a design decision; that one exists is not.
+test('the home page offers a route to the catalog', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page.locator('a[href="/gallery"]').first()).toBeVisible()
 })
 
 // Regression guard: an HTML 404 used to render as a 500 because serialising the
@@ -52,7 +64,7 @@ test('an unknown route returns a 404, not a 500', async ({ page }) => {
 test('the catalog link navigates to the gallery', async ({ page }) => {
   await page.goto('/')
 
-  await page.locator('nav[aria-label="Primary"] a[href="/gallery"]').click()
+  await page.locator('a[href="/gallery"]').first().click()
 
   await expect(page).toHaveURL(/\/gallery/)
 })

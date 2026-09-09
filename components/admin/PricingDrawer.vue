@@ -130,7 +130,7 @@ watch(() => props.modelValue, (value) => {
     >
       <aside
         v-if="modelValue"
-        class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-cream-50 shadow-soft-lg overflow-y-auto"
+        class="fixed inset-y-0 right-0 z-50 w-full max-w-[28rem] bg-cream-50 shadow-soft-lg overflow-y-auto"
       >
         <!-- Header -->
         <div class="sticky top-0 z-10 bg-cream-50 border-b border-stone-200 px-6 py-4 flex items-center justify-between">

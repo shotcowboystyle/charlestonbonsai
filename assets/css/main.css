@@ -11,6 +11,13 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
+/* The scroll-driven interaction runtime's stylesheet. Unlayered on purpose:
+ * it is mechanism, not style (sticky stages, clip-path wipes, pan rails, the
+ * reduced-motion fallbacks), and it has to win over Tailwind utilities that
+ * would otherwise reposition a stage. Its own reset is stripped; its six
+ * colour roles are re-pointed at tokens.css at the foot of the file. */
+@import './scrollcraft.css';
+
 /* Tailwind v4 auto-detects sources, but Nuxt's Vite root is not guaranteed to
  * be the repo root. These mirror the `content` array of the old v3 config. */
 @source '../../components';
@@ -184,6 +191,17 @@
   --spacing-section: var(--section-y);
 
   --max-width-reading: var(--measure-reading);
+
+
+  /* NOTE: `max-w-sm|md|lg|xl|2xl|3xl` do NOT mean what they mean in stock
+   * Tailwind here, and cannot be made to. v4 resolves `max-w-<key>` against
+   * the spacing namespace whenever a matching `--spacing-<key>` exists, and
+   * the semantic spacing names above (which is what lets components write
+   * `p-md`) therefore shadow the container scale. `max-w-md` resolves to
+   * 1.5rem, not 28rem. Declaring `--container-md` does not win it back.
+   *
+   * Write the width you mean — `max-w-[28rem]` — until the semantic spacing
+   * names are renamed out of the collision. */
 
   /* Legacy rounded value stays for unchanged components */
   --radius-4xl: 2rem;
@@ -532,4 +550,166 @@
 /* Three.js canvas container */
 .three-container canvas {
   @apply rounded-lg;
+}
+
+/* ============================================================
+   SPECIMEN PLATE — the one presentation rule for tree photography.
+   ------------------------------------------------------------
+   Any image sourced from the catalog carries `.ink-plate`. The filter
+   itself is defined once in app.vue; see the comment there for why the
+   grade is applied at render time rather than baked into files.
+
+   The hairline and the paper ground are part of it: a graded photograph
+   floating on paper with no edge reads as a mistake, and a graded
+   photograph in a box reads as a card. A single ink rule reads as a
+   mounted plate, which is what it is.
+   ============================================================ */
+.ink-plate {
+  filter: url('#ink-plate');
+  background: var(--surface-raised);
+}
+
+/* Forced-colors mode replaces the image with a system rendering; a filter on
+   top of that is noise. Print wants the real tones on real paper. */
+@media (forced-colors: active), print {
+  .ink-plate { filter: none; }
+}
+
+/* The plate's frame. Sits on the element that wraps the image, never on the
+   image itself, so the hairline is not scaled by object-fit. */
+.plate-frame {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--border-hair);
+}
+
+.plate-frame > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ============================================================
+   SPECIMEN LABEL — the schema every object on the site is described by.
+   ------------------------------------------------------------
+   Museum register, not marketing. Every specimen gets the same keys in
+   the same order, because the identical schema is what makes six trees
+   read as a collection rather than as a grid of products. A label that
+   editorialises breaks the set.
+   ============================================================ */
+.label-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--border-hair);
+}
+
+.label-list > div {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 6.5rem) 1fr;
+  gap: var(--space-md);
+  padding: var(--space-2xs) 0;
+  border-bottom: 1px solid var(--border-hair);
+}
+
+/* --text-muted, not --text-faint. Measured on the render, ink-3 gives
+   3.63:1 on paper and 4.39:1 on the gallery wall, and these keys are 10px —
+   they are the smallest type on the site and they carry the specimen's
+   facts. ink-2 clears AAA on both grounds. */
+.label-list dt {
+  margin: 0;
+  align-self: baseline;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-feature-settings: var(--feat-small-caps);
+}
+
+.label-list dd {
+  margin: 0;
+  align-self: baseline;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  color: var(--text);
+  font-feature-settings: var(--feat-spec-data);
+}
+
+/* The binomial, wherever it appears. Italic is the convention and the
+   convention is the point. */
+.binomial {
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+/* A quiet link that is a line of text rather than a button island. Used for
+   every navigation affordance outside the specimen index. */
+.rule-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: max-content;
+  padding-bottom: var(--space-2xs);
+  border-bottom: 1px solid var(--ink-4);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-feature-settings: var(--feat-small-caps);
+  transition:
+    color var(--duration-base) var(--ease-out-quart),
+    border-color var(--duration-base) var(--ease-out-quart);
+}
+
+.rule-link svg {
+  width: 1.25rem;
+  height: 0.625rem;
+  transition: transform var(--duration-base) var(--ease-out-quart);
+}
+
+.rule-link:hover,
+.rule-link:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rule-link:hover svg { transform: translateX(4px); }
+}
+
+/* ============================================================
+   THE SHEET — the ground for every page.
+   ------------------------------------------------------------
+   One kozo paper photograph, graded into a narrow band around the
+   surface token so it reads as tooth rather than as a tint, and
+   attached to the viewport rather than to the scroller: the paper is
+   stationary and the content travels over it, which is the physical
+   relationship the whole design is about.
+
+   Light only. The dark theme's ground is a gallery wall at night, and
+   a photograph of bone fibre laid over it just turns it grey.
+   ============================================================ */
+:root {
+  --sheet: url('/images/ground/paper.jpg') center / cover fixed no-repeat,
+           var(--surface);
+}
+
+/* `fixed` is what makes this reusable. Every element that paints the sheet
+   resolves it against the viewport, so a fixed navbar, a sticky toolbar and a
+   pinned stage all land on exactly the same square inch of paper as the page
+   behind them and no seam is possible. Chrome that painted flat bone over a
+   textured page would show its own edge on every scroll. */
+[data-theme='dark'] {
+  --sheet: var(--surface);
+}
+
+body {
+  background: var(--sheet);
 }

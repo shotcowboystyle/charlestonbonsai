@@ -174,7 +174,7 @@ const { data: relatedTrees } = await useAsyncData<PublicTree[]>(
             v-show="!isThreeDActive"
             :src="heroImage"
             :alt="`${tree.name} — ${tree.species}`"
-            class="monograph__hero-image"
+            class="monograph__hero-image ink-plate"
             fetchpriority="high"
             @error="handleImageError"
           >
@@ -251,6 +251,7 @@ const { data: relatedTrees } = await useAsyncData<PublicTree[]>(
             <img
               :src="image"
               :alt="`${tree.name}, additional view ${i + 2}`"
+              class="ink-plate"
               loading="lazy"
               @error="handleImageError"
             >
@@ -299,7 +300,6 @@ const { data: relatedTrees } = await useAsyncData<PublicTree[]>(
 
   min-height: 100vh;
   padding-top: var(--nav-h);
-  background: var(--surface);
   color: var(--text);
 }
 

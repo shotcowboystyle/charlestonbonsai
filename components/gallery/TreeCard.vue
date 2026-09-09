@@ -27,7 +27,7 @@ function handleImageError(e: Event) {
       <img
         :src="tree.thumbnail"
         :alt="tree.name"
-        class="specimen__photo"
+        class="specimen__photo ink-plate"
         loading="lazy"
         @error="handleImageError"
       >
@@ -38,15 +38,20 @@ function handleImageError(e: Event) {
       <h3 class="specimen__name">
         <span class="specimen__name-text">{{ tree.name }}</span>
       </h3>
-      <p class="specimen__price">
-        Price on inquiry
-      </p>
       <p class="specimen__line">
         <span>Age {{ tree.age }} yrs</span>
         <span class="specimen__sep" aria-hidden="true">·</span>
         <span>{{ sizeShort }}</span>
         <span class="specimen__sep" aria-hidden="true">·</span>
         <span>{{ tree.height }}</span>
+      </p>
+      <!-- Every specimen in the catalog carries this, and it is the same on
+           all of them, so it is set quietly under the record rather than
+           beside the name where it would compete with it. It stays on the card
+           rather than being stated once in the header because it is the
+           commercial terms for this object, and a grid is scanned. -->
+      <p class="specimen__price">
+        Price on inquiry
       </p>
     </div>
   </NuxtLink>
@@ -56,19 +61,9 @@ function handleImageError(e: Event) {
 .specimen {
   display: grid;
   grid-template-rows: auto 1fr;
+  height: 100%;
   text-decoration: none;
   color: var(--text);
-  background: var(--surface-raised);
-  border: 1px solid var(--border-hair);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  transition:
-    border-color var(--duration-base) var(--ease-out-quart),
-    transform var(--duration-base) var(--ease-out-quart);
-}
-
-.specimen:hover {
-  border-color: color-mix(in oklch, var(--text) 22%, transparent);
 }
 
 .specimen:focus-visible {
@@ -78,14 +73,15 @@ function handleImageError(e: Event) {
 
 /* ---- photograph ---- */
 
+/* The plate. A hairline inset rather than a border, so it reads as the edge
+   of a mounted print rather than as the outline of a tile, and so it does not
+   add to the box the grid measures. */
 .specimen__frame {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   margin: 0;
-  background: var(--surface-sunken);
-  /* Hairline separator between photo and caption — set in the same ink
-     as the outer border, so the card reads as one mounted plate. */
-  border-bottom: 1px solid var(--border-hair);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--border-hair);
   overflow: hidden;
 }
 
@@ -130,12 +126,20 @@ function handleImageError(e: Event) {
 
 .specimen__meta {
   display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
-  column-gap: var(--space-sm);
-  row-gap: var(--space-3xs);
-  align-items: baseline;
-  padding: var(--space-sm) var(--space-md) var(--space-md);
+  gap: var(--space-3xs);
+  align-content: start;
+  padding: var(--space-sm) 0 0;
+}
+
+.specimen__price {
+  margin: var(--space-3xs) 0 0;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-feature-settings: var(--feat-small-caps);
 }
 
 .specimen__name {
@@ -176,21 +180,6 @@ function handleImageError(e: Event) {
 
 /* "Price on inquiry" reads as a quiet status tag, not a numeric anchor —
    small caps in body face so the tree name stays the typographic lead. */
-.specimen__price {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: baseline;
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  line-height: 1.4;
-  color: var(--text-faint);
-  font-feature-settings: var(--feat-small-caps);
-  white-space: nowrap;
-}
 
 .specimen__line {
   grid-column: 1 / -1;

@@ -23,6 +23,13 @@ export default antfu({
     '**/.claude/**',
     '**/.cursor/**',
     'pnpm-workspace.yaml',
+    // Vendored scroll runtime. Third-party source, kept byte-identical to
+    // upstream so it can be re-vendored; it is configured with data-sc-*
+    // attributes and CSS custom properties, never edited.
+    'assets/js/scrollcraft.js',
+    // Verification artifacts: contact sheets and machine-written reports.
+    'lab/**',
+    'scrollcraft-out/**',
   ],
   rules: {
     // Nuxt uses process.env convention

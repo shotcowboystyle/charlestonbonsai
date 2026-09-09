@@ -38,16 +38,21 @@ describe('Modal', () => {
     expect(document.body.textContent).toContain('Confirm removal')
   })
 
+  // Asserted as the width, not as a Tailwind size key. `max-w-md` and friends
+  // do not mean what they say in this theme — the semantic `--spacing-*` names
+  // shadow the container scale, so `max-w-md` resolved to 1.5rem and every
+  // modal rendered as a 24px column while this test went on passing. See the
+  // note in assets/css/main.css.
   it('applies the size class for the requested width', async () => {
     await mountSuspended(Modal, { props: { modelValue: true, size: 'xl' } })
 
-    expect(currentDialog()?.className).toContain('max-w-xl')
+    expect(currentDialog()?.className).toContain('max-w-[36rem]')
   })
 
   it('defaults to the medium width', async () => {
     await mountSuspended(Modal, { props: { modelValue: true } })
 
-    expect(currentDialog()?.className).toContain('max-w-md')
+    expect(currentDialog()?.className).toContain('max-w-[28rem]')
   })
 
   it('locks body scroll when it opens', async () => {
