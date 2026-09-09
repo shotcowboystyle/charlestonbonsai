@@ -337,7 +337,6 @@ const emptyState = computed<'narrow' | 'zero' | null>(() => {
 
   min-height: 100vh;
   padding-top: var(--nav-h);
-  background: var(--surface);
   color: var(--text);
 }
 
@@ -401,7 +400,7 @@ const emptyState = computed<'narrow' | 'zero' | null>(() => {
   /* One layer below the fixed navbar so the navbar's solid surface
      covers the toolbar as it slides out of view on scroll-down. */
   z-index: var(--z-raised);
-  background: var(--surface);
+  background: var(--sheet);
   border-bottom: 1px solid transparent;
   transition:
     transform var(--duration-base) var(--ease-out-quart),

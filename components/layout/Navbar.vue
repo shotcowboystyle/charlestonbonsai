@@ -134,9 +134,10 @@ function closeMenu() {
     border-color var(--duration-base) var(--ease-out-quart);
 }
 
-/* Product mode: solid bone from first paint. */
+/* Product mode: the sheet from first paint. Viewport-anchored, so the bar
+   sits on the same paper as the page travelling beneath it. */
 .cb-nav--product {
-  background: var(--surface);
+  background: var(--sheet);
   border-bottom-color: var(--border-hair);
 }
 
@@ -148,9 +149,9 @@ function closeMenu() {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* Menu open: surface becomes solid so the mobile takeover meets it cleanly. */
+/* Menu open: the ground goes solid so the mobile takeover meets it cleanly. */
 .cb-nav--menu-open {
-  background: var(--surface);
+  background: var(--sheet);
   border-bottom-color: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
