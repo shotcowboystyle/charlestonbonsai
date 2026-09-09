@@ -76,16 +76,13 @@ helper — `test/server/require-admin.test.ts` already covers its behaviour.
 ### Netlify and Vercel configs contradict each other
 
 `vercel.json` declares the Nuxt framework preset; `netlify.toml` runs
-`npm run generate` and redirects `/*` to `/index.html`. The Netlify path would
+`pnpm generate` and redirects `/*` to `/index.html`. The Netlify path would
 produce a static SPA whose catch-all redirect swallows every `/api/**` route,
 breaking admin auth and all inquiry forms.
 
 Vercel is the real target (`DEPLOYMENT.md` is Vercel-only, and uploads depend on
 `@vercel/blob`). Delete `netlify.toml` unless Netlify is genuinely a fallback.
-Both files also invoke `npm` while the repo is pnpm-locked.
-
-Also delete the stale committed `bun.lock` — `pnpm-lock.yaml` is the live one,
-and two lockfiles invite a wrong-resolver install.
+Both files also invoke `pnpm` while the repo is pnpm-locked.
 
 ### Node version is unpinned
 

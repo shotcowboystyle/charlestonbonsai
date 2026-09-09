@@ -155,19 +155,19 @@ XSS is a full admin session takeover.
 
 ### 5.5 The Netlify deployment path cannot work
 
-`netlify.toml` sets `command = "npm run generate"` and a catch-all
+`netlify.toml` sets `command = "pnpm generate"` and a catch-all
 `from = "/*" → to = "/index.html"` at status 200. `nuxt generate` produces a fully
 prerendered app with **no Nitro server**, so none of `/api/*` exists. That takes out the
 newsletter, both inquiry forms, and the entire admin dashboard. Netlify is documented in
 `README.md` as a first-class option; the real target is Vercel (`vercel.json`,
 `@vercel/blob`, `nitro.prerender.ignore: ['/api']`). Either delete the Netlify path or
-switch it to `npm run build` with the Netlify Nuxt preset.
+switch it to `pnpm build` with the Netlify Nuxt preset.
 
 ### 5.6 No CI, no tests, and Renovate merging into both
 
 There is no `.github/` directory — no workflows, no PR template, no Dependabot config.
 `renovate.json` extends `local>shotcowboystyle/renovate-config`, and 18 of 50 commits are
-dependency bumps. Nothing runs `npm run lint`, `npm run typecheck`, or a build against
+dependency bumps. Nothing runs `pnpm lint`, `pnpm typecheck`, or a build against
 those bumps before they land on `main`. `test.mjs` is a hardcoded Supabase connectivity
 script, not a test.
 
@@ -318,7 +318,7 @@ Ranked by consequence per unit of effort, not by ease.
 7. **Update `CLAUDE.md`** against §5.8 and document the six missing env vars in
    `.env.example`. Stale agent instructions actively cause regressions here — the deleted
    `stores/trees.ts` is a live example of something an agent would helpfully recreate.
-8. **Resolve the Netlify path** — delete it or fix it to `npm run build`.
+8. **Resolve the Netlify path** — delete it or fix it to `pnpm build`.
 9. **Regenerate `types/database.ts`** from the live schema so the three untyped tables are
    covered.
 10. **Finish the admin surface's sumi-e migration,** or explicitly declare admin exempt and

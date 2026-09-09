@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Nuxt Dev",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "pnpm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
     }
