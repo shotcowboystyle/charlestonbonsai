@@ -47,3 +47,8 @@ blob-report/
 *.local
 supabase/.branches/
 supabase/.temp/
+
+# Scroll verification artifacts (contact sheets, harness reports) and the
+# raw generation output the published assets were derived from.
+lab/
+scrollcraft-out/
