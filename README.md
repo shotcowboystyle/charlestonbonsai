@@ -6,13 +6,13 @@ A premium gallery website for bonsai trees with an e-commerce aesthetic.
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Set up environment
 cp .env.example .env
 
 # Start development server
-npm run dev
+pnpm dev
 ```
 
 ## Deployment
@@ -28,7 +28,7 @@ npm run dev
 
 1. Push code to GitHub
 2. Import project in Netlify
-3. Set build command: `npm run generate`
+3. Set build command: `pnpm generate`
 4. Set publish directory: `.output/public`
 5. Add environment variables
 6. Deploy
@@ -74,10 +74,10 @@ bonsai-gallery/
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run generate` | Generate static site |
-| `npm run preview` | Preview production build |
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm generate` | Generate static site |
+| `pnpm preview` | Preview production build |
 
 ## Tech Stack
 

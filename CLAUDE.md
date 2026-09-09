@@ -5,18 +5,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev          # Start dev server on port 3000
-npm run build        # Production build (SSR)
-npm run generate     # Static site generation (used by Netlify)
-npm run preview      # Preview production build locally
-npm run lint         # ESLint with auto-fix
-npm run lint:ci      # ESLint without --fix (the CI gate)
-npm run typecheck    # TypeScript type checking
-npm run test         # All three Vitest projects (unit + server + nuxt)
-npm run test:unit    # Node-env projects only — fast inner loop
-npm run test:watch   # Vitest watch mode
-npm run test:e2e     # Playwright (builds + previews the app first)
-npm run verify       # lint:ci + typecheck + test + build (the full local gate)
+pnpm dev          # Start dev server on port 3000
+pnpm build        # Production build (SSR)
+pnpm generate     # Static site generation (used by Netlify)
+pnpm preview      # Preview production build locally
+pnpm lint         # ESLint with auto-fix
+pnpm lint:ci      # ESLint without --fix (the CI gate)
+pnpm typecheck    # TypeScript type checking
+pnpm test         # All three Vitest projects (unit + server + nuxt)
+pnpm test:unit    # Node-env projects only — fast inner loop
+pnpm test:watch   # Vitest watch mode
+pnpm test:e2e     # Playwright (builds + previews the app first)
+pnpm verify       # lint:ci + typecheck + test + build (the full local gate)
 ```
 
 ### Testing

@@ -100,12 +100,12 @@ Value: cname.vercel-dns.com
 **Missing dependencies:**
 ```bash
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 ```
 
 **TypeScript errors:**
 ```bash
-npm run typecheck
+pnpm typecheck
 ```
 
 ### Runtime Errors
@@ -134,7 +134,7 @@ npm run typecheck
 ### Error Tracking
 Consider adding Sentry:
 ```bash
-npm install @sentry/nuxt
+pnpm install @sentry/nuxt
 ```
 
 ## Updates
