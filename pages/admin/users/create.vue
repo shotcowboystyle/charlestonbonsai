@@ -71,7 +71,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto">
+  <div class="max-w-[42rem] mx-auto">
     <!-- Header -->
     <div class="flex items-center gap-4 mb-6">
       <NuxtLink to="/admin/users" class="text-stone-400 hover:text-charcoal transition-colors">

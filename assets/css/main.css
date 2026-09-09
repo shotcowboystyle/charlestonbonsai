@@ -192,6 +192,17 @@
 
   --max-width-reading: var(--measure-reading);
 
+
+  /* NOTE: `max-w-sm|md|lg|xl|2xl|3xl` do NOT mean what they mean in stock
+   * Tailwind here, and cannot be made to. v4 resolves `max-w-<key>` against
+   * the spacing namespace whenever a matching `--spacing-<key>` exists, and
+   * the semantic spacing names above (which is what lets components write
+   * `p-md`) therefore shadow the container scale. `max-w-md` resolves to
+   * 1.5rem, not 28rem. Declaring `--container-md` does not win it back.
+   *
+   * Write the width you mean — `max-w-[28rem]` — until the semantic spacing
+   * names are renamed out of the collision. */
+
   /* Legacy rounded value stays for unchanged components */
   --radius-4xl: 2rem;
 
