@@ -1,0 +1,139 @@
+/* Bonsai Studio on phones: re-arranged, not scaled down. Headline in the
+   sky, selectors in a horizontally scrolling strip above the transport. */
+
+/* ── Phones: re-arranged, not scaled down ───────────────── */
+@media (max-width: 760px), (max-height: 460px) {
+  .st-head {
+    min-height: 3rem;
+    gap: 0.75rem;
+  }
+
+  .st-head__en {
+    display: none;
+  }
+
+  .st-head__sound {
+    margin-left: auto;
+  }
+
+  .st-selectors {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--st-foot-h, 4rem);
+    margin: 0;
+    padding: 0.35rem max(0.75rem, env(safe-area-inset-right)) 0.35rem max(0.75rem, env(safe-area-inset-left));
+    gap: 0.9rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    background: linear-gradient(to top, var(--st-scrim) 55%, transparent);
+    /* The trailing fade says "there is more": the strip scrolls sideways. */
+    mask-image: linear-gradient(to right, #000 82%, transparent);
+    padding-right: 3.5rem;
+  }
+
+  .st-selectors::-webkit-scrollbar {
+    display: none;
+  }
+
+  .st-sel {
+    flex: none;
+  }
+
+  .st-sel__value {
+    max-width: none;
+  }
+
+  .st-sel__cycle {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.05rem;
+    font-size: 0.6875rem;
+  }
+
+  .st__headline {
+    top: calc(3rem + 0.9rem);
+    max-width: 62vw;
+  }
+
+  .st__kanji {
+    font-size: 2.6rem;
+  }
+
+  .st__title {
+    margin-top: 0.4rem;
+    font-size: 1.15rem;
+  }
+
+  .st__line {
+    display: none;
+  }
+
+  .st__pct {
+    top: calc(3rem + 0.9rem);
+    bottom: auto;
+    font-size: 3rem;
+  }
+
+  .st-plaque {
+    max-width: 9.5rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .st-plaque__stage,
+  .st-plaque__en {
+    font-size: 0.75rem;
+  }
+
+  .st-plaque__latin {
+    display: none;
+  }
+
+  .st-plaque__meta:last-child {
+    display: none;
+  }
+
+  .st-tl {
+    min-height: 3.5rem;
+    gap: 0.5rem;
+  }
+
+  .st-tl__body {
+    padding-bottom: 0;
+  }
+
+  .st-tl__tick-label {
+    display: none;
+  }
+
+  .st-tl__dur {
+    display: none;
+  }
+
+  .st-tl__clock {
+    min-width: 6ch;
+  }
+}
+
+/* Short and wide: landscape phones keep the strip and drop the headline. */
+@media (max-height: 460px) {
+  .st__headline {
+    display: none;
+  }
+
+  .st__pct {
+    font-size: 2.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st,
+  .st-head,
+  .st__footer,
+  .st-plaque,
+  .st__pct {
+    transition: none;
+  }
+}

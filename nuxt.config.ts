@@ -16,6 +16,10 @@ export default defineNuxtConfig({
   // (assets/css/main.css), not in a tailwind.config.ts.
   css: ['~/assets/css/main.css'],
 
+  // Agent skill folders hold tens of thousands of files; watching them makes
+  // `nuxt dev` fail with EMFILE. Merged with Nuxt's default ignore list.
+  ignore: ['.claude', '.agents'],
+
   vite: {
     plugins: [tailwindcss()],
   },

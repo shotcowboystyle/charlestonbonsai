@@ -1,0 +1,289 @@
+/* Bonsai Studio chrome. Sumi-e atelier language from tokens.css: Cardo for
+   display, Albert Sans for UI, hairline rules, no soft shadows. Colours come
+   from the atmosphere preset (--st-*) and transition with the scene. */
+
+.st {
+  --st-jp: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Songti SC', var(--font-display), serif;
+  --st-ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --st-fade: 1.6s;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: var(--st-ink);
+  background: var(--st-paper);
+  font-family: var(--font-body);
+  transition: color var(--st-fade) var(--st-ease), background-color var(--st-fade) var(--st-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.st__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+.st__canvas:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--st-accent);
+}
+
+.st :focus-visible {
+  outline: 2px solid var(--st-accent);
+  outline-offset: 2px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.st-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.6vw, 1.75rem);
+  min-height: 3.5rem;
+  padding: env(safe-area-inset-top) max(clamp(1rem, 2.6vw, 2.5rem), env(safe-area-inset-right)) 0 max(clamp(1rem, 2.6vw, 2.5rem), env(safe-area-inset-left));
+  background: var(--st-scrim);
+  border-bottom: 1px solid var(--st-line);
+  transition: background-color var(--st-fade) var(--st-ease), border-color var(--st-fade) var(--st-ease);
+}
+
+.st-head__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  color: var(--st-ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.st-head__back:hover {
+  color: var(--st-ink);
+}
+
+.st-head__mark {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.st-head__jp {
+  font-family: var(--st-jp);
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+}
+
+.st-head__en {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.st-head__sound,
+.st-sel__cycle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 0.15rem;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.st-head__sound {
+  align-items: center;
+  border-bottom: 1px solid var(--st-line);
+}
+
+.st-head__sound-label,
+.st-sel__label {
+  color: var(--st-ink-soft);
+  text-transform: uppercase;
+}
+
+.st-head__sound-value,
+.st-sel__value {
+  color: var(--st-ink);
+  font-weight: 500;
+}
+
+.st-selectors {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.3vw, 1.4rem);
+  margin-left: auto;
+}
+
+.st-sel {
+  display: inline-flex;
+  align-items: center;
+  border-bottom: 1px solid var(--st-line);
+  transition: border-color var(--st-fade) var(--st-ease);
+}
+
+.st-sel__cycle {
+  align-items: center;
+}
+
+.st-sel__value {
+  max-width: 15ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1360px) {
+  .st-head__en {
+    display: none;
+  }
+
+  .st-sel__value {
+    max-width: 11ch;
+  }
+}
+
+.st-sel__cycle:hover .st-sel__value {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.st-sel--locked .st-sel__cycle {
+  cursor: default;
+}
+
+.st-sel--locked .st-sel__value {
+  color: var(--st-ink-soft);
+}
+
+.st-sel__pick {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  min-height: 44px;
+  color: var(--st-ink-soft);
+}
+
+.st-sel__pick select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.st-sel__pick:focus-within {
+  outline: 2px solid var(--st-accent);
+}
+
+/* ── Headline in the sky ────────────────────────────────── */
+.st__headline {
+  position: absolute;
+  z-index: 2;
+  top: calc(3.5rem + clamp(1.5rem, 7vh, 4.5rem));
+  left: max(clamp(1rem, 4vw, 3.5rem), env(safe-area-inset-left));
+  max-width: 21rem;
+  pointer-events: none;
+  text-shadow: 0 0 1.2rem var(--st-paper);
+}
+
+.st__kanji {
+  margin: 0;
+  font-family: var(--st-jp);
+  font-size: clamp(3rem, 6.4vw, 5.75rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.st__title {
+  color: inherit;
+  margin: 0.9rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.st__title-en {
+  display: block;
+  margin-top: 0.2rem;
+  font-style: italic;
+  font-size: 0.62em;
+  color: var(--st-ink-soft);
+}
+
+.st__line {
+  margin: 0.9rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--st-ink);
+}
+
+/* A soft wash of the chrome's paper behind the headline keeps it readable over
+   boulders, lanterns and bright windows without boxing it in. */
+.st__headline::before {
+  content: '';
+  position: absolute;
+  inset: -2.5rem -3rem -2rem -4rem;
+  z-index: -1;
+  background: radial-gradient(ellipse at 35% 45%, var(--st-scrim) 0%, transparent 72%);
+  pointer-events: none;
+}
+
+/* Interiors are dark rooms whatever the weather outside: type over them inverts. */
+.st--interior .st__headline,
+.st--interior .st__pct {
+  color: #efe9d8;
+  text-shadow: 0 0 1.4rem rgba(12, 9, 6, 0.85);
+}
+
+.st--interior .st__headline::before {
+  background: radial-gradient(ellipse at 35% 45%, rgba(12, 9, 6, 0.55) 0%, transparent 72%);
+}
+
+.st--interior .st__title-en,
+.st--interior .st__line {
+  color: #cfc6ae;
+}
+
+/* ── Oversized percentage ───────────────────────────────── */
+.st__pct {
+  position: absolute;
+  z-index: 2;
+  right: max(clamp(1rem, 4vw, 3.5rem), env(safe-area-inset-right));
+  bottom: calc(var(--st-foot-h, 4.5rem) + 0.5rem);
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 8vw, 7.5rem);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums lining-nums;
+  min-width: 3ch;
+  text-align: right;
+  pointer-events: none;
+  opacity: 0.88;
+  transition: opacity 0.9s var(--st-ease);
+  text-shadow: 0 0 1.2rem var(--st-paper);
+}
+
+.st__pct span {
+  font-size: 0.32em;
+  margin-left: 0.1em;
+}
+
+.st__pct--done {
+  opacity: 0;
+}
