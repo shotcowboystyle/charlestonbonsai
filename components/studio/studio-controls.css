@@ -1,0 +1,228 @@
+/* Bonsai Studio chrome, part two: plaque, transport, fallback and the
+   phone re-arrangement. Shares the --st-* palette set on .st. */
+
+/* ── Projected plaque ───────────────────────────────────── */
+.st-plaque {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  max-width: 14.5rem;
+  padding: 0.55rem 0.75rem 0.6rem;
+  background: var(--st-scrim);
+  border: 1px solid var(--st-line);
+  pointer-events: none;
+  will-change: transform;
+  transition: background-color var(--st-fade) var(--st-ease), border-color var(--st-fade) var(--st-ease);
+}
+
+.st-plaque p {
+  margin: 0;
+}
+
+.st-plaque__stage {
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.st-plaque__stage [lang='ja'] {
+  font-family: var(--st-jp);
+  font-weight: 400;
+}
+
+.st-plaque__sep {
+  color: var(--st-ink-soft);
+  font-weight: 400;
+}
+
+.st-plaque__en {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.875rem;
+  margin-bottom: 0.3rem !important;
+}
+
+.st-plaque__meta {
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--st-ink-soft);
+}
+
+/* ── Footer transport ───────────────────────────────────── */
+.st__footer {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 max(clamp(1rem, 2.6vw, 2.5rem), env(safe-area-inset-right)) env(safe-area-inset-bottom) max(clamp(1rem, 2.6vw, 2.5rem), env(safe-area-inset-left));
+  background: var(--st-scrim);
+  border-top: 1px solid var(--st-line);
+  transition: background-color var(--st-fade) var(--st-ease), border-color var(--st-fade) var(--st-ease);
+}
+
+.st-tl {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.25rem;
+}
+
+.st-tl__btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  background: none;
+  border: 1px solid var(--st-line);
+  border-radius: 50%;
+  color: inherit;
+  cursor: pointer;
+}
+
+.st-tl__btn:hover {
+  border-color: var(--st-ink);
+}
+
+.st-tl__body {
+  flex: 1;
+  padding: 0 0.5rem 0.9rem;
+}
+
+.st-tl__track {
+  position: relative;
+  height: 44px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.st-tl__rail,
+.st-tl__fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+}
+
+.st-tl__rail {
+  height: 1px;
+  background: var(--st-line);
+}
+
+.st-tl__fill {
+  height: 2px;
+  margin-top: -0.5px;
+  background: var(--st-ink);
+  transform-origin: left center;
+}
+
+.st-tl__tick {
+  position: absolute;
+  top: calc(50% + 5px);
+  width: 1px;
+  height: 6px;
+  background: var(--st-ink-soft);
+}
+
+.st-tl__tick-label {
+  position: absolute;
+  top: 9px;
+  left: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  color: var(--st-ink-soft);
+  white-space: nowrap;
+  transform: translateX(-2px);
+}
+
+.st-tl__tick--on .st-tl__tick-label {
+  color: var(--st-ink);
+}
+
+.st-tl__thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--st-ink);
+  box-shadow: 0 0 0 3px var(--st-paper);
+}
+
+.st-tl__track:focus-visible .st-tl__thumb {
+  box-shadow: 0 0 0 3px var(--st-paper), 0 0 0 5px var(--st-accent);
+}
+
+.st-tl__clock {
+  margin: 0;
+  min-width: 10ch;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.st-tl__dur {
+  color: var(--st-ink-soft);
+}
+
+/* ── Fallback ───────────────────────────────────────────── */
+.st-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 6rem 1.5rem;
+  text-align: center;
+}
+
+.st-fallback__art {
+  width: min(70vw, 320px);
+  color: var(--st-ink);
+}
+
+.st-fallback__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.st-fallback__note {
+  max-width: 34ch;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--st-ink-soft);
+}
+
+.st-fallback__toasts {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.st-fallback__toasts li {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--st-line);
+}
+
+/* Automation stills (?capture=1): scene only. */
+.st--capture .st-head,
+.st--capture .st__footer,
+.st--capture .st__headline,
+.st--capture .st__pct,
+.st--capture .st-plaque,
+.st--capture .st-selectors {
+  display: none;
+}

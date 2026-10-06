@@ -18,6 +18,8 @@ const { siteName } = useSite()
 const navLinks = [
   { to: '/', label: 'Index' },
   { to: '/gallery', label: 'Catalog' },
+  // MobileMenu renders this same list, so the studio link appears in both.
+  { to: '/studio', label: 'Studio' },
   { to: '/events', label: 'Events' },
   { to: '/retreats', label: 'Retreats' },
   { to: '/visit', label: 'Visit' },
