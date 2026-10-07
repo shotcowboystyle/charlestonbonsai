@@ -35,9 +35,17 @@ test('the home page renders its shell and navigation', async ({ page }) => {
   await page.goto('/')
 
   await expect(page.locator('header[role="banner"]')).toBeVisible()
-  await expect(page.locator('footer[role="contentinfo"]')).toBeVisible()
   await expect(page.locator('nav[aria-label="Primary"]')).toBeVisible()
   await expect(page.locator('nav[aria-label="Primary"] a[href="/gallery"]')).toBeVisible()
+
+  // The home page is one handscroll; its colophon (the site footer) is the
+  // last thing on the paper, so it is only legible once the scroll has ended.
+  await page.waitForSelector('html.sc-ready')
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  const footer = page.locator('footer[role="contentinfo"]')
+  await expect(footer).toBeVisible()
+  await expect.poll(() => footer.evaluate(el => Number(getComputedStyle(el.closest('[data-sc-copy]')!).opacity))).toBeGreaterThan(0.9)
+  await expect(page.getByRole('link', { name: 'Arrange a visit' }).last()).toBeVisible()
 })
 
 // Regression guard: an HTML 404 used to render as a 500 because serialising the
