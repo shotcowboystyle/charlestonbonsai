@@ -47,3 +47,7 @@ blob-report/
 *.local
 supabase/.branches/
 supabase/.temp/
+
+# scrollcraft build workspace: generated masters and verification screenshots
+scrollcraft/builds/*/out/
+scrollcraft/builds/*/lab/

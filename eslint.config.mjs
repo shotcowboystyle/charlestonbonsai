@@ -23,6 +23,9 @@ export default antfu({
     '**/.claude/**',
     '**/.cursor/**',
     'pnpm-workspace.yaml',
+    // Vendored scrollcraft engine, shipped unmodified, and the build workspace (briefs, lab scripts, reports)
+    'public/scrollcraft/**',
+    'scrollcraft/**',
   ],
   rules: {
     // Nuxt uses process.env convention
