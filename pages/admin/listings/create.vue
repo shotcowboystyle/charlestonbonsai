@@ -95,7 +95,7 @@ async function handleThumbnailUpload(event: Event) {
 
   uploadingThumbnail.value = true
   try {
-    const url = await uploadFile(file)
+    const url = await uploadFile(await resizeImage(file))
     form.value.thumbnail = url
     toast.success('Thumbnail uploaded')
   }
