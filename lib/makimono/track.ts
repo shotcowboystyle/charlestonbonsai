@@ -1,8 +1,10 @@
 /**
  * The handscroll's timeline. Pure data and math, no DOM.
  *
- * Time `t` is position along the scroll track in viewport-heights, the same
- * unit the worldflight engine uses for leg weights. The scroll reads right to
+ * Time `t` is position along the track, in track units. Each stretch of the
+ * track has its own PACE (track units per viewport-height of scroll), so the
+ * world can unroll slower than the wheel where there is something to look at.
+ * The scroll reads right to
  * left like a real emakimono: as `t` grows, everything on the paper travels to
  * the right and new scenes unroll in from the left edge.
  */
@@ -11,9 +13,9 @@ export interface Leg {
   key: string
   kanji: string
   label: string
-  /** Scroll this leg owns, in viewport-heights (`data-sc-w`). */
+  /** Track this leg owns, in track units. */
   w: number
-  /** Where the map lands inside the leg, in viewport-heights from its start. */
+  /** Where the map lands inside the leg, in track units from its start. */
   rest: number
 }
 
@@ -22,8 +24,8 @@ export const LEGS: readonly Leg[] = [
   { key: 'hand', kanji: '手', label: 'The hand', w: 1.3, rest: 0.65 },
   { key: 'seasons', kanji: '四季', label: 'Seasons', w: 2.0, rest: 1.35 },
   { key: 'ink', kanji: '墨', label: 'Ink', w: 3.1, rest: 2.6 },
-  { key: 'nursery', kanji: '庭', label: 'The nursery', w: 2.0, rest: 1.15 },
-  { key: 'bench', kanji: '学', label: 'The bench', w: 1.3, rest: 0.55 },
+  { key: 'nursery', kanji: '庭', label: 'The nursery', w: 2.4, rest: 1.15 },
+  { key: 'bench', kanji: '学', label: 'The bench', w: 2.2, rest: 1.2 },
   { key: 'seal', kanji: '印', label: 'The seal', w: 1.4, rest: 1.4 },
 ]
 
@@ -36,10 +38,10 @@ export function legStart(i: number): number {
 
 /**
  * A copy window in track time, written as the engine's `data-sc-window`
- * string (fractions of the whole track). Ramps are fractions of the window.
+ * string (fractions of the whole scroll). Ramps are fractions of the window.
  */
 export function win(from: number, to: number, rampIn = 0.3, rampOut = 0.3): string {
-  const f = (v: number) => (Math.min(Math.max(v / TOTAL, 0), 1)).toFixed(4)
+  const f = (v: number) => (Math.min(Math.max(scrollAt(v) / SCROLL_TOTAL, 0), 1)).toFixed(4)
   return `${f(from)} ${f(to)} ${rampIn} ${rampOut}`
 }
 
@@ -50,15 +52,7 @@ export function win(from: number, to: number, rampIn = 0.3, rampOut = 0.3): stri
  * to photograph what is behind them, and a scrim is part of what is behind).
  */
 export function windowOpacity(t: number, spec: string): number {
-  const [from = 0, to = 1, rIn = 0.3, rOut = 0.3] = spec.split(/\s+/).map(Number)
-  const pr = t / TOTAL
-  const span = Math.max(to - from, 0.001)
-  const inEnd = from + span * rIn
-  const outStart = to - span * rOut
-  const smooth = (x: number) => {
-    const c = clamp01(x)
-    return c * c * (3 - 2 * c)
-  }
+  const { pr, from, to, inEnd, outStart } = parseWindow(t, spec)
   if (pr < from)
     return 0
   if (pr < inEnd)
@@ -66,6 +60,26 @@ export function windowOpacity(t: number, spec: string): number {
   if (pr <= outStart)
     return 1
   return smooth(1 - (pr - outStart) / Math.max(to - outStart, 0.001))
+}
+
+/**
+ * How far through its fade-in a window is at track time t (0..1), and 1 from
+ * then on. Copy rises while it fades in, then holds still: it does not drift.
+ */
+export function windowIn(t: number, spec: string): number {
+  const { pr, from, inEnd } = parseWindow(t, spec)
+  return pr >= inEnd ? 1 : smooth((pr - from) / Math.max(inEnd - from, 0.001))
+}
+
+function parseWindow(t: number, spec: string) {
+  const [from = 0, to = 1, rIn = 0.3, rOut = 0.3] = spec.split(/\s+/).map(Number)
+  const span = Math.max(to - from, 0.001)
+  return { pr: scrollAt(t) / SCROLL_TOTAL, from, to, inEnd: from + span * rIn, outStart: to - span * rOut }
+}
+
+function smooth(x: number): number {
+  const c = clamp01(x)
+  return c * c * (3 - 2 * c)
 }
 
 /** How fast the paper travels: band-heights of mid-plane travel per viewport-height of scroll. */
@@ -118,8 +132,8 @@ export const PLATES: readonly Plate[] = [
   // far: pale ridges and marsh, tiled end to end
   { src: 'f-ridges', plane: 'far', at: -2.9, x: 0.5, h: 0.46, y: 0.2, ratio: 3.7, flip: true, fade: 'lr' },
   { src: 'f-ridges', plane: 'far', at: 3.4, x: 0.5, h: 0.46, y: 0.22, ratio: 3.7, fade: 'lr' },
-  { src: 'f-marsh', plane: 'far', at: 9.5, x: 0.5, h: 0.4, y: 0.12, ratio: 3.287, fade: 'lrb' },
-  { src: 'f-ridges', plane: 'far', at: 15.6, x: 0.5, h: 0.5, y: 0.18, ratio: 3.7, flip: true, fade: 'lr' },
+  { src: 'f-marsh', plane: 'far', at: legStart(4) + 1.8, x: 0.5, h: 0.4, y: 0.12, ratio: 3.287, fade: 'lrb' },
+  { src: 'f-ridges', plane: 'far', at: TOTAL + 3.2, x: 0.5, h: 0.5, y: 0.18, ratio: 3.7, flip: true, fade: 'lr' },
 
   // mid: the scenes
   { src: 'm-pine', plane: 'mid', at: 0, x: 0.84, xm: 0.84, h: 0.9, y: -0.06, ratio: 1.773, fade: 'b' },
@@ -128,14 +142,14 @@ export const PLATES: readonly Plate[] = [
   { src: 'm-summer', plane: 'mid', at: 3.76, x: 0.5, h: 0.5, y: 0.06, ratio: 0.943 },
   { src: 'm-autumn', plane: 'mid', at: 4.32, x: 0.5, h: 0.5, y: 0.06, ratio: 0.9275 },
   { src: 'm-winter', plane: 'mid', at: 4.88, x: 0.5, h: 0.5, y: 0.06, ratio: 0.935 },
-  { src: 'm-nursery2', plane: 'mid', at: 8.8, x: 0.33, xm: 0.5, h: 0.78, y: 0.02, ratio: 1.499 },
-  { src: 'm-bench', plane: 'mid', at: 10.35, x: 0.4, xm: 0.5, h: 0.58, y: 0.03, ratio: 2.004 },
+  { src: 'm-nursery2', plane: 'mid', at: legStart(4) + 1.1, x: 0.33, xm: 0.5, h: 0.78, y: 0.02, ratio: 1.499 },
+  { src: 'm-bench', plane: 'mid', at: legStart(5) + 0.35, x: 0.4, xm: 0.5, h: 0.58, y: 0.03, ratio: 2.004 },
   { src: 'm-gate', plane: 'mid', at: TOTAL, x: 0.27, xm: 0.5, h: 0.8, y: -0.03, ratio: 1.887, fade: 'b' },
 
   // near: dark foreground, overtakes everything
   { src: 'n-rocks', plane: 'near', at: 0.3, x: 0.5, xm: 0.7, h: 0.26, y: -0.08, ratio: 2.03, fade: 'l' },
   { src: 'n-rocks', plane: 'near', at: 4.2, x: 0.22, h: 0.22, y: -0.08, ratio: 2.03, flip: true, fade: 'l' },
-  { src: 'n-branch', plane: 'near', at: 11.3, x: 0.3, h: 0.36, y: 0.72, ratio: 1.608, flip: true, fade: 't' },
+  { src: 'n-branch', plane: 'near', at: legStart(5) + 1.3, x: 0.3, h: 0.36, y: 0.72, ratio: 1.608, flip: true, fade: 't' },
   { src: 'n-rocks', plane: 'near', at: TOTAL, x: 0.08, h: 0.22, y: -0.08, ratio: 2.03, flip: true, fade: 'l' },
 ]
 
@@ -144,8 +158,8 @@ export const MISTS: readonly { at: number, x: number, w: number, h: number, y: n
   { at: 0.4, x: 0.5, w: 1.5, h: 0.3, y: 0.3 },
   { at: 2.5, x: 0.4, w: 1.3, h: 0.28, y: 0.38 },
   { at: 5.2, x: 0.5, w: 1.8, h: 0.4, y: 0.22 },
-  { at: 9.7, x: 0.5, w: 1.4, h: 0.3, y: 0.34 },
-  { at: 11.5, x: 0.55, w: 1.6, h: 0.34, y: 0.3 },
+  { at: legStart(5), x: 0.5, w: 1.4, h: 0.3, y: 0.34 },
+  { at: legStart(5) + 1.5, x: 0.55, w: 1.6, h: 0.34, y: 0.3 },
 ]
 
 /** The peak, in track time. */
@@ -168,6 +182,68 @@ export const FINALE = {
   riseFrom: TOTAL - 1.15,
   riseTo: TOTAL - 0.35,
   seal: TOTAL - 0.3,
+} as const
+
+/**
+ * Track units per viewport-height of scroll, from track time `from` on. Lower
+ * is slower: the hero leaves at full speed, the real tree and the bench hold.
+ */
+export const PACE: readonly { from: number, pace: number }[] = [
+  { from: 0, pace: 1 },
+  { from: legStart(1), pace: 0.7 },
+  { from: legStart(2), pace: 0.85 },
+  { from: PEAK.photoFrom, pace: 0.5 },
+  { from: legStart(4), pace: 0.85 },
+  { from: legStart(5), pace: 0.6 },
+  { from: legStart(6), pace: 0.85 },
+]
+
+/** Viewport-heights of scroll needed to reach track time t. */
+export function scrollAt(t: number): number {
+  let s = 0
+  PACE.forEach(({ from, pace }, i) => {
+    const to = PACE[i + 1]?.from ?? Infinity
+    if (t > from)
+      s += (Math.min(t, to) - from) / pace
+  })
+  return s
+}
+
+/** Track time at scroll position s (viewport-heights). Inverse of scrollAt. */
+export function trackAt(s: number): number {
+  for (const [i, { from, pace }] of PACE.entries()) {
+    const len = ((PACE[i + 1]?.from ?? Infinity) - from) / pace
+    if (s <= len)
+      return from + s * pace
+    s -= len
+  }
+  return TOTAL
+}
+
+/** Length of the whole scroll, in viewport-heights. */
+export const SCROLL_TOTAL = scrollAt(TOTAL)
+
+/** Hung specimen i's anchor. Portrait spaces them wider, to fit a bigger card (0.4 band-h) and a gap. */
+export function hungAt(i: number, portrait = false): number {
+  return portrait ? legStart(4) + 0.45 + i * 0.56 : legStart(4) + 0.75 + i * 0.42
+}
+
+/** Copy windows, in track time. Each block gets one, and its scrim shares it. */
+export const WINDOWS = {
+  // on screen at load, gone within the first 40% of a screen of scroll
+  hero: win(0, 0.4, 0, 0.95),
+  hand: win(legStart(1) - 0.05, legStart(2)),
+  // holds through the autumn tree, fades as the ink veil closes over the world
+  seasons: win(legStart(2) + 0.15, legStart(3) + 0.45, 0.25, 0.2),
+  veil: win(PEAK.veilFrom, PEAK.veilTo, 0.12, 0.14),
+  peak: win(PEAK.show, PEAK.hide, 0.03, 0.12),
+  real: win(PEAK.photoFrom + 0.25, PEAK.hide, 0.3, 0.15),
+  // holds until the last hung specimen is centred
+  nursery: win(legStart(4) + 0.25, legStart(5) + 0.05, 0.25, 0.2),
+  // a beat of empty paper after the nursery before it comes in
+  bench: win(legStart(5) + 0.45, legStart(6) - 0.05, 0.2, 0.2),
+  // the engine's "finale": in from 0.4 of the last leg, holds to the end
+  finale: win(legStart(6) + 0.4 * LEGS[6]!.w, TOTAL, 0.55, 0),
 } as const
 
 /** Ensō stroke progress (0..1) for track time t. The circle closes as the seal lands. */
