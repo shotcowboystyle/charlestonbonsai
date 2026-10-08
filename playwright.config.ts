@@ -1,7 +1,9 @@
 import process from 'node:process'
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 3100
+// Assigned by portless (`pnpm test:e2e`), so concurrent sessions never collide.
+// The fallback only serves a bare `playwright test` (e.g. an IDE runner).
+const PORT = Number(process.env.PORT) || 3100
 const baseURL = `http://127.0.0.1:${PORT}`
 
 export default defineConfig({
@@ -33,7 +35,7 @@ export default defineConfig({
     // the only mode that exercises nitro.prerender. `nuxt dev` would skip both.
     command: 'pnpm build && pnpm preview',
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 300_000,
     stdout: 'pipe',
     stderr: 'pipe',

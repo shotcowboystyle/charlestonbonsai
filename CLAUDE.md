@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-pnpm dev          # Start dev server on port 3000
+pnpm dev          # Dev server via portless: http://charleston-bonsai.localhost:1355 (random free port behind the proxy)
 pnpm build        # Production build (SSR)
 pnpm generate     # Static site generation (used by Netlify)
 pnpm preview      # Preview production build locally
@@ -27,6 +27,8 @@ pnpm verify       # lint:ci + typecheck + test + build (the full local gate)
 | API handlers | `test/server/` | node + stubbed Nitro globals + fake Supabase |
 | Components | `test/nuxt/` | `environment: 'nuxt'` + happy-dom |
 | End-to-end | `test/e2e/` | Playwright against `build` + `preview` |
+
+Dev server, e2e and Lighthouse run under `portless` (`pnpm pl`), which hands each run a free `PORT` so sessions in other repos never collide. Vitest opens no ports. Bypass with `PORTLESS=0`.
 
 **Convention: `*.test.ts` is Vitest, `*.spec.ts` is Playwright.** The globs never overlap.
 
