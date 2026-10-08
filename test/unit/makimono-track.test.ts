@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { dryness, FINALE, LEGS, legStart, PEAK, PLATES, restTime, screenX, strokeProgress, TOTAL, win, windowOpacity } from '~/lib/makimono/track'
+import { dryness, FINALE, hungAt, LEGS, legStart, PEAK, PLATES, RATE, restTime, screenX, SCROLL_TOTAL, scrollAt, SPEED, strokeProgress, TOTAL, trackAt, win, windowIn, windowOpacity, WINDOWS } from '~/lib/makimono/track'
 
 describe('the handscroll track', () => {
   it('lays the legs end to end, and the peak owns the most scroll', () => {
@@ -12,8 +12,47 @@ describe('the handscroll track', () => {
     expect(LEGS.filter(l => l.w === peak.w)).toHaveLength(1)
   })
 
-  it('writes copy windows as fractions of the whole track, clamped', () => {
-    expect(win(0, TOTAL / 2)).toBe('0.0000 0.5000 0.3 0.3')
+  it('scrolls the hero 1:1, then slows the world where there is something to look at', () => {
+    expect(scrollAt(1)).toBe(1)
+    const vhPerUnit = (from: number, to: number) => (scrollAt(to) - scrollAt(from)) / (to - from)
+    // the hand, the real tree and the bench each take more scroll per unit of track than the hero
+    expect(vhPerUnit(legStart(1), legStart(2))).toBeGreaterThan(1)
+    expect(vhPerUnit(PEAK.photoFrom, legStart(4))).toBeGreaterThan(vhPerUnit(legStart(2), legStart(3)))
+    expect(vhPerUnit(legStart(5), legStart(6))).toBeGreaterThan(vhPerUnit(legStart(4), legStart(5)))
+    for (const t of [0.5, legStart(1), 4.2, PEAK.photoFrom + 0.3, 11, TOTAL])
+      expect(trackAt(scrollAt(t))).toBeCloseTo(t)
+    expect(SCROLL_TOTAL).toBeGreaterThan(TOTAL)
+  })
+
+  it('lets the hero go the moment the visitor scrolls', () => {
+    expect(windowOpacity(0, WINDOWS.hero)).toBe(1)
+    expect(windowOpacity(0.1, WINDOWS.hero)).toBeLessThan(1)
+    expect(windowOpacity(0.41, WINDOWS.hero)).toBe(0)
+  })
+
+  it('holds the real tree on screen for at least two viewports of scroll', () => {
+    expect(scrollAt(PEAK.hide) - scrollAt(PEAK.photoTo)).toBeGreaterThanOrEqual(1.4)
+    expect(scrollAt(legStart(4)) - scrollAt(PEAK.photoFrom)).toBeGreaterThanOrEqual(2)
+  })
+
+  it('leaves empty paper between the nursery and the bench', () => {
+    const [, nurseryEnd = 0] = WINDOWS.nursery.split(' ').map(Number)
+    const [benchStart = 0] = WINDOWS.bench.split(' ').map(Number)
+    expect((benchStart - nurseryEnd) * SCROLL_TOTAL).toBeGreaterThanOrEqual(0.5)
+  })
+
+  it('raises copy only while it fades in, then holds it still', () => {
+    const spec = WINDOWS.bench
+    const [from = 0, to = 0] = spec.split(' ').map(Number)
+    const at = (f: number) => trackAt(f * SCROLL_TOTAL)
+    expect(windowIn(at(from), spec)).toBe(0)
+    expect(windowIn(at(from + (to - from) * 0.5), spec)).toBe(1)
+    expect(windowIn(at(to - 0.0001), spec)).toBe(1)
+  })
+
+  it('writes copy windows as fractions of the whole scroll, clamped', () => {
+    expect(win(0, TOTAL)).toBe('0.0000 1.0000 0.3 0.3')
+    expect(win(0, legStart(1))).toBe(`0.0000 ${(legStart(1) / SCROLL_TOTAL).toFixed(4)} 0.3 0.3`)
     expect(win(-1, TOTAL * 2, 0, 0.5)).toBe('0.0000 1.0000 0 0.5')
   })
 
@@ -71,5 +110,31 @@ describe('the handscroll track', () => {
       expect(existsSync(resolve('public/makimono', `${p}.avif`)), `${p}.avif`).toBe(true)
       expect(existsSync(resolve('public/makimono', `${p}.webp`)), `${p}.webp`).toBe(true)
     }
+  })
+
+  it('keeps the seasons copy up through the third tree', () => {
+    const autumn = PLATES.find(p => p.src === 'm-autumn')!
+    expect(windowOpacity(autumn.at, WINDOWS.seasons)).toBe(1)
+  })
+
+  it('keeps the nursery copy up until the last specimen is centred', () => {
+    expect(windowOpacity(hungAt(3), WINDOWS.nursery)).toBe(1)
+  })
+
+  it('holds the bench copy for at least a viewport of scroll', () => {
+    const [from = 0, to = 0, rIn = 0, rOut = 0] = WINDOWS.bench.split(' ').map(Number)
+    expect((to - from) * (1 - rIn - rOut) * SCROLL_TOTAL).toBeGreaterThanOrEqual(1.5)
+  })
+
+  it('hangs the specimens inside the nursery, with room between the bigger phone cards', () => {
+    for (const portrait of [false, true]) {
+      for (let i = 0; i < 4; i++) {
+        expect(hungAt(i, portrait)).toBeGreaterThan(legStart(4))
+        expect(hungAt(i, portrait)).toBeLessThan(legStart(5))
+      }
+    }
+    // centre-to-centre travel, in band-heights; the portrait card is 0.4 band-h wide
+    const gap = RATE.front * SPEED * (hungAt(1, true) - hungAt(0, true))
+    expect(gap).toBeGreaterThan(0.45)
   })
 })

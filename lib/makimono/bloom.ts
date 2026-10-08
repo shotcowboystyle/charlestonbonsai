@@ -90,7 +90,7 @@ void main() {
   float leave = 1.0 - smoothstep(0.15, 0.95, uP2);
   float settle = 1.0 - 0.75 * smoothstep(0.0, 1.0, uP2);
 
-  float f2 = uP2 * 0.64 - 0.02;
+  float f2 = uP2 * 1.5 - 0.02;
   float photoLive = uHasPhoto * step(0.0005, uP2);
   float hole = photoLive * smoothstep(f2 + 0.01, f2 - 0.035, a) * edge;
   float ring = photoLive * 0.7 * exp(-pow((a - f2) / 0.018, 2.0)) * edge;

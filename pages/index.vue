@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type Lenis from 'lenis'
 import type { Bloom } from '~/lib/makimono/bloom'
 import type { ScrollCraftInstance } from '~/lib/makimono/engine'
 import type { Plane } from '~/lib/makimono/track'
@@ -9,6 +10,7 @@ import { Enso } from '~/lib/makimono/enso'
 import {
   dryness,
   FINALE,
+  hungAt,
   LEGS,
   legStart,
   MISTS,
@@ -18,10 +20,14 @@ import {
   RATE,
   restTime,
   screenX,
+  SCROLL_TOTAL,
+  scrollAt,
   SPEED,
   strokeProgress,
   TOTAL,
-  win,
+  trackAt,
+  WINDOWS as W,
+  windowIn,
   windowOpacity,
 } from '~/lib/makimono/track'
 import { TREE_SIZE_LABELS } from '~/types'
@@ -67,30 +73,12 @@ const SEASONS = (['春', '夏', '秋', '冬'] as const).map((kanji, i) => ({
   at: PLATES.find(p => p.src === ['m-spring', 'm-summer', 'm-autumn', 'm-winter'][i])?.at ?? 0,
 }))
 
-function hungAt(i: number): number {
-  return legStart(4) + 0.75 + i * 0.42
-}
-
 function metaLine(tree: PublicTree): string {
   return [
     tree.age ? `${tree.age} yrs` : null,
     tree.height ? `${tree.height} cm` : null,
     TREE_SIZE_LABELS[tree.size] ?? tree.size,
   ].filter(Boolean).join(' · ')
-}
-
-/** Copy windows, in track time. Each block gets one, and its scrim shares it. */
-const W = {
-  hero: win(0, 0.95, 0, 0.55),
-  hand: win(legStart(1) - 0.05, legStart(2)),
-  seasons: win(legStart(2) + 0.15, legStart(3) - 0.1),
-  veil: win(PEAK.veilFrom, PEAK.veilTo, 0.12, 0.14),
-  peak: win(PEAK.show, PEAK.hide, 0.03, 0.12),
-  real: win(PEAK.photoFrom + 0.25, PEAK.hide, 0.3, 0.15),
-  nursery: win(legStart(4) + 0.25, legStart(5) - 0.1),
-  bench: win(legStart(5) + 0.15, legStart(6) - 0.05),
-  // the engine's "finale": in from 0.4 of the last leg, holds to the end
-  finale: win(legStart(6) + 0.4 * LEGS[6]!.w, TOTAL, 0.55, 0),
 }
 
 /** Ticks around the ensō where each waypoint begins. */
@@ -119,8 +107,11 @@ function goTo(i: number) {
   if (!leg || !flightEl.value)
     return
   routeEl.value?.hidePopover?.()
-  const top = flightEl.value.offsetTop + (legStart(i) + leg.rest) * window.innerHeight
-  window.scrollTo({ top, behavior: reduced.value ? 'auto' : 'smooth' })
+  const top = flightEl.value.offsetTop + scrollAt(legStart(i) + leg.rest) * window.innerHeight
+  if (lenis)
+    lenis.scrollTo(top)
+  else
+    window.scrollTo({ top, behavior: reduced.value ? 'auto' : 'smooth' })
 }
 
 // ---------------------------------------------------------------------------
@@ -131,6 +122,8 @@ interface Item {
   el: HTMLElement
   plane: Plane
   at: number
+  /** Anchor on portrait phones. */
+  atm: number
   x: number
   xm: number
   /** Offset from the anchor, in band-heights. */
@@ -145,6 +138,7 @@ let engine: ScrollCraftInstance | null = null
 let enso: Enso | null = null
 let bloom: Bloom | null = null
 let raf = 0
+let lenis: Lenis | null = null
 let themeObserver: MutationObserver | null = null
 const cleanups: Array<() => void> = []
 
@@ -174,6 +168,16 @@ onMounted(async () => {
     return // navigated away while the engine loaded
   engine = scrollcraft.mount(root, { lerp: 0.12 })
 
+  // The scroll itself glides: wheel input eases toward its target instead of
+  // jumping, so a flick cannot throw the visitor past a scene. Touch keeps its
+  // native momentum. Reduced motion keeps native scrolling.
+  if (!reduced.value) {
+    const { default: LenisCtor } = await import('lenis')
+    if (!rootEl.value)
+      return
+    lenis = new LenisCtor({ lerp: 0.08, autoRaf: false })
+  }
+
   // A webfont swapping in changes every copy block's height, and some early
   // loads report innerHeight as 0; one resize after both settles the spacer.
   const relayout = () => dispatchEvent(new Event('resize'))
@@ -188,6 +192,7 @@ onMounted(async () => {
       el,
       plane: d.mkPlane as Plane,
       at: Number(d.mkAt),
+      atm: Number(d.mkAtm ?? d.mkAt),
       x: Number(d.mkX),
       xm: Number(d.mkXm ?? d.mkX),
       dx: Number(d.mkDx ?? 0),
@@ -258,6 +263,14 @@ onMounted(async () => {
     op: -1,
   }))
 
+  // The engine drifts copy upward across its whole window; it rises while it
+  // fades in and then holds still instead (the CSS turns the engine's transform off).
+  const copies = [...root.querySelectorAll<HTMLElement>('[data-sc-copy]')].map(el => ({
+    el,
+    spec: el.dataset.scWindow === 'finale' ? W.finale : el.dataset.scWindow ?? '',
+    rise: -1,
+  }))
+
   // ---- the ensō ----------------------------------------------------------
   if (ensoCanvas.value) {
     enso = new Enso(ensoCanvas.value, '#1d211c')
@@ -323,10 +336,14 @@ onMounted(async () => {
     const host = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-mk-t]')
     if (!host)
       return
-    const t = Number(host.dataset.mkT)
+    const t = Number((portrait && host.dataset.mkTm) || host.dataset.mkT)
     // Instant: the page's smooth scrolling would leave the focus ring on an
     // invisible element for the whole glide.
-    window.scrollTo({ top: flightTop + t * vh, behavior: 'instant' })
+    const top = flightTop + scrollAt(t) * vh
+    if (lenis)
+      lenis.scrollTo(top, { immediate: true })
+    else
+      window.scrollTo({ top, behavior: 'instant' })
     // Let the engine re-read now rather than on its next scroll event, so the
     // focused block is legible the moment the ring lands on it.
     dispatchEvent(new Event('scroll'))
@@ -337,14 +354,16 @@ onMounted(async () => {
   // ---- loop ---------------------------------------------------------------
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame)
+    lenis?.raf(now)
     const dt = Math.min(now - then, 64) / 1000
     then = now
-    const raw = Math.min(Math.max((window.scrollY - flightTop) / Math.max(vh, 1), 0), TOTAL)
+    const raw = trackAt(Math.min(Math.max((window.scrollY - flightTop) / Math.max(vh, 1), 0), SCROLL_TOTAL))
     const inst = Math.abs(raw - rawPrev) / Math.max(dt, 1e-3)
     rawPrev = raw
     speed += (inst - speed) * 0.08
-    // The world rides a damped playhead so wheel judder never reaches the paper.
-    t = reduced.value ? raw : t + (raw - t) * (1 - (1 - 0.12) ** (dt * 60))
+    // Lenis already glides the scroll; without it the world rides a damped
+    // playhead so wheel judder never reaches the paper.
+    t = reduced.value || lenis ? raw : t + (raw - t) * (1 - (1 - 0.12) ** (dt * 60))
     const dry = dryness(speed)
 
     enso?.extend(strokeProgress(raw), dry)
@@ -377,7 +396,7 @@ onMounted(async () => {
     }
 
     for (const it of items) {
-      const left = screenX(tw, it.at, portrait ? it.xm : it.x, RATE[it.plane], vw, H) + it.dx * H - it.w / 2
+      const left = screenX(tw, portrait ? it.atm : it.at, portrait ? it.xm : it.x, RATE[it.plane], vw, H) + it.dx * H - it.w / 2
       const visible = left < vw + 60 && left + it.w > -60
       if (visible !== it.shown) {
         if (it.focusable) {
@@ -400,6 +419,14 @@ onMounted(async () => {
       if (Math.abs(op - sc.op) > 0.002) {
         sc.el.style.opacity = op.toFixed(3)
         sc.op = op
+      }
+    }
+
+    for (const c of copies) {
+      const rise = reduced.value ? 0 : (1 - windowIn(raw, c.spec)) * 2
+      if (Math.abs(rise - c.rise) > 0.005) {
+        c.el.style.translate = `0 ${rise.toFixed(2)}vh`
+        c.rise = rise
       }
     }
 
@@ -433,6 +460,8 @@ onBeforeUnmount(() => {
   cleanups.forEach(fn => fn())
   themeObserver?.disconnect()
   bloom?.destroy()
+  lenis?.destroy()
+  lenis = null
   engine?.destroy()
   engine = null
   enso = null
@@ -506,10 +535,10 @@ onBeforeUnmount(() => {
 
           <!-- Timing legs for the engine: waypoints and copy windows. They hold no media. -->
           <div
-            v-for="leg in LEGS"
+            v-for="(leg, i) in LEGS"
             :key="leg.key"
             data-sc-segment
-            :data-sc-w="leg.w"
+            :data-sc-w="(scrollAt(legStart(i + 1)) - scrollAt(legStart(i))).toFixed(4)"
             :data-sc-waypoint="leg.label"
             aria-hidden="true"
           />
@@ -640,9 +669,11 @@ onBeforeUnmount(() => {
             class="mk-hung"
             data-mk-plane="front"
             :data-mk-at="hungAt(i)"
+            :data-mk-atm="hungAt(i, true)"
             data-mk-x="0.52"
             data-mk-xm="0.5"
             :data-mk-t="hungAt(i)"
+            :data-mk-tm="hungAt(i, true)"
           >
             <span class="mk-hung__cord" aria-hidden="true" />
             <span class="mk-hung__silk">
@@ -771,6 +802,9 @@ onBeforeUnmount(() => {
   --sc-font-display: var(--font-display);
   --sc-font-text: var(--font-body);
 }
+
+/* The engine stylesheet asks for native smooth scrolling, which fights Lenis. */
+html.lenis { scroll-behavior: auto; }
 </style>
 
 <style scoped>
@@ -975,6 +1009,9 @@ onBeforeUnmount(() => {
   justify-items: start;
 }
 
+/* The engine's copy drift is replaced by the page's rise-on-fade-in (see `copies`). */
+.mk-copy [data-sc-copy] { transform: none !important; }
+
 .mk-block--hero { left: calc(var(--gutter) + 2.5rem); top: 31vh; max-width: 30rem; }
 .mk-block--hand { left: var(--gutter); top: 18vh; }
 .mk-block--seasons { right: var(--gutter); top: 11vh; }
@@ -1133,7 +1170,7 @@ onBeforeUnmount(() => {
 .mk-bloom--still img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .mk-bloom__paint { mix-blend-mode: multiply; }
 .mk-bloom__photo {
-  mask-image: radial-gradient(closest-side, #000 62%, transparent 78%);
+  mask-image: radial-gradient(closest-side, #000 80%, transparent 98%);
 }
 
 /* ----------------------------------------------------------------- ensō -- */
@@ -1321,6 +1358,8 @@ onBeforeUnmount(() => {
   }
 
   .mk-scrim--finale { height: 50svh !important; background: linear-gradient(to top, var(--paper) 86%, transparent); }
+
+  .mk-hung { width: clamp(9.5rem, calc(var(--band-h) * 0.4), 15rem); }
 
   .mk-tategaki { display: none; }
   .mk-h1 { font-size: 2.15rem; }
