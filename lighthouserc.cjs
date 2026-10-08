@@ -11,8 +11,9 @@
 module.exports = {
   ci: {
     collect: {
-      url: ['http://localhost:3100'],
-      // The server comes from the `serve:lhci` package script: lhci autorun
+      url: [`http://127.0.0.1:${process.env.PORT || 3100}`],
+      // PORT is assigned by portless (see the `pl` script) and inherited by the
+      // server. The server comes from the `serve:lhci` package script: lhci autorun
       // passes it as a flag, which overrides any startServerCommand here.
       startServerReadyPattern: 'Listening on',
       numberOfRuns: 3, // median of 3

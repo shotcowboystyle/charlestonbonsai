@@ -227,6 +227,9 @@ importers:
       playwright-core:
         specifier: ^1.63.0
         version: 1.63.0
+      portless:
+        specifier: ^0.15.7
+        version: 0.15.7
       postcss:
         specifier: ^8.5.28
         version: 8.5.28
@@ -5334,6 +5337,12 @@ packages:
 
   pnpm-workspace-yaml@1.9.1:
     resolution: {integrity: sha512-Xj/T2X6DNAWbtk/9UQ0/TJRswltiHZevmcMjqoL7WrpJi67lu3qaslU4+I+zJ8wtwqmuvAE0KkB8rbv2ZdogBg==}
+
+  portless@0.15.7:
+    resolution: {integrity: sha512-fffMnzfwU/0chJmOMmeAOjFouRsZUmdJagxdqE4DATLw83ssAnHX4BzvNqOI5vBgsuvWLX5ZLg63bzs7zdVFNw==}
+    engines: {node: '>=24'}
+    os: [darwin, linux, win32]
+    hasBin: true
 
   postcss-calc@10.1.1:
     resolution: {integrity: sha512-NYEsLHh8DgG/PRH2+G9BTuUdtf9ViS+vdoQ0YA5OQdGsfN4ztiwtDWNtBl9EKeqNMFnIu8IKZ0cLxEQ5r5KVMw==}
@@ -12882,6 +12891,8 @@ snapshots:
   pnpm-workspace-yaml@1.9.1:
     dependencies:
       yaml: 2.9.0
+
+  portless@0.15.7: {}
 
   postcss-calc@10.1.1(postcss@8.5.28):
     dependencies:
