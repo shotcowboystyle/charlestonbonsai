@@ -185,6 +185,19 @@
 
   --max-width-reading: var(--measure-reading);
 
+  /* v4 resolves max-w-* from --spacing-* before --container-*, so the named
+   * spacing keys above would turn max-w-md into a few pixels. --max-width-*
+   * wins over both; point the shared names back at the container scale. */
+  --max-width-3xs: var(--container-3xs);
+  --max-width-2xs: var(--container-2xs);
+  --max-width-xs: var(--container-xs);
+  --max-width-sm: var(--container-sm);
+  --max-width-md: var(--container-md);
+  --max-width-lg: var(--container-lg);
+  --max-width-xl: var(--container-xl);
+  --max-width-2xl: var(--container-2xl);
+  --max-width-3xl: var(--container-3xl);
+
   /* Legacy rounded value stays for unchanged components */
   --radius-4xl: 2rem;
 

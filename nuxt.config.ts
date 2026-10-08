@@ -43,6 +43,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      htmlAttrs: { lang: 'en' },
       title: `${process.env.SITE_NAME || 'Charleston Bonsai'} Gallery`,
       meta: [
         { name: 'description', content: `Premium bonsai trees cultivated with care. Explore the ${process.env.SITE_NAME || 'Charleston Bonsai'} collection of living art.` },
@@ -87,6 +88,10 @@ export default defineNuxtConfig({
 
   // Configure Nitro for server API routes
   nitro: {
+    // Precompressed .br/.gz copies of public assets and prerendered pages, so
+    // the node server (and `pnpm lighthouse:*`) serves them compressed.
+    compressPublicAssets: true,
+
     // Nitro treats node builtins as ESM externals, and its default
     // `requireReturnsDefault: 'auto'` then resolves `require('stream')` to the
     // module *namespace* rather than the CJS module object. Bundled CJS

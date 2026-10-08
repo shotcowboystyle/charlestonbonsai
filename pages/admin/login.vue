@@ -16,8 +16,13 @@ const errors = ref({
   password: '',
 })
 
+// Until hydration the form has no submit handler: a click would do a native
+// GET submit and reload the page, and v-model would wipe anything typed.
+const hydrated = ref(false)
+
 // Redirect if already authenticated
 onMounted(async () => {
+  hydrated.value = true
   if (authStore.isAuthenticated) {
     router.push('/admin')
     return
@@ -92,49 +97,51 @@ async function handleLogin() {
         </h1>
 
         <form @submit.prevent="handleLogin">
-          <div class="space-y-4">
-            <UiInput
-              v-model="email"
-              type="email"
-              label="Email"
-              placeholder="admin@example.com"
-              required
-              :error="errors.email"
-            />
+          <fieldset :disabled="!hydrated">
+            <div class="space-y-4">
+              <UiInput
+                v-model="email"
+                type="email"
+                label="Email"
+                placeholder="admin@example.com"
+                required
+                :error="errors.email"
+              />
 
-            <UiInput
-              v-model="password"
-              type="password"
-              label="Password"
-              placeholder="••••••••"
-              required
-              :error="errors.password"
-            />
-          </div>
+              <UiInput
+                v-model="password"
+                type="password"
+                label="Password"
+                placeholder="••••••••"
+                required
+                :error="errors.password"
+              />
+            </div>
 
-          <!-- Error message -->
-          <div v-if="loginError" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-sm text-red-600">
-              {{ loginError }}
-            </p>
-          </div>
+            <!-- Error message -->
+            <div v-if="loginError" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-sm text-red-600">
+                {{ loginError }}
+              </p>
+            </div>
 
-          <UiButton
-            type="submit"
-            variant="primary"
-            full-width
-            class="mt-6"
-            :loading="loading"
-          >
-            Sign In
-          </UiButton>
+            <UiButton
+              type="submit"
+              variant="primary"
+              full-width
+              class="mt-6"
+              :loading="loading"
+            >
+              Sign In
+            </UiButton>
 
-          <!-- Forgot password link -->
-          <div class="mt-4 text-center">
-            <NuxtLink to="/admin/forgot-password" class="text-sm text-sage hover:text-sage-400 transition-colors">
-              Forgot password?
-            </NuxtLink>
-          </div>
+            <!-- Forgot password link -->
+            <div class="mt-4 text-center">
+              <NuxtLink to="/admin/forgot-password" class="text-sm text-sage hover:text-sage-400 transition-colors">
+                Forgot password?
+              </NuxtLink>
+            </div>
+          </fieldset>
         </form>
       </div>
 

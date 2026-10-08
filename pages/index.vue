@@ -268,17 +268,31 @@ onMounted(async () => {
     bloom?.setInk(readColor(getComputedStyle(root).color))
     last = -1
   }
-  if (bloomCanvas.value) {
+  // WebGL setup (context, shader compile, texture upload) costs ~1s of main
+  // thread, so it waits until the visitor heads for the peak instead of
+  // blocking first paint. Leaves ample lead: the peak is legs away.
+  let bloomStarted = false
+  const startBloom = async () => {
+    bloomStarted = true
+    if (!bloomCanvas.value)
+      return
+    let b: Bloom | null
     try {
-      bloom = await createBloom(bloomCanvas.value, '/makimono/b-tree.jpg', '/makimono/b-bloom.jpg')
+      b = await createBloom(bloomCanvas.value, '/makimono/b-tree.jpg', '/makimono/b-bloom.jpg')
     }
     catch {
       // Safe to continue: a GPU that cannot compile the shader gets the static
       // figure (painting and photograph), which tells the same story without motion.
-      bloom = null
+      b = null
     }
+    if (!rootEl.value) {
+      b?.destroy() // navigated away while the bloom loaded
+      return
+    }
+    bloom = b
     webgl.value = Boolean(bloom)
     if (bloom) {
+      bloom.resize()
       setBloomColors()
       const photo = peakTree.value?.thumbnail || FALLBACK_PHOTO
       // Safe to fall back: a catalog photo that fails to load is replaced by the
@@ -336,6 +350,9 @@ onMounted(async () => {
     enso?.extend(strokeProgress(raw), dry)
     if (enso?.busy)
       enso.tick()
+
+    if (!bloomStarted && raw > PEAK.show - 1.5)
+      void startBloom()
 
     if (Math.abs(t - last) < 1e-4)
       return
@@ -436,7 +453,9 @@ onBeforeUnmount(() => {
         data-sc-lerp="0.12"
       >
         <!-- The world. Decorative paint; every word lives in the copy layer. -->
-        <div data-sc-world class="mk-world">
+        <!-- The sc-* classes are what the engine adds on mount; rendering them up
+             front pins the stage on first paint instead of after the script. -->
+        <div data-sc-world class="sc-world mk-world">
           <div ref="paperEl" class="mk-paper" aria-hidden="true" />
 
           <div ref="bandEl" class="mk-band">
@@ -496,7 +515,7 @@ onBeforeUnmount(() => {
           />
         </div>
 
-        <div data-sc-world-copy class="mk-copy">
+        <div data-sc-world-copy class="sc-world__copy mk-copy">
           <!-- Paper mist behind each block. Siblings of the copy and not copy blocks
                themselves, so the contrast pass photographs them as part of the backdrop.
                They fade on the same windows as their text (see windowOpacity). -->
@@ -694,7 +713,7 @@ onBeforeUnmount(() => {
           </section>
         </div>
 
-        <div data-sc-spacer aria-hidden="true" />
+        <div data-sc-spacer class="sc-world__spacer" aria-hidden="true" />
       </div>
     </main>
 
