@@ -13,7 +13,6 @@
  * lockup that reads like a startup mark.
  */
 const route = useRoute()
-const { siteName } = useSite()
 
 const navLinks = [
   { to: '/', label: 'Index' },
@@ -76,13 +75,7 @@ function closeMenu() {
     <nav class="cb-nav__inner" aria-label="Primary">
       <div class="cb-nav__row">
         <NuxtLink to="/" class="cb-nav__wordmark" @click="closeMenu">
-          <span class="cb-nav__mark" aria-hidden="true">
-            <span class="cb-nav__bracket cb-nav__bracket--open">[</span>
-            <span class="cb-nav__monogram">CB</span>
-            <span class="cb-nav__bracket cb-nav__bracket--close">]</span>
-          </span>
-          <span class="cb-nav__rule" aria-hidden="true" />
-          <span class="cb-nav__name">{{ siteName }}</span>
+          <UiBrandLogo class="cb-nav__logo" />
         </NuxtLink>
 
         <div class="cb-nav__links">
@@ -184,66 +177,16 @@ function closeMenu() {
 }
 
 /* --------------------------------------------------------
-   WORDMARK — bracketed monogram + hairline rule + name
+   WORDMARK — brand logo
    -------------------------------------------------------- */
 .cb-nav__wordmark {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
   text-decoration: none;
-  color: var(--text);
 }
 
-.cb-nav__mark {
-  display: inline-flex;
-  align-items: baseline;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1rem;
-  letter-spacing: 0.02em;
-  color: var(--text);
-  line-height: 1;
-}
-
-.cb-nav__bracket {
-  color: var(--accent);
-  font-style: normal;
-  font-weight: 400;
-}
-
-.cb-nav__bracket--open {
-  margin-right: 0.075em;
-}
-
-.cb-nav__bracket--close {
-  margin-left: 0.075em;
-}
-
-.cb-nav__monogram {
-  font-feature-settings: 'smcp' 1;
-  letter-spacing: 0.08em;
-}
-
-.cb-nav__rule {
-  display: inline-block;
-  width: 1px;
-  height: 1rem;
-  background: var(--border-hair);
-}
-
-.cb-nav__name {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 0.9375rem;
-  color: var(--text);
-  line-height: 1;
-}
-
-@media (max-width: 480px) {
-  .cb-nav__rule,
-  .cb-nav__name {
-    display: none;
-  }
+.cb-nav__logo {
+  height: 1.75rem;
 }
 
 /* --------------------------------------------------------

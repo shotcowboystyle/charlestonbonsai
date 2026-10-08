@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 const router = useRouter()
-const { siteName } = useSite()
 
 // Compute page title from route
 const route = useRoute()
@@ -56,16 +55,9 @@ onMounted(async () => {
         <!-- Logo -->
         <div class="p-6 border-b border-stone-200">
           <NuxtLink to="/admin" class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-forest rounded-lg flex items-center justify-center">
-              <span class="text-white text-xl">🌲</span>
-            </div>
-            <div>
-              <div class="font-serif font-semibold text-charcoal">
-                {{ siteName }}
-              </div>
-              <div class="text-xs text-stone-500">
-                Admin Panel
-              </div>
+            <UiBrandLogo fixed class="h-8" />
+            <div class="text-xs text-stone-500">
+              Admin Panel
             </div>
           </NuxtLink>
         </div>

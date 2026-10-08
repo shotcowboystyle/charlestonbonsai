@@ -104,7 +104,7 @@ async function handleSubmit() {
       <!-- Logo -->
       <div class="text-center mb-8">
         <NuxtLink to="/" class="inline-block">
-          <span class="text-3xl font-serif font-bold text-forest">{{ siteName }}</span>
+          <UiBrandLogo variant="wordmark" fixed class="h-10" />
         </NuxtLink>
       </div>
 

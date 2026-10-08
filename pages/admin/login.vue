@@ -5,7 +5,6 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const router = useRouter()
-const { siteName } = useSite()
 
 const email = ref('')
 const password = ref('')
@@ -76,16 +75,9 @@ async function handleLogin() {
       <!-- Logo -->
       <div class="text-center mb-8">
         <NuxtLink to="/" class="inline-flex items-center gap-3">
-          <div class="w-12 h-12 bg-forest rounded-lg flex items-center justify-center">
-            <span class="text-2xl">🌲</span>
-          </div>
-          <div class="text-left">
-            <div class="font-serif text-xl font-semibold text-charcoal">
-              {{ siteName }}
-            </div>
-            <div class="text-xs text-stone-500">
-              Admin Portal
-            </div>
+          <UiBrandLogo fixed class="h-10" />
+          <div class="text-xs text-stone-500 text-left">
+            Admin Portal
           </div>
         </NuxtLink>
       </div>

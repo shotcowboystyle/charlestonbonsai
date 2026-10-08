@@ -49,9 +49,13 @@ export default defineNuxtConfig({
         { name: 'description', content: `Premium bonsai trees cultivated with care. Explore the ${process.env.SITE_NAME || 'Charleston Bonsai'} collection of living art.` },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { charset: 'utf-8' },
+        { name: 'theme-color', content: '#F4F0E7' },
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', href: '/favicon.ico', sizes: '32x32' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         // Sumi-e atelier type system. Cardo (Renaissance-revival serif with
