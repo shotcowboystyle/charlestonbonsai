@@ -39,16 +39,17 @@ interface InquiryResponse {
   field?: FieldKey
 }
 
-const { siteName, contactEmail } = useSite()
+const { contactEmail } = useSite()
 
-useHead({
-  title: `Retreats — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: 'Multi-day bonsai workshops at a private house in the Blue Ridge. Packages bundle lodging, time at the bench, and a finished specimen to bring home.',
-    },
-  ],
+useSeo({
+  title: 'Retreats',
+  description: 'Multi-day bonsai workshops at a private house in the Blue Ridge. Packages bundle lodging, time at the bench, and a finished specimen to bring home.',
+})
+
+useServiceSchema({
+  name: 'Bonsai retreats',
+  description: 'Multi-day bonsai workshops at a private house in the Blue Ridge, bundling lodging, time at the bench, and a finished specimen to bring home.',
+  areaServed: 'Blue Ridge Mountains',
 })
 
 const currentYear = new Date().getFullYear()

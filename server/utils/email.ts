@@ -2,7 +2,7 @@
 // different name and domain. Email prefixes (hello/noreply) are derived from
 // SITE_DOMAIN; EMAIL_FROM and STUDIO_EMAIL still override when set.
 const siteName = () => process.env.SITE_NAME || 'Charleston Bonsai'
-const siteDomain = () => process.env.SITE_DOMAIN || 'charlestonbonsai.com'
+const siteDomain = () => process.env.SITE_DOMAIN || 'charlestonbonsaico.com'
 
 /**
  * Inquiry payload from the /events landing page.

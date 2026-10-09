@@ -6,7 +6,7 @@ import { CARE_LEVEL_LABELS, TREE_SIZE_SHORT_LABELS, TREE_TYPE_LABELS } from '~/t
 
 const route = useRoute()
 const slug = route.params.id as string
-const { siteName, contactEmail } = useSite()
+const { contactEmail } = useSite()
 
 const { data: fetched, error: fetchError } = await useFetch<PublicTree>(`/api/trees/${slug}`)
 
@@ -25,15 +25,7 @@ if (fetchError.value || !fetched.value) {
 // PublicTree from this point on. The cast lets the template skip null checks.
 const tree = fetched as Ref<PublicTree>
 
-useHead({
-  title: `${tree.value.name} — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: tree.value.shortDescription || `${tree.value.name} — a specimen from the ${siteName} catalog.`,
-    },
-  ],
-})
+useProductSeo(tree.value)
 
 // ── images ──────────────────────────────────────────────────────────────
 

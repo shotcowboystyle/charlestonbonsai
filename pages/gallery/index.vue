@@ -2,16 +2,9 @@
 import type { PublicTreesResponse } from '~/server/api/trees/list.get'
 import type { FilterState, PublicTree } from '~/types'
 
-const { siteName } = useSite()
-
-useHead({
-  title: `Catalog — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: 'Working catalog of bonsai specimens cultivated and trained by hand in Charleston, South Carolina.',
-    },
-  ],
+useSeo({
+  title: 'Catalog',
+  description: 'Working catalog of bonsai specimens cultivated and trained by hand in Charleston, South Carolina.',
 })
 
 // ── state ───────────────────────────────────────────────────────────────

@@ -23,14 +23,15 @@ interface InquiryResponse {
 
 const { siteName, contactEmail } = useSite()
 
-useHead({
-  title: `Events — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: 'Bonsai composed for weddings, private dinners, and hospitality installs in the Lowcountry. Every event built from scratch and tended through the evening.',
-    },
-  ],
+useSeo({
+  title: 'Events',
+  description: 'Bonsai composed for weddings, private dinners, and hospitality installs in the Lowcountry. Every event built from scratch and tended through the evening.',
+})
+
+useServiceSchema({
+  name: 'Event bonsai',
+  description: 'Bonsai composed for weddings, private dinners, and hospitality installs, built from scratch and tended through the evening.',
+  areaServed: 'Lowcountry, South Carolina',
 })
 
 const currentYear = new Date().getFullYear()

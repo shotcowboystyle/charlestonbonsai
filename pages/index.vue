@@ -49,6 +49,7 @@ useSeo({
   title: 'Bonsai, shaped by hand in Charleston',
   description: 'Over twenty years at the bench and around two hundred trees in the nursery. Specimen bonsai trained by hand in Charleston, South Carolina. Visits by appointment.',
 })
+useBusinessSchema()
 
 const KANJI = `盆栽${LEGS.map(l => l.kanji).join('')}`
 
