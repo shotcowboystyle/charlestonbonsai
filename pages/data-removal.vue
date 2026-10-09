@@ -3,14 +3,9 @@ definePageMeta({ layout: 'legal' })
 
 const { siteName } = useSite()
 
-useHead({
-  title: `Data Removal — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: `Request removal of your personal information from ${siteName}. We confirm within 5 business days and complete the removal within 30 days.`,
-    },
-  ],
+useSeo({
+  title: 'Data Removal',
+  description: `Request removal of your personal information from ${siteName}. We confirm within 5 business days and complete the removal within 30 days.`,
 })
 
 // Email assembled at runtime so it never appears as a plain string in source.

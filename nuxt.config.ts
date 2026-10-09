@@ -44,7 +44,7 @@ export default defineNuxtConfig({
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY || 'sb_publishable_ERYNxpVpCDlF17CT_VwCgg_ogPIzCg7',
       siteUrl: process.env.SITE_URL || 'http://localhost:3000',
       siteName: process.env.SITE_NAME || 'Charleston Bonsai',
-      siteDomain: process.env.SITE_DOMAIN || 'charlestonbonsai.com',
+      siteDomain: process.env.SITE_DOMAIN || 'charlestonbonsaico.com',
       // Set via NUXT_PUBLIC_GA_MEASUREMENT_ID. Empty disables analytics.
       gaMeasurementId: '',
     },
@@ -85,6 +85,12 @@ export default defineNuxtConfig({
       ],
     },
     pageTransition: { name: 'page', mode: 'out-in' },
+  },
+
+  // robots.txt disallows crawling /admin; this keeps any linked admin URL out
+  // of the index too.
+  routeRules: {
+    '/admin/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
   },
 
   pinia: {

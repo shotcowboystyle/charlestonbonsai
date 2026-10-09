@@ -3,14 +3,9 @@ definePageMeta({ layout: 'legal' })
 
 const { siteName, siteDomain, contactEmail, contactMailto } = useSite()
 
-useHead({
-  title: `Terms of Service — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: `The terms that govern use of the ${siteName} website, the catalog, and any inquiries or purchases conducted through us.`,
-    },
-  ],
+useSeo({
+  title: 'Terms of Service',
+  description: `The terms that govern use of the ${siteName} website, the catalog, and any inquiries or purchases conducted through us.`,
 })
 </script>
 

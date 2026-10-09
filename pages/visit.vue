@@ -3,14 +3,9 @@ import heroImage from '~/assets/images/visit-the-nursery.jpg'
 
 const { siteName, contactEmail, contactMailto } = useSite()
 
-useHead({
-  title: `Visit — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: `Visits to the ${siteName} nursery are by appointment, Tuesday through Saturday. Specimens viewed by request.`,
-    },
-  ],
+useSeo({
+  title: 'Visit',
+  description: `Visits to the ${siteName} nursery are by appointment, Tuesday through Saturday. Specimens viewed by request.`,
 })
 
 const currentYear = new Date().getFullYear()

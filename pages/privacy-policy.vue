@@ -3,14 +3,9 @@ definePageMeta({ layout: 'legal' })
 
 const { siteName, siteDomain, contactEmail, contactMailto } = useSite()
 
-useHead({
-  title: `Privacy Policy — ${siteName}`,
-  meta: [
-    {
-      name: 'description',
-      content: `How ${siteName} collects, uses, and protects information from visitors to the catalog and from inquiries received by email or social media.`,
-    },
-  ],
+useSeo({
+  title: 'Privacy Policy',
+  description: `How ${siteName} collects, uses, and protects information from visitors to the catalog and from inquiries received by email or social media.`,
 })
 </script>
 

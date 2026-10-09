@@ -6,6 +6,7 @@ import {
   readBody,
   readMultipartFormData,
   sendRedirect,
+  setHeader,
   setResponseStatus,
 } from 'h3'
 import { afterEach, vi } from 'vitest'
@@ -25,7 +26,7 @@ export const testRuntimeConfig = {
     supabaseAnonKey: 'test-anon-key',
     siteUrl: 'http://localhost:3000',
     siteName: 'Charleston Bonsai',
-    siteDomain: 'charlestonbonsai.com',
+    siteDomain: 'charlestonbonsaico.com',
   },
 }
 
@@ -42,6 +43,7 @@ vi.stubGlobal('getRouterParam', getRouterParam)
 vi.stubGlobal('readBody', readBody)
 vi.stubGlobal('readMultipartFormData', readMultipartFormData)
 vi.stubGlobal('sendRedirect', sendRedirect)
+vi.stubGlobal('setHeader', setHeader)
 vi.stubGlobal('setResponseStatus', setResponseStatus)
 
 // server/utils/* is auto-imported by Nitro too. Using the real implementation
