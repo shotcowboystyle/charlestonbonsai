@@ -95,6 +95,7 @@ BLOB_READ_WRITE_TOKEN     # Vercel Blob uploads
 ADMIN_EMAIL               # Default admin email
 ADMIN_PASSWORD_HASH       # bcrypt hash (overrides schema default)
 SITE_URL                  # For email links
+NUXT_PUBLIC_GA_MEASUREMENT_ID  # GA4 ID (G-XXXX), loaded via Partytown; empty disables analytics
 ```
 
 ## Code Conventions

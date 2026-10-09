@@ -10,7 +10,14 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@nuxt/eslint',
+    '@nuxtjs/partytown',
   ],
+
+  // GA4 runs in a Partytown web worker (see plugins/gtag.ts) so gtag.js stays
+  // off the main thread. `forward` stubs these on window and relays calls in.
+  partytown: {
+    forward: ['dataLayer.push', 'gtag'],
+  },
 
   // Tailwind v4 ships as a Vite plugin; the theme lives in the CSS entry
   // (assets/css/main.css), not in a tailwind.config.ts.
@@ -38,6 +45,8 @@ export default defineNuxtConfig({
       siteUrl: process.env.SITE_URL || 'http://localhost:3000',
       siteName: process.env.SITE_NAME || 'Charleston Bonsai',
       siteDomain: process.env.SITE_DOMAIN || 'charlestonbonsai.com',
+      // Set via NUXT_PUBLIC_GA_MEASUREMENT_ID. Empty disables analytics.
+      gaMeasurementId: '',
     },
   },
 
