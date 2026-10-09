@@ -8,6 +8,16 @@
       "description": "@nuxt/test-utils peer-requires vitest ^4. Release the ceiling once it supports vitest 5.",
       "matchPackageNames": ["vitest", "@vitest/coverage-v8"],
       "allowedVersions": "<5"
+    },
+    {
+      "description": "typescript-eslint peer-requires typescript <6.1 and vue-tsc needs the JS compiler API. Release the ceiling once both support TS 7.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
+      "description": "h3 must match the version Nitro 2 bundles (^1); the test stubs use it as the real Nitro runtime. Release the ceiling when moving to Nitro 3.",
+      "matchPackageNames": ["h3"],
+      "allowedVersions": "<2"
     }
   ]
 }
