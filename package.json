@@ -69,7 +69,7 @@
     "h3": "^1.15.11",
     "happy-dom": "^20.14.0",
     "lighthouse": "^13.5.0",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.0",
     "playwright-core": "^1.64.0",
     "portless": "^0.15.7",
     "postcss": "^8.5.29",
