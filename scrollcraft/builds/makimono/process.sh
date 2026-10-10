@@ -27,6 +27,13 @@ plane() { # name maxheight [alpha gain]
   # AVIF first (about half the bytes), WebP as the fallback for older Safari
   magick "/tmp/mk-$n.png" -quality 55 "$DEST/$n.avif"
   magick "/tmp/mk-$n.png" -quality 70 -define webp:alpha-quality=70 -define webp:method=6 "$DEST/$n.webp"
+  # Narrower copies for srcset: a plate is drawn at band height x ratio, often far below full size.
+  local w; w=$(magick identify -format '%w' "/tmp/mk-$n.png")
+  for vw in 800 1600; do
+    [ "$w" -gt "$vw" ] || continue
+    magick "/tmp/mk-$n.png" -resize "${vw}x" -quality 55 "$DEST/$n-$vw.avif"
+    magick "/tmp/mk-$n.png" -resize "${vw}x" -quality 70 -define webp:alpha-quality=70 -define webp:method=6 "$DEST/$n-$vw.webp"
+  done
   echo "$n paper<${hi}% $(magick identify -format '%w %h' "$DEST/$n.webp") avif=$(du -k "$DEST/$n.avif" | cut -f1)KB webp=$(du -k "$DEST/$n.webp" | cut -f1)KB"
 }
 

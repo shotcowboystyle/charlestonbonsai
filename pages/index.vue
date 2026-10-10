@@ -16,6 +16,8 @@ import {
   MISTS,
   PEAK,
   PLATES,
+  plateSizes,
+  plateSrcset,
   ramp,
   RATE,
   restTime,
@@ -51,13 +53,22 @@ useSeo({
 })
 useBusinessSchema()
 
-const KANJI = `盆栽${LEGS.map(l => l.kanji).join('')}`
+/** The opening scene's painting, the largest paint on first load. */
+const LCP_PLATE = PLATES.find(p => p.at === 0 && p.plane === 'mid')!
 
 useHead({
   link: [
     { rel: 'stylesheet', href: ENGINE_CSS },
-    { rel: 'stylesheet', href: `https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=${encodeURIComponent(KANJI)}&display=swap` },
-    { rel: 'preload', as: 'image', href: '/makimono/m-pine.avif', type: 'image/avif' },
+    // The LCP plate. imagesrcset/imagesizes must match its <img> so both share one request.
+    {
+      rel: 'preload',
+      as: 'image',
+      type: 'image/avif',
+      href: `/makimono/${LCP_PLATE.src}.avif`,
+      imagesrcset: plateSrcset(LCP_PLATE.src),
+      imagesizes: plateSizes(LCP_PLATE),
+      fetchpriority: 'high',
+    },
   ],
 })
 
@@ -496,10 +507,12 @@ onBeforeUnmount(() => {
               class="mk-plate"
               :class="`mk-plate--${p.plane}`"
               :src="`/makimono/${p.src}.avif`"
+              :srcset="plateSrcset(p.src)"
+              :sizes="plateSizes(p)"
               alt=""
               aria-hidden="true"
               decoding="async"
-              :fetchpriority="p.at < 1 ? 'high' : 'low'"
+              :fetchpriority="p === LCP_PLATE ? 'high' : Math.abs(RATE[p.plane] * SPEED * p.at) < 1.2 ? 'auto' : 'low'"
               :style="{ '--h': p.h, '--y': p.y, '--r': p.ratio, '--x': p.x, '--xm': p.xm ?? p.x, '--dx0': -RATE[p.plane] * SPEED * p.at }"
               :data-first="Math.abs(RATE[p.plane] * SPEED * p.at) < 1.2 ? '' : undefined"
               :data-mk-plane="p.plane"
@@ -508,7 +521,7 @@ onBeforeUnmount(() => {
               :data-mk-xm="p.xm ?? p.x"
               :data-mk-flip="p.flip ? 1 : 0"
               :data-fade="p.fade"
-              @error="(e: Event) => ((e.target as HTMLImageElement).src = `/makimono/${p.src}.webp`)"
+              @error="(e: Event) => Object.assign(e.target as HTMLImageElement, { srcset: plateSrcset(p.src, 'webp'), src: `/makimono/${p.src}.webp` })"
             >
 
             <div

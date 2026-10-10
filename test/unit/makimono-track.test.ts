@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { dryness, FINALE, hungAt, LEGS, legStart, PEAK, PLATES, RATE, restTime, screenX, SCROLL_TOTAL, scrollAt, SPEED, strokeProgress, TOTAL, trackAt, win, windowIn, windowOpacity, WINDOWS } from '~/lib/makimono/track'
+import { dryness, FINALE, hungAt, LEGS, legStart, PEAK, PLATE_WIDTHS, PLATES, plateSizes, plateSrcset, RATE, restTime, screenX, SCROLL_TOTAL, scrollAt, SPEED, strokeProgress, TOTAL, trackAt, win, windowIn, windowOpacity, WINDOWS } from '~/lib/makimono/track'
 
 describe('the handscroll track', () => {
   it('lays the legs end to end, and the peak owns the most scroll', () => {
@@ -110,6 +110,22 @@ describe('the handscroll track', () => {
       expect(existsSync(resolve('public/makimono', `${p}.avif`)), `${p}.avif`).toBe(true)
       expect(existsSync(resolve('public/makimono', `${p}.webp`)), `${p}.webp`).toBe(true)
     }
+  })
+
+  it('ships every size its srcset names, in both formats', () => {
+    for (const p of new Set(PLATES.map(p => p.src))) {
+      expect(PLATE_WIDTHS[p], `${p} width`).toBeGreaterThan(0)
+      for (const ext of ['avif', 'webp']) {
+        for (const entry of plateSrcset(p, ext).split(', ')) {
+          const file = entry.split(' ')[0]!
+          expect(existsSync(resolve('public', file.slice(1))), file).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('sizes a plate by its drawn width', () => {
+    expect(plateSizes({ h: 0.5, ratio: 2 })).toBe('(max-aspect-ratio: 4/5) 55vh, 100vh')
   })
 
   it('keeps the seasons copy up through the third tree', () => {

@@ -11,7 +11,21 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxt/eslint',
     '@nuxtjs/partytown',
+    '@nuxt/fonts',
   ],
+
+  // Self-hosted from /_fonts/ at build: no render-blocking third-party CSS.
+  // Sumi-e atelier type system. Cardo (Renaissance-revival serif with
+  // small-caps and oldstyle figures) pairs with Albert Sans (restrained
+  // humanist body). Yuji Syuku brushes the kanji on the home page.
+  fonts: {
+    defaults: { weights: [400], styles: ['normal'] },
+    families: [
+      { name: 'Cardo', provider: 'google', weights: [400, 700], styles: ['normal', 'italic'] },
+      { name: 'Albert Sans', provider: 'google', weights: [300, 400, 500, 600, 700] },
+      { name: 'Yuji Syuku', provider: 'google' },
+    ],
+  },
 
   // GA4 runs in a Partytown web worker (see plugins/gtag.ts) so gtag.js stays
   // off the main thread. `forward` stubs these on window and relays calls in.
@@ -65,13 +79,6 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'manifest', href: '/site.webmanifest' },
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        // Sumi-e atelier type system. Cardo (Renaissance-revival serif with
-        // small-caps and oldstyle figures) pairs with Albert Sans (restrained
-        // humanist body). Legacy Playfair + Outfit families are retired with
-        // the design reset (see .impeccable.md).
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Albert+Sans:wght@300;400;500;600;700&display=swap' },
       ],
       script: [
         // Pre-paint theme bootstrap. Runs synchronously in <head> before
