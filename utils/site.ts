@@ -9,6 +9,8 @@ export const SITE_ADDRESS = {
   addressCountry: 'US',
 } as const
 
+export const SITE_FOUNDING_YEAR = '2015'
+
 export const SITE_SUMMARY = 'Specimen bonsai trained by hand in Charleston, South Carolina. Over twenty years at the bench and around two hundred trees in the nursery. Visits by appointment, Tuesday through Saturday.'
 
 export interface SitePage {
@@ -24,7 +26,6 @@ export const SITE_PAGES: SitePage[] = [
   { path: '/visit', title: 'Visit', description: 'Nursery visits by appointment, Tuesday through Saturday.' },
   { path: '/events', title: 'Events', description: 'Bonsai composed for weddings, private dinners and hospitality installs in the Lowcountry.' },
   { path: '/retreats', title: 'Retreats', description: 'Multi-day bonsai workshops at a private house in the Blue Ridge.' },
-  { path: '/studio', title: 'Bonsai Studio', description: 'Interactive 3D studio: grow and style a bonsai in a Japanese garden.' },
   { path: '/privacy-policy', title: 'Privacy Policy', description: 'How visitor and inquiry information is handled.' },
   { path: '/terms-of-service', title: 'Terms of Service', description: 'Terms governing use of the site and catalog.' },
 ]

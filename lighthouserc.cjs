@@ -8,6 +8,15 @@
  * No `lighthouse:recommended` preset: it errors on every insight audit, so the
  * gate would be red for reasons that are not regressions.
  */
+
+// CI builds point Supabase at a dead port. supabase-js retries connection
+// errors with backoff (~7s per query), and `/` renders per request (ISR), so
+// that wait landed in server response time. Aim the server under test at a
+// 404 path on itself instead, which fails at once. The `serve:lhci` server
+// inherits this process's env. Local runs keep their real Supabase.
+if (process.env.CI)
+  process.env.NUXT_PUBLIC_SUPABASE_URL = `http://127.0.0.1:${process.env.PORT || 3100}/__no-supabase`
+
 module.exports = {
   ci: {
     collect: {

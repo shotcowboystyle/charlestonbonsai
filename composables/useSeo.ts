@@ -1,6 +1,6 @@
 import type { PublicTree } from '~/types'
 import { TREE_TYPE_LABELS } from '~/types'
-import { SITE_SUMMARY } from '~/utils/site'
+import { SITE_FOUNDING_YEAR, SITE_SUMMARY } from '~/utils/site'
 
 export function useSeo(options: {
   title?: string
@@ -129,6 +129,7 @@ export function useBusinessSchema() {
       'image': `${siteUrl}/og-image.jpg`,
       'email': contactEmail,
       'description': SITE_SUMMARY,
+      'foundingDate': SITE_FOUNDING_YEAR,
       'address': { '@type': 'PostalAddress', ...address },
       'areaServed': 'Charleston, South Carolina',
     },

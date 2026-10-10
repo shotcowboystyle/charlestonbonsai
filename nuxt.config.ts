@@ -87,10 +87,28 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
   },
 
-  // robots.txt disallows crawling /admin; this keeps any linked admin URL out
-  // of the index too.
   routeRules: {
+    // robots.txt disallows crawling /admin; this keeps any linked admin URL
+    // out of the index too.
     '/admin/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
+
+    // Pages that read the trees table are cached (ISR on Vercel) and refresh
+    // every 10 minutes, so catalog edits, sales and slug changes reach the
+    // live site without a redeploy. Prerendering them froze a build-time
+    // snapshot: retired slugs kept serving 200 with stale content.
+    '/': { isr: 600 },
+    '/gallery': { isr: 600 },
+    '/gallery/**': { isr: 600 },
+
+    // Slugs renamed in the October 2026 catalog cleanup. Permanent redirects
+    // carry over links and search history from the old URLs.
+    ...Object.fromEntries(Object.entries({
+      'ficus-retusa': 'lagerstroemia-indica',
+      'ficus-ginseng': 'ligustrum',
+      'cedar-of-lebanon': 'chloroleucon-tortum',
+      'trident-maple-forest': 'taxodium-distichum-forest',
+      'bamboo-leaf-ficus': 'planera-aquatica',
+    }).map(([from, to]) => [`/gallery/${from}`, { redirect: { to: `/gallery/${to}`, statusCode: 301 } }])),
   },
 
   pinia: {
@@ -127,11 +145,10 @@ export default defineNuxtConfig({
       requireReturnsDefault: (id: string) => (isBuiltin(id) ? 'preferred' : 'auto'),
     },
 
-    // Don't prerender API routes
+    // Only pages with no database content are prerendered. Catalog pages
+    // use ISR (see routeRules) so they track the trees table.
     prerender: {
-      crawlLinks: true,
-      routes: ['/'],
-      ignore: ['/api'],
+      routes: ['/visit', '/events', '/retreats', '/privacy-policy', '/terms-of-service', '/data-removal'],
     },
   },
 })

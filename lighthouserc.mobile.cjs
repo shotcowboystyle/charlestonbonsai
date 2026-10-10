@@ -5,6 +5,11 @@
  * added), so every threshold here is a warning. Promote to `error` once mobile
  * catches up. Same server and build expectations as lighthouserc.cjs.
  */
+
+// Same CI Supabase redirect as lighthouserc.cjs.
+if (process.env.CI)
+  process.env.NUXT_PUBLIC_SUPABASE_URL = `http://127.0.0.1:${process.env.PORT || 3100}/__no-supabase`
+
 module.exports = {
   ci: {
     collect: {

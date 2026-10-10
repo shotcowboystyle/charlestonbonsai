@@ -36,7 +36,7 @@ Tests live in a top-level `test/` directory, never colocated — Nitro scans `se
 
 Handler tests stub the Nitro auto-imports in `test/setup/nitro-globals.ts` (real h3 implementations; only `defineEventHandler` and `useRuntimeConfig` are faked) and mock `~/server/utils/supabase` — that module is the single injection seam for the database. `test/utils/supabase-mock.ts` models the chainable query builder, including the `.single()` (PGRST116 on empty) vs `.maybeSingle()` (null on empty) difference.
 
-E2E runs against a build whose Supabase URL points at a dead port, so it never touches live data; all API responses come from `page.route` fixtures.
+E2E runs against a build whose Supabase URL points at a 404 path on the app itself (not a dead port: supabase-js retries connection errors for ~7s), so it never touches live data; all API responses come from `page.route` fixtures. `/` and `/gallery` render their tree data on the server (ISR), so in E2E those server fetches fail and the pages fall back to client-side fetches, which the fixtures supply.
 
 Pin `vitest` to `^4` — `@nuxt/test-utils` does not yet support Vitest 5 (enforced by a `packageRules` entry in `renovate.json`).
 

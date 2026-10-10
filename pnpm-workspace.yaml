@@ -53,3 +53,6 @@ onlyBuiltDependencies:
   - esbuild
   - unrs-resolver
   - vue-demi
+
+overrides:
+  "@qwik.dev/partytown": 0.14.5
