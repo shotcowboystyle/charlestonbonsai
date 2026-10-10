@@ -53,11 +53,11 @@ const SIZES = {
   display: none;
 }
 
-:global([data-theme='dark']) .brand-logo:not(.brand-logo--fixed) .brand-logo__img--ink {
+[data-theme='dark'] .brand-logo:not(.brand-logo--fixed) .brand-logo__img--ink {
   display: none;
 }
 
-:global([data-theme='dark']) .brand-logo:not(.brand-logo--fixed) .brand-logo__img--bone {
+[data-theme='dark'] .brand-logo:not(.brand-logo--fixed) .brand-logo__img--bone {
   display: block;
 }
 </style>
