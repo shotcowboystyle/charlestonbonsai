@@ -77,7 +77,8 @@ const SEASONS = (['春', '夏', '秋', '冬'] as const).map((kanji, i) => ({
 function metaLine(tree: PublicTree): string {
   return [
     tree.age ? `${tree.age} yrs` : null,
-    tree.height ? `${tree.height} cm` : null,
+    // Height is free text that already carries its unit (e.g. '8-10 inches').
+    tree.height || null,
     TREE_SIZE_LABELS[tree.size] ?? tree.size,
   ].filter(Boolean).join(' · ')
 }

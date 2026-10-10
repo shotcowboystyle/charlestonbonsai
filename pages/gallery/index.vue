@@ -81,6 +81,25 @@ const countLabel = computed(() => {
 
 // ── fetch ───────────────────────────────────────────────────────────────
 
+function listQuery() {
+  return {
+    page: page.value,
+    pageSize,
+    inStockOnly: true,
+    sizes: filters.value.sizes,
+    careLevels: filters.value.careLevels,
+    treeTypes: filters.value.treeTypes,
+    search: filters.value.search,
+    sortBy: filters.value.sortBy,
+  }
+}
+
+function applyResult(result: PublicTreesResponse, append = false) {
+  trees.value = append ? [...trees.value, ...result.trees] : result.trees
+  total.value = result.total
+  hasMore.value = result.hasMore
+}
+
 async function fetchTrees(append = false) {
   if (append) {
     loadingMore.value = true
@@ -92,26 +111,7 @@ async function fetchTrees(append = false) {
   error.value = null
 
   try {
-    const result = await $fetch<PublicTreesResponse>('/api/trees/list', {
-      query: {
-        page: page.value,
-        pageSize,
-        inStockOnly: true,
-        sizes: filters.value.sizes,
-        careLevels: filters.value.careLevels,
-        treeTypes: filters.value.treeTypes,
-        search: filters.value.search,
-        sortBy: filters.value.sortBy,
-      },
-    })
-
-    if (append)
-      trees.value = [...trees.value, ...result.trees]
-    else
-      trees.value = result.trees
-
-    total.value = result.total
-    hasMore.value = result.hasMore
+    applyResult(await $fetch<PublicTreesResponse>('/api/trees/list', { query: listQuery() }), append)
   }
   catch (e) {
     console.error('Failed to load catalog:', e)
@@ -170,9 +170,21 @@ function clearAll() {
 
 // ── lifecycle ───────────────────────────────────────────────────────────
 
+// The unfiltered first page renders on the server so crawlers and
+// no-JS readers see the specimens and their links. Filter changes refetch
+// client-side through fetchTrees.
+const { data: initial } = await useAsyncData('catalog-initial', () =>
+  $fetch<PublicTreesResponse>('/api/trees/list', { query: listQuery() }))
+if (initial.value) {
+  applyResult(initial.value)
+  pending.value = false
+}
+
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
-  fetchTrees()
+  // Server render failed: let the client retry and surface its own error.
+  if (!initial.value)
+    fetchTrees()
 })
 
 onBeforeUnmount(() => {
@@ -193,9 +205,9 @@ const emptyState = computed<'narrow' | 'zero' | null>(() => {
   <div class="catalog">
     <!-- ───────── masthead ───────── -->
     <header class="catalog__masthead">
-      <p class="catalog__eyebrow">
+      <h1 class="catalog__eyebrow">
         Catalog
-      </p>
+      </h1>
       <p class="catalog__count">
         <span :class="{ 'catalog__count-num--quiet': pending }">{{ countLabel }}</span>
         <span v-if="!pending && !hasActiveFilters" class="catalog__count-tag" aria-hidden="true">· in stock</span>
