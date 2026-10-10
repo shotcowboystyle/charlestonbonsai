@@ -1,17 +1,16 @@
 <script setup lang="ts">
-// Initialize GSAP on client
-const { $gsap } = useNuxtApp()
 const route = useRoute()
 
+// Smooth scroll to in-page anchors, clearing the fixed header.
 function scrollToHash(hash: string) {
   const target = document.querySelector(hash)
-  if (target) {
-    $gsap.to(window, {
-      duration: 0.8,
-      scrollTo: { y: target, offsetY: 80 },
-      ease: 'power2.inOut',
-    })
-  }
+  if (!target)
+    return
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.scrollTo({
+    top: target.getBoundingClientRect().top + window.scrollY - 80,
+    behavior: reduceMotion ? 'auto' : 'smooth',
+  })
 }
 
 onMounted(() => {
@@ -24,15 +23,7 @@ onMounted(() => {
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (e) => {
       e.preventDefault()
-      const hash = anchor.getAttribute('href') as string
-      const target = document.querySelector(hash)
-      if (target) {
-        $gsap.to(window, {
-          duration: 0.8,
-          scrollTo: { y: target, offsetY: 80 },
-          ease: 'power2.inOut',
-        })
-      }
+      scrollToHash(anchor.getAttribute('href') as string)
     })
   })
 })
