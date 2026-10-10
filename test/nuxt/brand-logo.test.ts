@@ -21,4 +21,11 @@ describe('BrandLogo', () => {
     expect(img.attributes('width')).toBe('76')
     expect(img.attributes('height')).toBe('90')
   })
+
+  it('names the logo on the wrapper so it stays named when the ink image is hidden in dark mode', async () => {
+    const wrapper = await mountSuspended(BrandLogo)
+
+    expect(wrapper.attributes('role')).toBe('img')
+    expect(wrapper.attributes('aria-label')).toBeTruthy()
+  })
 })
