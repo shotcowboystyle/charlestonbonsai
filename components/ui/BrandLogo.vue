@@ -17,13 +17,18 @@ const SIZES = {
 </script>
 
 <template>
-  <span class="brand-logo" :class="{ 'brand-logo--fixed': fixed }">
+  <span
+    class="brand-logo"
+    :class="{ 'brand-logo--fixed': fixed }"
+    role="img"
+    :aria-label="siteName"
+  >
     <img
       class="brand-logo__img brand-logo__img--ink"
       :src="`/brand/charleston-bonsai-${variant}-ink.svg`"
       :width="SIZES[variant][0]"
       :height="SIZES[variant][1]"
-      :alt="siteName"
+      alt=""
     >
     <img
       v-if="!fixed"
