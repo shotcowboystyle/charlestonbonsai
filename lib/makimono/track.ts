@@ -153,6 +153,39 @@ export const PLATES: readonly Plate[] = [
   { src: 'n-rocks', plane: 'near', at: TOTAL, x: 0.08, h: 0.22, y: -0.08, ratio: 2.03, flip: true, fade: 'l' },
 ]
 
+/** Full width of each processed asset; process.sh also writes -800 and -1600 copies of anything wider. */
+export const PLATE_WIDTHS: Readonly<Record<string, number>> = {
+  'f-ridges': 2706,
+  'f-marsh': 2768,
+  'm-pine': 2128,
+  'm-hands2': 1525,
+  'm-spring': 1069,
+  'm-summer': 1132,
+  'm-autumn': 1113,
+  'm-winter': 1122,
+  'm-nursery2': 1799,
+  'm-bench': 2405,
+  'm-gate': 2264,
+  'n-rocks': 2436,
+  'n-branch': 1930,
+}
+
+/** srcset over the processed widths, in the given format. */
+export function plateSrcset(src: string, ext = 'avif'): string {
+  const full = PLATE_WIDTHS[src] ?? 0
+  return [800, 1600]
+    .filter(w => full > w)
+    .map(w => `/makimono/${src}-${w}.${ext} ${w}w`)
+    .concat(`/makimono/${src}.${ext} ${full}w`)
+    .join(', ')
+}
+
+/** Drawn width is h x ratio x band height; the band is 55svh on portrait phones, else 100svh. */
+export function plateSizes(p: Pick<Plate, 'h' | 'ratio'>): string {
+  const vh = (band: number) => `${Math.ceil(p.h * p.ratio * band)}vh`
+  return `(max-aspect-ratio: 4/5) ${vh(55)}, ${vh(100)}`
+}
+
 /** Paper-coloured mist veils between the far and mid planes (suyari-gasumi). */
 export const MISTS: readonly { at: number, x: number, w: number, h: number, y: number }[] = [
   { at: 0.4, x: 0.5, w: 1.5, h: 0.3, y: 0.3 },
